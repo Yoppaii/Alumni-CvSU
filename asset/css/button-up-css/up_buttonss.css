@@ -1,0 +1,67 @@
+.back-to-top {
+    display: none; 
+    position: fixed;
+    bottom: 20px;  
+    left: 20px;   /* Changed from right to left */
+    background-color: #388e3c;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    padding: 10px;
+    width: 50px;  
+    height: 50px; 
+    font-size: 20px;  
+    cursor: pointer;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    z-index: 998; /* Added to ensure proper layering */
+}
+
+.back-to-top:hover {
+    background-color: #66bb6a;
+    transform: scale(1.1); 
+}
+
+/* Updated media queries with left positioning */
+@media (max-width: 768px) {
+    .back-to-top {
+        bottom: 15px;
+        left: 15px;    /* Changed from right to left */
+        padding: 8px;   
+        font-size: 18px; 
+        width: 45px;   
+        height: 45px;   
+    }
+}
+
+@media (max-width: 480px) {
+    .back-to-top {
+        bottom: 10px;
+        left: 10px;    /* Changed from right to left */
+        padding: 6px;   
+        font-size: 16px; 
+        width: 40px;   
+        height: 40px;  
+    }
+}
+
+/* Ensure chatbot button stays on the right */
+.chat-floating-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 45px;
+    height: 45px;
+    z-index: 999; /* Added to ensure proper layering */
+}
+
+/* Update chatbot media queries */
+@media (max-width: 480px) {
+    .chat-floating-btn {
+        bottom: 20px;
+        right: 20px;
+        width: 40px;
+        height: 40px;
+    }
+}

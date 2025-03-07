@@ -1,0 +1,38 @@
+# Disable directory listing
+Options -Indexes
+
+RewriteEngine On
+RewriteBase /Alumni-CvSU/
+
+# Error documents
+ErrorDocument 404 /Alumni-CvSU/asset/error/404-error.php
+ErrorDocument 400 /Alumni-CvSU/asset/error/400-error.php
+ErrorDocument 401 /Alumni-CvSU/asset/error/401-error.php
+ErrorDocument 403 /Alumni-CvSU/asset/error/403-error.php
+ErrorDocument 500 /Alumni-CvSU/asset/error/500-error.php
+ErrorDocument 502 /Alumni-CvSU/asset/error/502-error.php
+ErrorDocument 503 /Alumni-CvSU/asset/error/503-error.php
+ErrorDocument 504 /Alumni-CvSU/asset/error/504-error.php
+
+# Block direct access to specific files
+RewriteCond %{REQUEST_URI} \.(json|lock|env|config|log|sql|yml|yaml|xml)$ [NC]
+RewriteRule .* /Alumni-CvSU/asset/error/404-error.php [L]
+
+# Handle directories
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^.*$ /Alumni-CvSU/asset/error/401-error.php [L]
+
+# Handle PHP files without extension
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^(.*?)/?$ /Alumni-CvSU/$1.php [L]
+
+# Remove .php extension from URLs
+RewriteCond %{THE_REQUEST} \s/([a-zA-Z0-9_-]+)\.php [NC]
+RewriteRule ^ /Alumni-CvSU/%1 [R=301,L]
+
+# Catch all rule for non-existing files/pages
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}.php !-f
+RewriteRule ^(.*)$ /Alumni-CvSU/asset/error/404-error.php [L]
