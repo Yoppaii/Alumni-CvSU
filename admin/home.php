@@ -17,17 +17,23 @@ $today = date('Y-m-d');
 </head>
 
 <body>
-    <div class="d-flex align-items-center justify-content-between mb-4">
-        <h5>Analytics</h5>
-        <select class="form-select shadow-none bg-light w-auto" onchange="updateAnalytics(this.value)">
-            <option value=" 1">Today</option>
-            <option value="2">Past 7 Days</option>
-            <option value="3">Past 30 Days</option>
-            <option value="4">Past 90 Days</option>
-            <option value="5">Past 1 Year</option>
-            <option value="6">All time</option>
-        </select>
+    <div class="dashboard-row">
+        <div class="analytics-card">
+            <div class="analytics-header">
+                <h5>Analytics</h5>
+                <select class="form-select shadow-none bg-light w-auto" onchange="updateAnalytics(this.value)">
+                    <option value="1">Today</option>
+                    <option value="2">Past 7 Days</option>
+                    <option value="3">Past 30 Days</option>
+                    <option value="4">Past 90 Days</option>
+                    <option value="5">Past 1 Year</option>
+                    <option value="6">All time</option>
+                </select>
+            </div>
+        </div>
     </div>
+
+
     <div class="dashboard-stats">
         <!-- Users Card -->
         <div class="stat-card">
@@ -62,71 +68,6 @@ $today = date('Y-m-d');
                 <p id="alumni_id_cards_footer"></p>
             </div>
         </div>
-
-        <!-- <div class="stat-card">
-            <div class="stat-header">
-                <i class="fas fa-users"></i>
-                <span>Users</span>
-            </div>
-            <?php
-            $query = "SELECT COUNT(*) as count FROM users WHERE DATE(created_at) = '$today'";
-            $result = $mysqli->query($query);
-            $newUsers = $result->fetch_assoc()['count'];
-
-            $totalQuery = "SELECT COUNT(*) as count FROM users";
-            $totalResult = $mysqli->query($totalQuery);
-            $totalUsers = $totalResult->fetch_assoc()['count'];
-            ?>
-            <div class="stat-content">
-                <h3><?php echo $newUsers; ?></h3>
-                <p>New Today</p>
-            </div>
-            <div class="stat-footer">
-                Total: <?php echo $totalUsers; ?>
-            </div>
-        </div> -->
-
-        <!-- Bookings Card -->
-        <!-- <div class="stat-card">
-            <div class="stat-header">
-                <i class="fas fa-calendar-check"></i>
-                <span>Bookings</span>
-            </div>
-            <?php
-            $query = "SELECT COUNT(*) as count FROM bookings WHERE DATE(created_at) = '$today'";
-            $result = $mysqli->query($query);
-            $newBookings = $result->fetch_assoc()['count'];
-
-            $totalQuery = "SELECT COUNT(*) as count FROM bookings";
-            $totalResult = $mysqli->query($totalQuery);
-            $totalBookings = $totalResult->fetch_assoc()['count'];
-            ?>
-            <div class="stat-content">
-                <h3><?php echo $newBookings; ?></h3>
-                <p>New Today</p>
-            </div>
-        </div> -->
-
-        <!-- ID Cards -->
-        <!-- <div class="stat-card">
-            <div class="stat-header">
-                <i class="fas fa-id-card"></i>
-                <span>Alumni ID Cards</span>
-            </div>
-            <?php
-            $query = "SELECT COUNT(*) as count FROM alumni_id_cards WHERE DATE(created_at) = '$today'";
-            $result = $mysqli->query($query);
-            $newCards = $result->fetch_assoc()['count'];
-
-            $totalQuery = "SELECT COUNT(*) as count FROM alumni_id_cards";
-            $totalResult = $mysqli->query($totalQuery);
-            $totalCards = $totalResult->fetch_assoc()['count'];
-            ?>
-            <div class="stat-content">
-                <h3><?php echo $newCards; ?></h3>
-                <p>New Today</p>
-            </div>
-        </div> -->
     </div>
 
     <!-- Analytics Dashboard Section -->
@@ -205,11 +146,12 @@ $today = date('Y-m-d');
                 </div>
             </div>
         </div>
-
         <div class="dashboard-row">
             <div class="analytics-card">
                 <div class="analytics-header">
                     <h2>Booking Trends & Revenue</h2>
+                    <label for="yearSelect" class="year-label">Select Year:</label>
+                    <select id="yearSelect" class="year-select"></select>
                 </div>
                 <div class="analytics-content">
                     <canvas id="bookingChart"></canvas>
@@ -217,11 +159,15 @@ $today = date('Y-m-d');
             </div>
         </div>
 
+
+
         <div class="dashboard-row">
             <!-- Room Occupancy Chart -->
             <div class="analytics-card">
+
                 <div class="analytics-header">
                     <h2>Room Occupancy Distribution</h2>
+
                 </div>
                 <div class="analytics-content">
                     <canvas id="roomOccupancyChart"></canvas>
@@ -554,13 +500,50 @@ $today = date('Y-m-d');
     <script src="/Alumni-CvSU/admin/script/dashboard_analytics.js"></script>
 
     <!-- Booking trends and revenue -->
-    <script src="/Alumni-CvSU/admin/script/get_booking_trends.js"></script>
+    <script src="/Alumni-CvSU/admin/script/dashboard_charts.js"></script>
 
-    <!-- Room Occupancy -->
-    <script src="/Alumni-CvSU/admin/script/get_room_occupancy.js"></script>
 
-    <!-- Booking Status -->
-    <script src="/Alumni-CvSU/admin/script/get_booking_status.js"></script>
+    <!-- Select year and months -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const yearSelect = document.getElementById("reportYearSelect");
+            const monthSelect = document.getElementById("reportMonthSelect");
+
+            // Populate Year Select
+            function populateYears() {
+                const currentYear = new Date().getFullYear();
+                const startYear = 2024; // Change this if you need more past years
+                for (let year = currentYear; year >= startYear; year--) {
+                    const option = document.createElement("option");
+                    option.value = year;
+                    option.textContent = year;
+                    yearSelect.appendChild(option);
+                }
+            }
+
+            // Populate Month Select
+            function populateMonths() {
+                const months = [
+                    "January", "February", "March", "April", "May", "June",
+                    "July", "August", "September", "October", "November", "December"
+                ];
+                months.forEach((month, index) => {
+                    const option = document.createElement("option");
+                    option.value = index + 1; // Month numbers (1 to 12)
+                    option.textContent = month;
+                    monthSelect.appendChild(option);
+                });
+            }
+
+            // Initialize dropdowns
+            populateYears();
+            populateMonths();
+
+            // Set default values to the current year and month
+            yearSelect.value = new Date().getFullYear();
+            monthSelect.value = new Date().getMonth() + 1;
+        });
+    </script>
 
 
 

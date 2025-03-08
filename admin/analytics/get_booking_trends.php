@@ -6,16 +6,22 @@ include '../../main_db.php';
 
 header('Content-Type: application/json');
 
+$year = isset($_GET['year']) ? intval($_GET['year']) : date('Y');
+
 $query = "SELECT 
-            DATE_FORMAT(arrival_date, '%Y-%m') AS month, 
+            DATE_FORMAT(created_at, '%Y-%m') AS month, 
             COUNT(*) AS total_bookings, 
             SUM(price) AS total_revenue
           FROM bookings 
-          WHERE status = 'Completed'
+          WHERE status = 'Completed' 
+          AND YEAR(created_at) = ?
           GROUP BY month
           ORDER BY month ASC";
 
-$result = $mysqli->query($query);
+$stmt = $mysqli->prepare($query);
+$stmt->bind_param("i", $year);
+$stmt->execute();
+$result = $stmt->get_result();
 
 $data = [];
 while ($row = $result->fetch_assoc()) {

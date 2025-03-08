@@ -8,10 +8,9 @@ function user_analytics(period = 1) {
         .then(data => {
             console.log(data);
 
-            // Ensure data is valid before updating DOM
             let totalUsers = data.count ?? 0;
-            let displayText = totalUsers; // Default display
-
+            let displayText = totalUsers; 
+            
             switch (parseInt(period)) {
                 case 1:
                     displayText = `New today`;
@@ -51,9 +50,8 @@ function booking_analytics(period = 1) {
         .then(data => {
             console.log(data);
 
-            // Ensure data is valid before updating DOM
             let displayData = data.count ?? 0;
-            let displayText = ""; // Default display
+            let displayText = ""; 
 
             switch (parseInt(period)) {
                 case 1:
@@ -94,10 +92,8 @@ function alumni_id_cards_analytics(period = 1) {
         .then(data => {
             console.log(data);
 
-            // Ensure data is valid before updating DOM
             let displayData = data.count ?? 0;
-            let displayText = ""; // Default display
-
+            let displayText = ""; 
             switch (parseInt(period)) {
                 case 1:
                     displayText = `New today`;

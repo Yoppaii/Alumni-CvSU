@@ -6,7 +6,6 @@ include '../../main_db.php';
 
 header('Content-Type: application/json');
 
-// Query to calculate stay duration and average price
 $query = "SELECT 
             DATEDIFF(departure_date, arrival_date) AS stay_duration, 
             COUNT(*) AS total_bookings,

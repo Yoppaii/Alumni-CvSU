@@ -308,6 +308,50 @@
     }
 }
 
+.year-label {
+    font-size: 1rem;
+    color: var(--text-primary);
+    font-weight: 500;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.year-select {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--bg-secondary);
+    border-radius: 0.375rem;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.year-select:hover {
+    border-color: var(--primary-color);
+}
+
+.year-select:focus {
+    outline: none;
+    border-color: var(--primary-hover);
+    box-shadow: 0 0 4px var(--primary-light);
+}
+
+[data-theme="dark"] .year-label {
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .year-select {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+[data-theme="dark"] .year-select:hover {
+    border-color: var(--primary-color);
+}
+
 [data-theme="dark"] {
     --primary-color: #10b981;
     --primary-hover: #059669;
