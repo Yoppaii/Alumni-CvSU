@@ -551,9 +551,7 @@ $today = date('Y-m-d');
     </script>
 
     <!-- Booking analytics -->
-
     <script src="/Alumni-CvSU/admin/script/dashboard_analytics.js"></script>
-
 
     <!-- Booking trends and revenue -->
     <script src="/Alumni-CvSU/admin/script/get_booking_trends.js"></script>

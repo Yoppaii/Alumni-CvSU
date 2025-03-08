@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alumni Tracer</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-
         .AT-page-header {
             display: flex;
             justify-content: space-between;
@@ -35,7 +35,7 @@
 
         .AT-chart-row {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(1, 1fr);
             gap: 30px;
             margin-bottom: 30px;
         }
@@ -61,7 +61,7 @@
 
         .AT-chart {
             flex: 1;
-            height: 300px;
+            height: auto;
         }
 
         .AT-summary {
@@ -87,7 +87,7 @@
             .AT-chart-row {
                 gap: 20px;
             }
-            
+
             .AT-chart-wrapper {
                 padding: 15px;
             }
@@ -149,6 +149,7 @@
         }
     </style>
 </head>
+
 <body>
 
     <header class="AT-page-header">
@@ -159,6 +160,17 @@
     <div class="AT-chart-container">
         <!-- Gender Distribution Row -->
         <div class="AT-chart-row">
+            <div class="AT-chart-wrapper">
+                <h3>Alumni Employment Status Trend</h3>
+                <div class="AT-chart-summary">
+                    <div class="AT-chart">
+                        <canvas id="employmentChart"></canvas>
+                    </div>
+                    <div class="AT-summary">
+                        <p></p>
+                    </div>
+                </div>
+            </div>
             <div class="AT-chart-wrapper">
                 <h3>Gender Distribution</h3>
                 <div class="AT-chart-summary">
@@ -365,270 +377,311 @@
             </div>
         </div>
     </div>
-<script>
-    // Update date-time
-    function updateDateTime() {
-        const now = new Date();
-        const dateTimeString = now.toLocaleString();
-        document.querySelector('.AT-date-time').textContent = dateTimeString;
-    }
-    setInterval(updateDateTime, 1000);
-    updateDateTime();
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    // Chart colors
-    const colors = {
-        primary: '#006400',
-        secondary: '#004d00',
-        success: '#1cc88a',
-        info: '#36b9cc',
-        warning: '#f6c23e',
-        danger: '#e74a3b'
-    };
+    <!-- Script Settings  -->
+    <script>
+        // Update date-time
+        function updateDateTime() {
+            const now = new Date();
+            const dateTimeString = now.toLocaleString();
+            document.querySelector('.AT-date-time').textContent = dateTimeString;
+        }
+        setInterval(updateDateTime, 1000);
+        updateDateTime();
 
-    // Common chart options
-    const commonOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                position: 'bottom',
-                labels: {
-                    padding: 10,
-                    font: { size: 12 }
+        // Chart colors
+        const colors = {
+            primary: '#006400',
+            secondary: '#004d00',
+            success: '#1cc88a',
+            info: '#36b9cc',
+            warning: '#f6c23e',
+            danger: '#e74a3b'
+        };
+
+        // Common chart options
+        const commonOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 10,
+                        font: {
+                            size: 12
+                        }
+                    }
                 }
             }
-        }
-    };
+        };
 
-    // Bar chart specific options
-    const barOptions = {
-        ...commonOptions,
-        scales: {
-            y: {
-                beginAtZero: true,
-                ticks: { font: { size: 12 } }
+        // Bar chart specific options
+        const barOptions = {
+            ...commonOptions,
+            scales: {
+                y: {
+                    title: {
+                        display: true,
+                        text: "Number of Graduates"
+                    },
+
+                    beginAtZero: true,
+                    stacked: true, // Ensure stacking on Y-axis
+                    ticks: {
+                        font: {
+                            size: 12
+                        }
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: "Year Graduated"
+                    },
+
+                    stacked: true, // Ensure stacking on X-axis
+                    ticks: {
+                        font: {
+                            size: 12
+                        }
+                    }
+                }
             },
-            x: {
-                ticks: { font: { size: 12 } }
+            plugins: {
+                legend: {
+                    position: 'top'
+                }
             }
-        }
-    };
+        };
 
-    // Line chart specific options
-    const lineOptions = {
-        ...barOptions,
-        elements: {
-            line: {
-                tension: 0.3
-            },
-            point: {
-                radius: 4
+
+        // Line chart specific options
+        const lineOptions = {
+            ...barOptions,
+            elements: {
+                line: {
+                    tension: 0.3
+                },
+                point: {
+                    radius: 4
+                },
+
             }
-        }
-    };
+        };
 
-    window.onload = function() {
-        console.log('Initializing charts...');
-        
-        // Gender Distribution Chart
-        new Chart(document.getElementById('genderRespondentChart'), {
-            type: 'pie',
-            data: {
-                labels: ['Male', 'Female', 'Other'],
-                datasets: [{
-                    data: [50, 45, 5],
-                    backgroundColor: [colors.primary, colors.success, colors.info]
-                }]
-            },
-            options: commonOptions
-        });
+        window.onload = function() {
+            console.log('Initializing charts...');
 
-        // Civil Status Chart
-        new Chart(document.getElementById('civilStatusChart'), {
-            type: 'bar',
-            data: {
-                labels: ['Single', 'Married', 'Divorced', 'Widowed'],
-                datasets: [{
-                    label: 'Civil Status',
-                    data: [60, 30, 5, 5],
-                    backgroundColor: colors.primary
-                }]
-            },
-            options: barOptions
-        });
 
-        // Year Graduated Chart
-        new Chart(document.getElementById('yearGraduatedChart'), {
-            type: 'line',
-            data: {
-                labels: ['2010', '2011', '2012', '2013'],
-                datasets: [{
-                    label: 'Graduates',
-                    data: [20, 25, 30, 25],
-                    borderColor: colors.success,
-                    backgroundColor: colors.success
-                }]
-            },
-            options: lineOptions
-        });
 
-        // Program Distribution Chart
-        new Chart(document.getElementById('programRespondentsChart'), {
-            type: 'bar',
-            data: {
-                labels: ['Program A', 'Program B', 'Program C'],
-                datasets: [{
-                    label: 'Students',
-                    data: [40, 35, 25],
-                    backgroundColor: colors.info
-                }]
-            },
-            options: barOptions
-        });
 
-        // Post Graduate Studies Chart
-        new Chart(document.getElementById('postGraduateStudiesChart'), {
-            type: 'pie',
-            data: {
-                labels: ['Yes', 'No'],
-                datasets: [{
-                    data: [30, 70],
-                    backgroundColor: [colors.primary, colors.danger]
-                }]
-            },
-            options: commonOptions
-        });
+            // Gender Distribution Chart
+            new Chart(document.getElementById('genderRespondentChart'), {
+                type: 'pie',
+                data: {
+                    labels: ['Male', 'Female', 'Other'],
+                    datasets: [{
+                        data: [50, 45, 5],
+                        backgroundColor: [colors.primary, colors.success, colors.info]
+                    }]
+                },
+                options: commonOptions
+            });
 
-        // Employment Status Chart
-        new Chart(document.getElementById('statusEmploymentChart'), {
-            type: 'bar',
-            data: {
-                labels: ['Employed', 'Unemployed'],
-                datasets: [{
-                    label: 'Status',
-                    data: [80, 20],
-                    backgroundColor: colors.success
-                }]
-            },
-            options: barOptions
-        });
+            // Civil Status Chart
+            new Chart(document.getElementById('civilStatusChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Single', 'Married', 'Divorced', 'Widowed'],
+                    datasets: [{
+                        label: 'Civil Status',
+                        data: [60, 30, 5, 5],
+                        backgroundColor: colors.primary
+                    }]
+                },
+                options: barOptions
+            });
 
-        // Length of Stay Chart
-        new Chart(document.getElementById('lengthOfStayChart'), {
-            type: 'bar',
-            data: {
-                labels: ['<1 year', '1-3 years', '>3 years'],
-                datasets: [{
-                    label: 'Length of Stay',
-                    data: [20, 50, 30],
-                    backgroundColor: colors.primary
-                }]
-            },
-            options: barOptions
-        });
+            // Year Graduated Chart
+            new Chart(document.getElementById('yearGraduatedChart'), {
+                type: 'line',
+                data: {
+                    labels: ['2010', '2011', '2012', '2013'],
+                    datasets: [{
+                        label: 'Graduates',
+                        data: [20, 25, 30, 25],
+                        borderColor: colors.success,
+                        backgroundColor: colors.success
+                    }]
+                },
+                options: lineOptions
+            });
 
-        // Present Tenure Chart
-        new Chart(document.getElementById('presentTenureChart'), {
-            type: 'pie',
-            data: {
-                labels: ['Permanent', 'Contractual', 'Temporary'],
-                datasets: [{
-                    data: [40, 30, 30],
-                    backgroundColor: [colors.success, colors.info, colors.primary]
-                }]
-            },
-            options: commonOptions
-        });
+            // Program Distribution Chart
+            new Chart(document.getElementById('programRespondentsChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Program A', 'Program B', 'Program C'],
+                    datasets: [{
+                        label: 'Students',
+                        data: [40, 35, 25],
+                        backgroundColor: colors.info
+                    }]
+                },
+                options: barOptions
+            });
 
-        // Relation Employment Chart
-        new Chart(document.getElementById('relationEmploymentChart'), {
-            type: 'pie',
-            data: {
-                labels: ['Related', 'Not Related'],
-                datasets: [{
-                    data: [70, 30],
-                    backgroundColor: [colors.primary, colors.danger]
-                }]
-            },
-            options: commonOptions
-        });
+            // Post Graduate Studies Chart
+            new Chart(document.getElementById('postGraduateStudiesChart'), {
+                type: 'pie',
+                data: {
+                    labels: ['Yes', 'No'],
+                    datasets: [{
+                        data: [30, 70],
+                        backgroundColor: [colors.primary, colors.danger]
+                    }]
+                },
+                options: commonOptions
+            });
 
-        // Location Employment Chart
-        new Chart(document.getElementById('locationEmploymentChart'), {
-            type: 'bar',
-            data: {
-                labels: ['Local', 'Abroad'],
-                datasets: [{
-                    label: 'Location',
-                    data: [80, 20],
-                    backgroundColor: colors.success
-                }]
-            },
-            options: barOptions
-        });
+            // Employment Status Chart
+            new Chart(document.getElementById('statusEmploymentChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Employed', 'Unemployed'],
+                    datasets: [{
+                        label: 'Status',
+                        data: [80, 20],
+                        backgroundColor: colors.success
+                    }]
+                },
+                options: barOptions
+            });
 
-        // First Job Chart
-        new Chart(document.getElementById('firstJobChart'), {
-            type: 'pie',
-            data: {
-                labels: ['Yes', 'No'],
-                datasets: [{
-                    data: [60, 40],
-                    backgroundColor: [colors.primary, colors.danger]
-                }]
-            },
-            options: commonOptions
-        });
+            // Length of Stay Chart
+            new Chart(document.getElementById('lengthOfStayChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['<1 year', '1-3 years', '>3 years'],
+                    datasets: [{
+                        label: 'Length of Stay',
+                        data: [20, 50, 30],
+                        backgroundColor: colors.primary
+                    }]
+                },
+                options: barOptions
+            });
 
-        // College Experience Chart
-        new Chart(document.getElementById('collegeExperienceChart'), {
-            type: 'bar',
-            data: {
-                labels: ['Very Helpful', 'Helpful', 'Neutral', 'Not Helpful', 'Not at All'],
-                datasets: [{
-                    label: 'Experience',
-                    data: [40, 30, 20, 5, 5],
-                    backgroundColor: colors.primary
-                }]
-            },
-            options: barOptions
-        });
+            // Present Tenure Chart
+            new Chart(document.getElementById('presentTenureChart'), {
+                type: 'pie',
+                data: {
+                    labels: ['Permanent', 'Contractual', 'Temporary'],
+                    datasets: [{
+                        data: [40, 30, 30],
+                        backgroundColor: [colors.success, colors.info, colors.primary]
+                    }]
+                },
+                options: commonOptions
+            });
 
-        // Length of Time Chart
-        new Chart(document.getElementById('lengthOfTimeChart'), {
-            type: 'line',
-            data: {
-                labels: ['<1 month', '1-3 months', '3-6 months', '6-12 months', '>1 year'],
-                datasets: [{
-                    label: 'Time to First Job',
-                    data: [10, 20, 30, 25, 15],
-                    borderColor: colors.primary,
-                    backgroundColor: colors.primary
-                }]
-            },
-            options: lineOptions
-        });
+            // Relation Employment Chart
+            new Chart(document.getElementById('relationEmploymentChart'), {
+                type: 'pie',
+                data: {
+                    labels: ['Related', 'Not Related'],
+                    datasets: [{
+                        data: [70, 30],
+                        backgroundColor: [colors.primary, colors.danger]
+                    }]
+                },
+                options: commonOptions
+            });
 
-        // Method of Finding First Job Chart
-        new Chart(document.getElementById('methodOfFindingFirstJobChart'), {
-            type: 'bar',
-            data: {
-                labels: ['Online Portal', 'Campus Placement', 'Referral', 'Direct Application', 'Others'],
-                datasets: [{
-                    label: 'Method',
-                    data: [12, 19, 3, 5, 2],
-                    backgroundColor: [
-                        colors.primary,
-                        colors.success,
-                        colors.info,
-                        colors.warning,
-                        colors.secondary
-                    ]
-                }]
-            },
-            options: barOptions
-        });
-    };
-</script>
+            // Location Employment Chart
+            new Chart(document.getElementById('locationEmploymentChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Local', 'Abroad'],
+                    datasets: [{
+                        label: 'Location',
+                        data: [80, 20],
+                        backgroundColor: colors.success
+                    }]
+                },
+                options: barOptions
+            });
+
+            // First Job Chart
+            new Chart(document.getElementById('firstJobChart'), {
+                type: 'pie',
+                data: {
+                    labels: ['Yes', 'No'],
+                    datasets: [{
+                        data: [60, 40],
+                        backgroundColor: [colors.primary, colors.danger]
+                    }]
+                },
+                options: commonOptions
+            });
+
+            // College Experience Chart
+            new Chart(document.getElementById('collegeExperienceChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Very Helpful', 'Helpful', 'Neutral', 'Not Helpful', 'Not at All'],
+                    datasets: [{
+                        label: 'Experience',
+                        data: [40, 30, 20, 5, 5],
+                        backgroundColor: colors.primary
+                    }]
+                },
+                options: barOptions
+            });
+
+            // Length of Time Chart
+            new Chart(document.getElementById('lengthOfTimeChart'), {
+                type: 'line',
+                data: {
+                    labels: ['<1 month', '1-3 months', '3-6 months', '6-12 months', '>1 year'],
+                    datasets: [{
+                        label: 'Time to First Job',
+                        data: [10, 20, 30, 25, 15],
+                        borderColor: colors.primary,
+                        backgroundColor: colors.primary
+                    }]
+                },
+                options: lineOptions
+            });
+
+            // Method of Finding First Job Chart
+            new Chart(document.getElementById('methodOfFindingFirstJobChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Online Portal', 'Campus Placement', 'Referral', 'Direct Application', 'Others'],
+                    datasets: [{
+                        label: 'Method',
+                        data: [12, 19, 3, 5, 2],
+                        backgroundColor: [
+                            colors.primary,
+                            colors.success,
+                            colors.info,
+                            colors.warning,
+                            colors.secondary
+                        ]
+                    }]
+                },
+                options: barOptions
+            });
+        };
+    </script>
+
+    <!-- Employment Status Trend
+    go to webiste/ajax/analytics.php and remove the extra data -->
+    <script src="/Alumni-CvSU/admin/website/script/analytics.js"></script>
+
 </body>
+
 </html>
