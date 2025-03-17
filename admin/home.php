@@ -3,6 +3,8 @@ include 'main_db.php';
 $today = date('Y-m-d');
 ?>
 
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -13,14 +15,104 @@ $today = date('Y-m-d');
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="asset/css/home.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 
 </head>
 
 <body>
+    <!-- NEW DASHBOARD -->
+
+    <!-- Filters -->
+
     <div class="dashboard-row">
         <div class="analytics-card">
             <div class="analytics-header">
-                <h5>Analytics</h5>
+                <h2>Filters</h2>
+                <button id="printReport">Print Report</button>
+
+            </div>
+            <div class="filters-container">
+                <div class="filter-group">
+                    <label for="yearFilter">Year:</label>
+                    <select id="yearFilter" class="filter-select"></select>
+                </div>
+                <div class="filter-group">
+                    <label for="monthFilter">Month:</label>
+                    <select id="monthFilter" class="filter-select"></select>
+                </div>
+                <div class="filter-group">
+                    <label for="userTypeFilter">User Type:</label>
+                    <select id="userTypeFilter" class="filter-select"></select>
+                </div>
+                <div class="filter-group">
+                    <label for="roomFilter">Room Number:</label>
+                    <select id="roomFilter" class="filter-select"></select>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- OVERVIEW -->
+
+    <div class="dashboard-row">
+        <div class="analytics-card">
+            <div class="analytics-header">
+                <h2>Total Bookings by Day of the Week</h2>
+            </div>
+            <div class="analytics-content">
+                <canvas id="bookingByDayChart"></canvas>
+            </div>
+        </div>
+        <div class="analytics-card">
+            <div class="analytics-header">
+                <h2>Total Bookings by Month</h2>
+            </div>
+            <div class="analytics-content">
+                <canvas id="bookingByMonthChart"></canvas>
+            </div>
+        </div>
+        <div class="analytics-card">
+            <div class="analytics-header">
+                <h2>Cancellation & No-Show Rate</h2>
+            </div>
+            <div class="analytics-content">
+                <canvas id="cancellationChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- TRENDS & PATTERNS -->
+
+    <div class="dashboard-row">
+        <div class="analytics-card">
+            <div class="analytics-header">
+                <h2>Booking Lead Time</h2>
+            </div>
+            <div class="analytics-content">
+                <canvas id="bookingLeadTimeChart"></canvas>
+            </div>
+        </div>
+        <div class="analytics-card">
+            <div class="analytics-header">
+                <h2>Booking Peak Hours</h2>
+            </div>
+            <div class="analytics-content">
+                <canvas id="peakBookingChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- OLD DASHBOARD -->
+
+    <!-- Filter -->
+    <!-- <div class="dashboard-row">
+        <div class="analytics-card">
+            <div class="analytics-header">
+                <h2>Business Overview </h2>
                 <select class="form-select shadow-none bg-light w-auto" onchange="updateAnalytics(this.value)">
                     <option value="1">Today</option>
                     <option value="2">Past 7 Days</option>
@@ -31,11 +123,10 @@ $today = date('Y-m-d');
                 </select>
             </div>
         </div>
-    </div>
+    </div> -->
 
-
-    <div class="dashboard-stats">
-        <!-- Users Card -->
+    <!-- Users/Bookings/AlumniID -->
+    <!-- <div class="dashboard-stats">
         <div class="stat-card">
             <div class="stat-header">
                 <i class="fas fa-users"></i>
@@ -68,125 +159,120 @@ $today = date('Y-m-d');
                 <p id="alumni_id_cards_footer"></p>
             </div>
         </div>
-    </div>
+    </div> -->
 
-    <!-- Analytics Dashboard Section -->
-    <div class="analytics-dashboard">
-        <div class="analytics-summary">
-            <div class="summary-card">
-                <i class="fas fa-chart-line"></i>
-                <div class="summary-content">
-                    <h3>Monthly Revenue</h3>
-                    <?php
-                    $query = "SELECT ROUND(AVG(price), 2) AS monthly_revenue FROM bookings WHERE status = 'Completed'";
-                    $result = $mysqli->query($query);
-                    $monthly_revenue = $result->fetch_assoc()['monthly_revenue'] ?? 0;
-                    ?>
-                    <p>₱<?php echo number_format($monthly_revenue, 2); ?>
-                </div>
+    <!-- Quick report -->
+    <!-- <div class="dashboard-row">
+        <div class="summary-card">
+            <i class="fas fa-chart-line"></i>
+            <div class="summary-content">
+                <h3>Monthly Revenue</h3>
+                <?php
+                $query = "SELECT ROUND(AVG(price), 2) AS monthly_revenue FROM bookings WHERE status = 'Completed'";
+                $result = $mysqli->query($query);
+                $monthly_revenue = $result->fetch_assoc()['monthly_revenue'] ?? 0;
+                ?>
+                <p>₱<?php echo number_format($monthly_revenue, 2); ?>
             </div>
 
-            <div class="summary-card">
-                <i class="fas fa-calendar-check"></i>
-                <div class="summary-content">
-                    <h3>Completion Rate</h3>
-                    <?php
-                    $query = "SELECT 
+        </div>
+
+        <div class="summary-card">
+            <i class="fas fa-calendar-check"></i>
+            <div class="summary-content">
+                <h3>Completion Rate</h3>
+                <?php
+                $query = "SELECT 
                     COUNT(*) AS total_bookings, 
                     SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) AS completed_bookings,
                     SUM(CASE WHEN status = 'Cancelled' THEN 1 ELSE 0 END) AS cancelled_bookings
                     FROM bookings";
 
-                    $result = $mysqli->query($query);
-                    $data = $result->fetch_assoc();
+                $result = $mysqli->query($query);
+                $data = $result->fetch_assoc();
 
-                    $total = $data['total_bookings'] ?? 0;
-                    $completed = $data['completed_bookings'] ?? 0;
-                    $cancelled = $data['cancelled_bookings'] ?? 0;
+                $total = $data['total_bookings'] ?? 0;
+                $completed = $data['completed_bookings'] ?? 0;
+                $cancelled = $data['cancelled_bookings'] ?? 0;
 
-                    // Calculate completion rate (avoid division by zero)
-                    $completion_rate = ($total > 0) ? ($completed / $total) * 100 : 0;
-                    ?>
-                    <p><?php echo number_format($completion_rate, 2); ?>%
-                </div>
+                $completion_rate = ($total > 0) ? ($completed / $total) * 100 : 0;
+                ?>
+                <p><?php echo number_format($completion_rate, 2); ?>%
             </div>
+        </div>
 
-            <div class="summary-card">
-                <i class="fas fa-clock"></i>
-                <div class="summary-content">
-                    <h3>Avg Stay Duration</h3>
-                    <?php
-                    $query = "SELECT AVG(TIMESTAMPDIFF(HOUR, CONCAT(arrival_date, ' ', arrival_time), CONCAT(departure_date, ' ', departure_time))) AS avg_stay_hours
+        <div class="summary-card">
+            <i class="fas fa-clock"></i>
+            <div class="summary-content">
+                <h3>Avg Stay Duration</h3>
+                <?php
+                $query = "SELECT AVG(TIMESTAMPDIFF(HOUR, CONCAT(arrival_date, ' ', arrival_time), CONCAT(departure_date, ' ', departure_time))) AS avg_stay_hours
                     FROM bookings WHERE status = 'Completed'";
 
-                    $result = $mysqli->query($query);
-                    $data = $result->fetch_assoc();
+                $result = $mysqli->query($query);
+                $data = $result->fetch_assoc();
 
-                    $avg_stay_hours = $data['avg_stay_hours'] ?? 0; // Default to 0 if null
-                    $avg_stay_days = $avg_stay_hours / 24; // Convert hours to days
-                    ?>
-                    <p><?php echo number_format($avg_stay_days, 2); ?> days (<?php echo number_format($avg_stay_hours, 2); ?> hours)</p>
+                $avg_stay_hours = $data['avg_stay_hours'] ?? 0;
+                $avg_stay_days = $avg_stay_hours / 24;
+                ?>
+                <p><?php echo number_format($avg_stay_days, 2); ?> days (<?php echo number_format($avg_stay_hours, 2); ?> hours)</p>
 
-                </div>
             </div>
-            <div class="summary-card">
-                <i class="fas fa-money-bill-wave"></i>
-                <div class="summary-content">
-                    <h3>Avg Price per Stay</h3>
-                    <?php
-                    $query = "SELECT AVG(price / NULLIF(TIMESTAMPDIFF(DAY, arrival_date, departure_date), 0)) AS avg_price_per_day
+        </div>
+
+        <div class="summary-card">
+            <i class="fas fa-money-bill-wave"></i>
+            <div class="summary-content">
+                <h3>Avg Price per Stay</h3>
+                <?php
+                $query = "SELECT AVG(price / NULLIF(TIMESTAMPDIFF(DAY, arrival_date, departure_date), 0)) AS avg_price_per_day
                     FROM bookings WHERE status = 'Completed'";
 
-                    $result = $mysqli->query($query);
-                    $data = $result->fetch_assoc();
+                $result = $mysqli->query($query);
+                $data = $result->fetch_assoc();
 
-                    $avg_price_per_day = $data['avg_price_per_day'] ?? 0; // Default to 0 if null
-                    ?>
-                    <p>₱<?php echo number_format($avg_price_per_day, 2); ?></p>
-                </div>
+                $avg_price_per_day = $data['avg_price_per_day'] ?? 0;
+                ?>
+                <p>₱<?php echo number_format($avg_price_per_day, 2); ?></p>
             </div>
         </div>
-        <div class="dashboard-row">
-            <div class="analytics-card">
-                <div class="analytics-header">
-                    <h2>Booking Trends & Revenue</h2>
-                    <label for="yearSelect" class="year-label">Select Year:</label>
-                    <select id="yearSelect" class="year-select"></select>
-                </div>
-                <div class="analytics-content">
-                    <canvas id="bookingChart"></canvas>
-                </div>
+    </div> -->
+
+    <!-- Booking Trends & Revenue -->
+    <!-- <div class="dashboard-row">
+        <div class="analytics-card">
+            <div class="analytics-header">
+                <h2>Booking Trends & Revenue</h2>
+                <select id="performanceSelect"></select>
+
+            </div>
+            <div class="analytics-content">
+                <canvas id="bookingChart"></canvas>
             </div>
         </div>
+    </div> -->
 
-
-
-        <div class="dashboard-row">
-            <!-- Room Occupancy Chart -->
-            <div class="analytics-card">
-
-                <div class="analytics-header">
-                    <h2>Room Occupancy Distribution</h2>
-
-                </div>
-                <div class="analytics-content">
-                    <canvas id="roomOccupancyChart"></canvas>
-                </div>
+    <!-- Room Occupancy & Booking Status Distribution -->
+    <!-- <div class="dashboard-row">
+        <div class="analytics-card">
+            <div class="analytics-header">
+                <h2>Room Occupancy Distribution</h2>
             </div>
-
-            <!-- Booking Status Chart -->
-            <div class="analytics-card">
-                <div class="analytics-header">
-                    <h2>Booking Status Distribution</h2>
-                </div>
-                <div class="analytics-content">
-                    <canvas id="bookingStatusChart"></canvas>
-                </div>
+            <div class="analytics-content">
+                <canvas id="roomOccupancyChart"></canvas>
             </div>
         </div>
 
+        <div class="analytics-card">
+            <div class="analytics-header">
+                <h2>Booking Status Distribution</h2>
+            </div>
+            <div class="analytics-content">
+                <canvas id="bookingStatusChart"></canvas>
+            </div>
+        </div>
+    </div> -->
 
-    </div>
 
     <div class="bookings-table-container">
         <div class="header-content">
@@ -497,51 +583,126 @@ $today = date('Y-m-d');
     </script>
 
     <!-- Booking analytics -->
-    <script src="/Alumni-CvSU/admin/script/dashboard_analytics.js"></script>
+    <script src="/Alumni-CvSU/admin/script/business_overview.js"></script>
 
     <!-- Booking trends and revenue -->
-    <script src="/Alumni-CvSU/admin/script/dashboard_charts.js"></script>
+    <script type="module" src="/Alumni-CvSU/admin/script/booking_performance.js"></script>
+
+    <script type="module" src="/Alumni-CvSU/admin/script/essentials.js"></script>
+
+    <script src="/Alumni-CvSU/admin/script/dashboard.js"></script>
+
+    <script src="/Alumni-CvSU/admin/script/generate_report.js"></script>
 
 
-    <!-- Select year and months -->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            const yearSelect = document.getElementById("reportYearSelect");
-            const monthSelect = document.getElementById("reportMonthSelect");
+            const yearFilter = document.getElementById("yearFilter");
+            const monthFilter = document.getElementById("monthFilter");
+            const userTypeFilter = document.getElementById("userTypeFilter");
+            const roomFilter = document.getElementById("roomFilter");
 
-            // Populate Year Select
+
             function populateYears() {
                 const currentYear = new Date().getFullYear();
-                const startYear = 2024; // Change this if you need more past years
+                const startYear = 2024; // Adjust this if needed
+
+                yearFilter.innerHTML = ""; // Clear existing options
+                let allYearsOption = document.createElement("option");
+                allYearsOption.value = "";
+                allYearsOption.text = "All Years";
+                yearFilter.appendChild(allYearsOption); // Add "All Years"
+
                 for (let year = currentYear; year >= startYear; year--) {
-                    const option = document.createElement("option");
+                    let option = document.createElement("option");
                     option.value = year;
-                    option.textContent = year;
-                    yearSelect.appendChild(option);
+                    option.text = year;
+                    yearFilter.appendChild(option);
                 }
+
+                yearFilter.value = currentYear; // ✅ Default to current year
             }
 
-            // Populate Month Select
-            function populateMonths() {
-                const months = [
-                    "January", "February", "March", "April", "May", "June",
-                    "July", "August", "September", "October", "November", "December"
-                ];
-                months.forEach((month, index) => {
-                    const option = document.createElement("option");
-                    option.value = index + 1; // Month numbers (1 to 12)
-                    option.textContent = month;
-                    monthSelect.appendChild(option);
-                });
+            function updateMonths() {
+                const selectedYear = yearFilter.value; // Get selected year
+                const currentYear = new Date().getFullYear();
+                const currentMonth = new Date().getMonth() + 1;
+
+                monthFilter.innerHTML = ""; // Clear previous months
+
+                // Add "All Months" option
+                let allMonthsOption = document.createElement("option");
+                allMonthsOption.value = "";
+                allMonthsOption.text = "All Months";
+                monthFilter.appendChild(allMonthsOption);
+
+                for (let i = 1; i <= 12; i++) {
+                    // If a specific year is selected and it's the current year, prevent future months
+                    if (selectedYear !== "" && parseInt(selectedYear) === currentYear && i > currentMonth) {
+                        break;
+                    }
+
+                    let option = document.createElement("option");
+                    option.value = i;
+                    option.text = new Date(0, i - 1).toLocaleString("default", {
+                        month: "long"
+                    });
+
+                    monthFilter.appendChild(option);
+                }
+
+                // ✅ Always select "All Months" by default
+                monthFilter.value = "";
             }
 
-            // Initialize dropdowns
+
+            function populateUserTypes() {
+                fetch('/Alumni-CvSU/admin/analytics/get_user_types.php')
+                    .then(response => response.json())
+                    .then(data => {
+                        const userTypeFilter = document.getElementById("userTypeFilter");
+                        userTypeFilter.innerHTML = "<option value=''>All</option>"; // Default "All" option
+
+                        data.forEach(user => {
+                            let option = document.createElement("option");
+                            option.value = user.user_status;
+                            option.text = user.user_status;
+                            userTypeFilter.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.error("Error fetching user types:", error));
+            }
+
+            // Call the function on page load
+            document.addEventListener("DOMContentLoaded", populateUserTypes);
+
+
+
+            function populateRooms() {
+                fetch('/Alumni-CvSU/admin/analytics/get_room_number.php')
+                    .then(response => response.json())
+                    .then(data => {
+                        roomFilter.innerHTML = "<option value=''>All Rooms</option>"; // Add "All Rooms"
+
+                        data.forEach(room => {
+                            let option = document.createElement("option");
+                            option.value = room.room_number;
+                            option.text = `Room ${room.room_number}`;
+                            roomFilter.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.error("Error fetching rooms:", error));
+            }
+
+
+            // Initialize filters
             populateYears();
-            populateMonths();
+            updateMonths();
+            populateUserTypes();
+            populateRooms();
 
-            // Set default values to the current year and month
-            yearSelect.value = new Date().getFullYear();
-            monthSelect.value = new Date().getMonth() + 1;
+            // Update months when year changes
+            yearFilter.addEventListener("change", updateMonths);
         });
     </script>
 
