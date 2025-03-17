@@ -1,6 +1,3 @@
-Here’s an enhanced version with improved readability, formatting, and clarity:  
-
----
 
 # 🎓 Alumni-CvSU  
 
@@ -42,4 +39,33 @@ git status
 
 ---
 
-Now you're all set! 🎉 Let me know if you need help with setting up or running the project. 🚀
+## 🗄️ How to Import the SQL Database  
+
+To set up the database, follow these steps:  
+
+### 1️⃣ Open **phpMyAdmin**  
+- If you’re using **XAMPP**, go to:  
+  🔗 [http://localhost/phpmyadmin](http://localhost/phpmyadmin)  
+
+### 2️⃣ Create a New Database  
+- Click on **Databases** in the top menu.  
+- In the **Create database** field, enter:  
+  ```
+  room_reservation
+  ```
+- Click **Create**.  
+
+### 3️⃣ Import the Database  
+- Click on the **room_reservation** database you just created.  
+- Navigate to the **Import** tab.  
+- Click **Choose File** and select the SQL file from your project.  
+  - The file is usually named **room_reservation.sql** and should be located in the project folder.  
+- Click **Go** to start the import process.  
+
+### 4️⃣ Verify the Import  
+- Once the import is complete, check the database tables under **room_reservation** in phpMyAdmin.  
+- If you see multiple tables, the import was successful! ✅  
+
+---
+
+🎉 Your database is now set up! You’re ready to start using the Alumni Booking System. Let me know if you need further assistance. 🚀
