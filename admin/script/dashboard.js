@@ -1,12 +1,11 @@
 let bookingByDayChart = null;
 let bookingByMonthChart = null;
 let cancellationChart = null;
-
+let bookingLeadTimeChart = null;
+let peakBookingChart = null;
 
 function fetchBookingByDay(year, month, guestType, roomNumber) {
-    let guestTypeParam = guestType === "All" ? "" : guestType;
-
-    fetch(`/Alumni-CvSU/admin/analytics/booking_by_day.php?year=${year}&month=${month}&guest_type=${guestTypeParam}&room_number=${roomNumber}`)
+    fetch(`/Alumni-CvSU/admin/analytics/booking_by_day.php?year=${year}&month=${month}&guest_type=${guestType}&room_number=${roomNumber}`)
         .then(response => response.json())
         .then(data => {
             const weekDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
@@ -92,10 +91,9 @@ function fetchBookingByDay(year, month, guestType, roomNumber) {
         .catch(error => console.error("Fetch error:", error.message));
 }
 
-function fetchBookingByMonth(year, guestType, roomNumber) {
-    let guestTypeParam = guestType === "All" ? "" : guestType;
 
-    fetch(`/Alumni-CvSU/admin/analytics/booking_by_month.php?year=${year}&guest_type=${guestTypeParam}&room_number=${roomNumber}`)
+function fetchBookingByMonth(year, guestType, roomNumber) {
+    fetch(`/Alumni-CvSU/admin/analytics/booking_by_month.php?year=${year}&guest_type=${guestType}&room_number=${roomNumber}`)
         .then(response => response.json())
         .then(data => {
             const monthNames = [
@@ -110,100 +108,17 @@ function fetchBookingByMonth(year, guestType, roomNumber) {
             if (Array.isArray(data) && data.length > 0) {
                 data.forEach(item => {
                     if (monthCounts.hasOwnProperty(item.month)) {
-                        monthCounts[item.month] = item.total;
-                        totalBookings += item.total;
+                        const bookingCount = Number(item.total) || 0;
+                        monthCounts[item.month] = bookingCount;
+                        totalBookings += bookingCount;
                     }
                 });
             } else {
                 console.warn("No booking data available.");
             }
 
-            const labels = Object.keys(monthCounts);
-            const values = Object.values(monthCounts);
-
-            if (window.bookingByMonthChart instanceof Chart) {
-                window.bookingByMonthChart.destroy();
-            }
-
-            const ctx = document.getElementById("bookingByMonthChart").getContext("2d");
-
-            window.bookingByMonthChart = new Chart(ctx, {
-                type: "line",
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: "Total Bookings per Month",
-                        data: values,
-                        backgroundColor: "rgba(54, 162, 235, 0.2)",
-                        borderColor: "rgba(54, 162, 235, 1)",
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: {
-                        duration: 1000,
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: { display: true, text: "Number of Bookings" },
-                            ticks: { stepSize: 1 }
-                        },
-                        x: {
-                            title: { display: true, text: "Month" }
-                        }
-                    },
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                label: function (tooltipItem) {
-                                    const count = tooltipItem.raw;
-                                    const percentage = totalBookings > 0
-                                        ? ((count / totalBookings) * 100).toFixed(1)
-                                        : 0;
-                                    return `${count} bookings (${percentage}%)`;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        })
-        .catch(error => console.error("Fetch error:", error.message));
-}
-
-
-
-function fetchBookingByMonth(year, guestType, roomNumber) {
-    let guestTypeParam = guestType === "All" ? "" : guestType;
-
-    fetch(`/Alumni-CvSU/admin/analytics/booking_by_month.php?year=${year}&guest_type=${guestTypeParam}&room_number=${roomNumber}`)
-        .then(response => response.json())
-        .then(data => {
-            const monthNames = [
-                "January", "February", "March", "April", "May", "June",
-                "July", "August", "September", "October", "November", "December"
-            ];
-
-            const monthCounts = Object.fromEntries(monthNames.map(month => [month, 0]));
-
-            let totalBookings = 0;
-
-            if (Array.isArray(data) && data.length > 0) {
-                data.forEach(item => {
-                    if (monthCounts.hasOwnProperty(item.month)) {
-                        monthCounts[item.month] = item.total;
-                        totalBookings += item.total;
-                    }
-                });
-            } else {
-                console.warn("No booking data available.");
-            }
+            console.log("Total Bookings:", totalBookings);
+            console.log("Month Counts:", monthCounts);
 
             const labels = Object.keys(monthCounts);
             const values = Object.values(monthCounts);
@@ -252,7 +167,7 @@ function fetchBookingByMonth(year, guestType, roomNumber) {
                         tooltip: {
                             callbacks: {
                                 label: function (tooltipItem) {
-                                    const count = tooltipItem.raw;
+                                    const count = Number(tooltipItem.raw) || 0;
                                     const percentage = totalBookings > 0
                                         ? ((count / totalBookings) * 100).toFixed(1)
                                         : 0;
@@ -268,11 +183,9 @@ function fetchBookingByMonth(year, guestType, roomNumber) {
 }
 
 
-
 function fetchCancellationRate(year, month, guestType, roomNumber) {
-    let guestTypeParam = guestType === "All" ? "" : guestType;
 
-    fetch(`/Alumni-CvSU/admin/analytics/cancellation_rate.php?year=${year}&month=${month}&guest_type=${guestTypeParam}&room_number=${roomNumber}`)
+    fetch(`/Alumni-CvSU/admin/analytics/cancellation_rate.php?year=${year}&month=${month}&guest_type=${guestType}&room_number=${roomNumber}`)
         .then(response => response.json())
         .then(data => {
             if (!data || typeof data.rate !== "number" || typeof data.cancelled !== "number" || typeof data.successful !== "number") {
@@ -350,12 +263,11 @@ function fetchCancellationRate(year, month, guestType, roomNumber) {
         .catch(error => console.error("Fetch error:", error.message));
 }
 
-
-function fetchBookingLeadTime(year, month, roomNumber) {
+function fetchBookingLeadTime(year, month, guestType, roomNumber) {
     const chartContainer = document.getElementById("bookingLeadTimeChart");
     const ctx = chartContainer.getContext("2d");
 
-    fetch(`/Alumni-CvSU/admin/analytics/booking_lead_time.php?year=${year}&month=${month}&room_number=${roomNumber}`)
+    fetch(`/Alumni-CvSU/admin/analytics/booking_lead_time.php?year=${year}&month=${month}&guest_type=${guestType}&room_number=${roomNumber}`)
         .then(response => response.json())
         .then(data => {
 
@@ -436,11 +348,8 @@ function fetchBookingLeadTime(year, month, roomNumber) {
         });
 }
 
-
 function fetchPeakBookingHours(year, month, guestType, roomNumber) {
-    let guestTypeParam = guestType === "All" ? "" : guestType;
-
-    fetch(`/Alumni-CvSU/admin/analytics/booking_peak_hours.php?year=${year}&month=${month}&guest_type=${guestTypeParam}&room_number=${roomNumber}`)
+    fetch(`/Alumni-CvSU/admin/analytics/booking_peak_hours.php?year=${year}&month=${month}&guest_type=${guestType}&room_number=${roomNumber}`)
         .then(response => response.json())
         .then(data => {
             console.log("Raw Data from PHP:", data); // Debugging
@@ -532,20 +441,16 @@ function fetchPeakBookingHours(year, month, guestType, roomNumber) {
         .catch(error => console.error("Fetch error:", error.message));
 }
 
-
-
 // fetchBookingByDay(new Date().getFullYear(), new Date().getMonth() + 1, "All", "");
 // fetchBookingByMonth(new Date().getFullYear(), "All", "");
 // fetchCancellationRate(new Date().getFullYear(), new Date().getMonth() + 1, "All", "");
 // fetchBookingLeadTime(new Date().getFullYear(), new Date().getMonth() + 1, "");
 // fetchPeakBookingHours(new Date().getFullYear(), new Date().getMonth() + 1, "All", "");
 
-
 document.getElementById("yearFilter").addEventListener("change", updateChart);
 document.getElementById("monthFilter").addEventListener("change", updateChart);
 document.getElementById("userTypeFilter").addEventListener("change", updateChart);
 document.getElementById("roomFilter").addEventListener("change", updateChart);
-
 
 function updateChart() {
     const selectedYear = document.getElementById("yearFilter").value;
@@ -553,14 +458,11 @@ function updateChart() {
     const selecteduserType = document.getElementById("userTypeFilter").value;
     const selectedRoomNumber = document.getElementById("roomFilter").value;
 
-
     fetchBookingByDay(selectedYear, selectedMonth, selecteduserType, selectedRoomNumber);
     fetchBookingByMonth(selectedYear, selecteduserType, selectedRoomNumber);
     fetchCancellationRate(selectedYear, selectedMonth, selecteduserType, selectedRoomNumber);
-    fetchBookingLeadTime(selectedYear, selectedMonth, selectedRoomNumber);
+    fetchBookingLeadTime(selectedYear, selectedMonth, selecteduserType, selectedRoomNumber);
     fetchPeakBookingHours(selectedYear, selectedMonth, selecteduserType, selectedRoomNumber);
-
-
 }
 
 window.onload = function () {
