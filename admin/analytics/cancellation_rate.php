@@ -22,6 +22,7 @@ $query = "SELECT
           WHERE 1=1 
           $yearCondition
           $monthCondition
+          
           $guestTypeCondition
           $roomNumberCondition";
 
