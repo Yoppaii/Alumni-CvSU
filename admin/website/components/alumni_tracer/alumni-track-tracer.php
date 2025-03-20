@@ -148,6 +148,142 @@
             --AT-dark: #5a5c69;
         }
     </style>
+    <style>
+        /* Filters Container Styling */
+        .filters-container {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .filter-section {
+            margin-bottom: 15px;
+        }
+
+        .filter-section h4 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+        }
+
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-group label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        .filter-dropdown,
+        .filter-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .year-range {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .year-range input {
+            flex: 1;
+            width: calc(50% - 15px);
+        }
+
+        .year-range span {
+            color: #777;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 15px;
+        }
+
+        .filter-buttons .btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+        }
+
+        #applyFiltersBtn {
+            background-color: #006400;
+            color: white;
+        }
+
+        #resetFiltersBtn {
+            background-color: #f1f1f1;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+
+        /* Primary vs Secondary Filter Visual Distinction */
+        .primary-filters {
+            background-color: rgba(0, 100, 0, 0.05);
+            border-left: 3px solid #006400;
+            padding-left: 12px;
+        }
+
+        .secondary-filters {
+            background-color: rgba(0, 0, 0, 0.02);
+            border-left: 3px solid #aaa;
+            padding-left: 12px;
+        }
+
+        /* Summary Section Enhancement */
+        .AT-summary {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .summary-item {
+            margin-bottom: 8px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+        }
+
+        .summary-item:before {
+            content: "•";
+            color: #006400;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .filter-row {
+                flex-direction: column;
+            }
+
+            .filter-group {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -158,8 +294,10 @@
     </header>
 
     <div class="AT-chart-container">
-        <!-- Gender Distribution Row -->
         <div class="AT-chart-row">
+            <div class="AT-chart-wrapper">
+                <div id="filterContainer" class="filters-container"></div>
+            </div>
             <div class="AT-chart-wrapper">
                 <h3>Alumni Employment Status Trend</h3>
                 <div class="AT-chart-summary">
@@ -171,6 +309,7 @@
                     </div>
                 </div>
             </div>
+            
             <div class="AT-chart-wrapper">
                 <h3>Gender Distribution</h3>
                 <div class="AT-chart-summary">

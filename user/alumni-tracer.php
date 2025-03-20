@@ -1,12 +1,12 @@
 <?php
-ob_start(); 
+ob_start();
 require('main_db.php');
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
 if (!isset($_SESSION['user_id'])) {
-    ob_end_clean(); 
+    ob_end_clean();
     header("Location: login.php");
     exit();
 }
@@ -19,414 +19,442 @@ $check_stmt->execute();
 $check_result = $check_stmt->get_result();
 
 if ($check_result->num_rows > 0) {
-    ob_end_clean(); 
+    ob_end_clean();
     echo "<script>window.location.href = 'Account?section=home';</script>";
     exit();
 }
 $check_stmt->close();
 
-ob_end_flush(); 
+ob_end_flush();
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alumni Tracer Study</title>
 </head>
-    <style>
-        :root {
-            --primary-color: #2d6936;
-            --secondary-color: #1e40af;
-            --background-color: #f4f6f8;
-            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
+<style>
+    :root {
+        --primary-color: #2d6936;
+        --secondary-color: #1e40af;
+        --background-color: #f4f6f8;
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
 
-        body {
-            background: var(--background-color);
-            min-height: 100vh;
-            padding: 10px;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        }
+    body {
+        background: var(--background-color);
+        min-height: 100vh;
+        padding: 10px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
 
+    .container {
+        max-width: auto;
+        margin: 20px auto;
+        background: white;
+        border-radius: 8px;
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+    }
+
+    .form-step {
+        padding: 24px;
+        background: white;
+    }
+
+    h2 {
+        font-size: 24px;
+        color: #111827;
+        margin: 0 0 24px 0;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        color: #374151;
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 8px;
+    }
+
+    select,
+    input[type="date"],
+    input[type="text"],
+    textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        background-color: white;
+        font-size: 14px;
+        color: #111827;
+        transition: all 0.2s ease;
+    }
+
+    select:focus,
+    input[type="date"]:focus,
+    input[type="text"]:focus,
+    textarea:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(45, 105, 54, 0.1);
+    }
+
+    .checkbox-group {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 8px;
+    }
+
+    .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #4b5563;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        border: 1.5px solid #d1d5db;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .step-indicators {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        padding: 24px;
+        background: white;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .step {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #e5e7eb;
+        color: #6b7280;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+
+    .step.active {
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+    .step.completed {
+        background-color: #4ade80;
+        color: white;
+    }
+
+    .button-group {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 24px;
+        padding-top: 16px;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .btn {
+        padding: 12px 24px;
+        border-radius: 6px;
+        font-weight: 500;
+        font-size: 14px;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        border: none;
+    }
+
+    .prev-btn {
+        background-color: #6b7280;
+        color: white;
+    }
+
+    .next-btn,
+    .submit-btn {
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+    .prev-btn:hover {
+        background-color: #4b5563;
+    }
+
+    .next-btn:hover,
+    .submit-btn:hover {
+        background-color: #1f4d27;
+    }
+
+    .error {
+        border-color: #dc2626 !important;
+    }
+
+    .error-message {
+        color: #dc2626;
+        font-size: 12px;
+        margin-top: 4px;
+    }
+
+    .person-entry {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 16px;
+    }
+
+    .person-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+    .person-header h3 {
+        margin: 0;
+        color: #374151;
+        font-size: 16px;
+    }
+
+    .remove-person-btn {
+        background: #ef4444;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .add-person-btn {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 12px 24px;
+        font-size: 14px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 16px 0;
+    }
+
+    @media (max-width: 640px) {
         .container {
-            max-width: auto;
-            margin: 20px auto;
-            background: white;
-            border-radius: 8px;
-            box-shadow: var(--shadow-md);
-            overflow: hidden;
+            margin: 10px;
         }
 
         .form-step {
-            padding: 24px;
-            background: white;
-        }
-
-        h2 {
-            font-size: 24px;
-            color: #111827;
-            margin: 0 0 24px 0;
-            padding-bottom: 16px;
-            border-bottom: 1px solid #e5e7eb;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            color: #374151;
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 8px;
-        }
-
-        select,
-        input[type="date"],
-        input[type="text"],
-        textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #e5e7eb;
-            border-radius: 6px;
-            background-color: white;
-            font-size: 14px;
-            color: #111827;
-            transition: all 0.2s ease;
-        }
-
-        select:focus,
-        input[type="date"]:focus,
-        input[type="text"]:focus,
-        textarea:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(45, 105, 54, 0.1);
-        }
-
-        .checkbox-group {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-top: 8px;
-        }
-
-        .checkbox-label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #4b5563;
-            font-size: 14px;
-            cursor: pointer;
-        }
-
-        input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
-            border: 1.5px solid #d1d5db;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .step-indicators {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            padding: 24px;
-            background: white;
-            border-bottom: 1px solid #e5e7eb;
+            padding: 16px;
         }
 
         .step {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: #e5e7eb;
-            color: #6b7280;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-        }
-
-        .step.active {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        .step.completed {
-            background-color: #4ade80;
-            color: white;
-        }
-
-        .button-group {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 24px;
-            padding-top: 16px;
-            border-top: 1px solid #e5e7eb;
+            width: 32px;
+            height: 32px;
+            font-size: 14px;
         }
 
         .btn {
-            padding: 12px 24px;
-            border-radius: 6px;
-            font-weight: 500;
-            font-size: 14px;
-            transition: all 0.2s ease;
-            cursor: pointer;
-            border: none;
+            padding: 10px 20px;
+        }
+    }
+
+    #loadingOverlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+    }
+
+    .loading-content {
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid var(--primary-color);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    .loading-text {
+        color: white;
+        font-size: 14px;
+        font-weight: 500;
+        animation: pulse 1.5s ease-in-out infinite;
+        margin: 0;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
         }
 
-        .prev-btn {
-            background-color: #6b7280;
-            color: white;
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    @keyframes pulse {
+        0% {
+            opacity: 0.6;
         }
 
-        .next-btn,
-        .submit-btn {
-            background-color: var(--primary-color);
-            color: white;
+        50% {
+            opacity: 1;
         }
 
-        .prev-btn:hover {
-            background-color: #4b5563;
+        100% {
+            opacity: 0.6;
+        }
+    }
+
+    .loading-overlay-show {
+        animation: fadeIn 0.3s ease-in-out forwards;
+    }
+
+    .loading-overlay-hide {
+        animation: fadeOut 0.3s ease-in-out forwards;
+    }
+
+    .notification-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+    }
+
+    .notification {
+        background: white;
+        padding: 15px 20px;
+        border-radius: 6px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-width: 300px;
+        max-width: 450px;
+        animation: slideIn 0.3s ease-out;
+    }
+
+    .notification.success {
+        background: #2d6936;
+        color: white;
+        border-left: 4px solid #1a4721;
+    }
+
+    .notification.error {
+        background: #dc2626;
+        color: white;
+        border-left: 4px solid #991b1b;
+    }
+
+    .notification-close {
+        background: none;
+        border: none;
+        color: currentColor;
+        cursor: pointer;
+        padding: 0 5px;
+        margin-left: 10px;
+        font-size: 20px;
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
         }
 
-        .next-btn:hover,
-        .submit-btn:hover {
-            background-color: #1f4d27;
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideOut {
+        from {
+            transform: translateX(0);
+            opacity: 1;
         }
 
-        .error {
-            border-color: #dc2626 !important;
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
         }
 
-        .error-message {
-            color: #dc2626;
-            font-size: 12px;
-            margin-top: 4px;
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes fadeOut {
+        from {
+            opacity: 1;
         }
 
-        .person-entry {
-            background: #f9fafb;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 16px;
+        to {
+            opacity: 0;
         }
+    }
+</style>
 
-        .person-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-        .person-header h3 {
-            margin: 0;
-            color: #374151;
-            font-size: 16px;
-        }
-
-        .remove-person-btn {
-            background: #ef4444;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 28px;
-            height: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .add-person-btn {
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 12px 24px;
-            font-size: 14px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin: 16px 0;
-        }
-
-        @media (max-width: 640px) {
-            .container {
-                margin: 10px;
-            }
-
-            .form-step {
-                padding: 16px;
-            }
-
-            .step {
-                width: 32px;
-                height: 32px;
-                font-size: 14px;
-            }
-
-            .btn {
-                padding: 10px 20px;
-            }
-        }
-        #loadingOverlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-        }
-
-        .loading-content {
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid var(--primary-color);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        .loading-text {
-            color: white;
-            font-size: 14px;
-            font-weight: 500;
-            animation: pulse 1.5s ease-in-out infinite;
-            margin: 0;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        @keyframes pulse {
-            0% { opacity: 0.6; }
-            50% { opacity: 1; }
-            100% { opacity: 0.6; }
-        }
-
-        .loading-overlay-show {
-            animation: fadeIn 0.3s ease-in-out forwards;
-        }
-
-        .loading-overlay-hide {
-            animation: fadeOut 0.3s ease-in-out forwards;
-        }
-
-        .notification-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-        }
-
-        .notification {
-            background: white;
-            padding: 15px 20px;
-            border-radius: 6px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            min-width: 300px;
-            max-width: 450px;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        .notification.success {
-            background: #2d6936;
-            color: white;
-            border-left: 4px solid #1a4721;
-        }
-
-        .notification.error {
-            background: #dc2626;
-            color: white;
-            border-left: 4px solid #991b1b;
-        }
-
-        .notification-close {
-            background: none;
-            border: none;
-            color: currentColor;
-            cursor: pointer;
-            padding: 0 5px;
-            margin-left: 10px;
-            font-size: 20px;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        @keyframes slideOut {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
-        }
-    </style>
 <body>
-<div id="loadingOverlay">
-    <div class="loading-content">
-        <div class="loading-spinner"></div>
-        <div class="loading-text">Processing your request...</div>
+    <div id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Processing your request...</div>
+        </div>
     </div>
-</div>
 
-<div class="notification-container" id="notificationContainer"></div>
+    <div class="notification-container" id="notificationContainer"></div>
 
     <div class="container">
         <form id="alumniTracerForm" method="POST" action="process_tracer.php">
-            
+
             <div class="step-indicators">
                 <div class="step active" data-step="1">1</div>
                 <div class="step" data-step="2">2</div>
@@ -587,7 +615,7 @@ ob_end_flush();
                         <option value="vocational">Vocational/Technical Course</option>
                     </select>
                 </div>
-                
+
                 <div class="form-group">
                     <label>Reason(s) for taking the course(s) or pursuing degree(s)</label>
                     <div class="checkbox-group">
@@ -648,10 +676,10 @@ ob_end_flush();
                 </div>
             </div>
 
-         <!-- Step 3: Training/Advance Studies -->
-         <div class="form-step" id="step3" style="display: none;">
+            <!-- Step 3: Training/Advance Studies -->
+            <div class="form-step" id="step3" style="display: none;">
                 <h2>Training(s)/Advance Studies Attended After College</h2>
-                
+
                 <p class="form-instruction">Please list down all professional or work-related training program(s) including advance studies you have attended after college.</p>
 
                 <div class="form-group">
@@ -693,7 +721,7 @@ ob_end_flush();
             <!-- Step 4: Employment Data -->
             <div class="form-step" id="step4" style="display: none;">
                 <h2>Employment Data</h2>
-                
+
                 <div class="form-group">
                     <label for="employmentStatus">Are you presently employed?</label>
                     <select name="employmentStatus" id="employmentStatus" required>
@@ -793,7 +821,7 @@ ob_end_flush();
             <!-- Step 5: Job Experience and Reasons -->
             <div class="form-step" id="step5" style="display: none;">
                 <h2>Job Experience and Reasons</h2>
-                
+
                 <div class="form-group">
                     <label for="firstJob">Is this your first job after college?</label>
                     <select name="firstJob" id="firstJob" required>
@@ -877,7 +905,7 @@ ob_end_flush();
             <!-- Step 6: Job Duration and Finding -->
             <div class="form-step" id="step6" style="display: none;">
                 <h2>Job Duration and Finding</h2>
-                
+
                 <div class="form-group">
                     <label>What were your reason(s) for changing job?</label>
                     <div class="checkbox-group">
@@ -1016,7 +1044,7 @@ ob_end_flush();
                 </div>
             </div>
 
-          <!-- Step 7: Thank You -->
+            <!-- Step 7: Thank You -->
             <div class="form-step" id="step7" style="display: none;">
                 <h2>Thank You!</h2>
                 <div class="thank-you-message">
@@ -1065,28 +1093,28 @@ ob_end_flush();
                 init: function() {
                     this.container = document.getElementById('notificationContainer');
                 },
-                
+
                 show: function(message, type = 'error', duration = 5000) {
                     if (!this.container) return;
-                    
+
                     const notification = document.createElement('div');
                     notification.className = `notification ${type}`;
-                    
+
                     const messageSpan = document.createElement('span');
                     messageSpan.textContent = message;
-                    
+
                     const closeButton = document.createElement('button');
                     closeButton.className = 'notification-close';
                     closeButton.innerHTML = '×';
                     closeButton.onclick = () => this.remove(notification);
-                    
+
                     notification.appendChild(messageSpan);
                     notification.appendChild(closeButton);
                     this.container.appendChild(notification);
-                    
+
                     setTimeout(() => this.remove(notification), duration);
                 },
-                
+
                 remove: function(notification) {
                     notification.style.animation = 'slideOut 0.3s ease-out forwards';
                     setTimeout(() => {
@@ -1301,30 +1329,30 @@ ob_end_flush();
                     e.preventDefault();
                     if (validateStep(currentStep)) {
                         const formData = new FormData(this);
-                        
+
                         showLoading('Submitting your tracer form...');
-                        
+
                         fetch('user/process_tracer.php', {
-                            method: 'POST',
-                            body: formData
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            hideLoading();
-                            if (data.status === 'success') {
-                                NotificationSystem.show('Form submitted successfully!', 'success');
-                                setTimeout(() => {
-                                    window.location.href = 'Account?section=home';
-                                }, 1500);
-                            } else {
-                                NotificationSystem.show(data.message || 'Error submitting form', 'error');
-                            }
-                        })
-                        .catch(error => {
-                            hideLoading();
-                            console.error('Error:', error);
-                            NotificationSystem.show('An error occurred while submitting the form', 'error');
-                        });
+                                method: 'POST',
+                                body: formData
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                hideLoading();
+                                if (data.status === 'success') {
+                                    NotificationSystem.show('Form submitted successfully!', 'success');
+                                    setTimeout(() => {
+                                        window.location.href = 'Account?section=home';
+                                    }, 1500);
+                                } else {
+                                    NotificationSystem.show(data.message || 'Error submitting form', 'error');
+                                }
+                            })
+                            .catch(error => {
+                                hideLoading();
+                                console.error('Error:', error);
+                                NotificationSystem.show('An error occurred while submitting the form', 'error');
+                            });
                     } else {
                         NotificationSystem.show('Please fill in all required fields', 'error');
                     }
@@ -1375,4 +1403,5 @@ ob_end_flush();
         });
     </script>
 </body>
+
 </html>

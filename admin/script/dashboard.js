@@ -616,7 +616,7 @@ function fetchPeakBookingHours(year, month, guestType, roomNumber) {
                         data: values,
                         backgroundColor: gradients, // Use the dynamically generated gradients
                         borderColor: "rgba(0, 0, 0, 0.1)",
-                        borderWidth: 1
+                        borderWidth: 0
                     }]
                 },
                 options: {
@@ -629,9 +629,15 @@ function fetchPeakBookingHours(year, month, guestType, roomNumber) {
                         y: {
                             beginAtZero: true,
                             title: { display: true, text: "Number of Bookings" },
-                            ticks: { stepSize: 1 }
+                            ticks: { stepSize: 1 },
+                            grid: {
+                                display: true,
+                                drawBorder: false,
+                                color: 'rgba(200, 200, 200, 0.15)',
+                            },
                         },
                         x: {
+                            grid: { display: false },
                             title: { display: true, text: "Time of Day (24-hour format)" }
                         }
                     },
