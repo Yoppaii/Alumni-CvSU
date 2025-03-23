@@ -195,6 +195,7 @@ function fetchBookingByDay(year, month, guestType, roomNumber) {
                                 }
                             }
                         }
+                        
                     }
                 }
             });

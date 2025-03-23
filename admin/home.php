@@ -259,7 +259,7 @@ $today = date('Y-m-d');
         <div class="dashboard-row">
             <div class="analytics-card">
                 <div class="analytics-header">
-                    <h2>Total Bookings by Day of the Week</h2>
+                    <h2>Total Bookings by Day</h2>
                     <label class="toggle-report">
                         <input type="checkbox" class="toggle-input report-checkbox" value="dailyBookings" checked>
                         <span class="toggle-label">Include in Report</span>
@@ -942,8 +942,13 @@ $today = date('Y-m-d');
             document.getElementById("resetFilters").addEventListener("click", function() {
                 // Reset all filter dropdowns to default (assuming first option is default)
                 document.querySelectorAll(".filter-select").forEach(select => {
-                    select.selectedIndex = 0;
+                    if (select.id === "yearFilter") {
+                        select.selectedIndex = 1;
+                    } else {
+                        select.selectedIndex = 0;
+                    }
                 });
+
 
                 // Reset all toggles
                 document.querySelectorAll(".toggle-input").forEach(toggle => {
