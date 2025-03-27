@@ -6,7 +6,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alumni Tracer</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
     <style>
+        /* Root Variables - Color Theme */
+        :root {
+            --primary-color: #10b981;
+            --primary-hover: #059669;
+            --primary-light: #d1fae5;
+            --secondary-color: #64748b;
+            --success-color: #22c55e;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --neutral-gray: #6b7280;
+            --dark-gray: #4b5563;
+            --shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Page Header */
         .AT-page-header {
             display: flex;
             justify-content: space-between;
@@ -27,175 +48,145 @@
             font-size: 1.1em;
         }
 
-        .AT-chart-container {
-            padding: 20px;
-            max-width: 1400px;
-            margin: 0 auto;
+        /* Analytics Dashboard */
+        .analytics-dashboard {
+            margin: 2rem 0;
         }
 
-        .AT-chart-row {
+        /* Summary Cards */
+        .analytics-summary {
             display: grid;
-            grid-template-columns: repeat(1, 1fr);
-            gap: 30px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
         }
 
-        .AT-chart-wrapper {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-        }
-
-        .AT-chart-wrapper h3 {
-            color: #006400;
-            margin: 0 0 20px 0;
-            font-size: 1.3em;
-            text-align: center;
-        }
-
-        .AT-chart-summary {
+        .summary-card {
+            background: var(--bg-primary);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
             display: flex;
-            gap: 20px;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--shadow);
         }
 
-        .AT-chart {
-            flex: 1;
-            height: auto;
+        .summary-card i {
+            font-size: 2rem;
+            color: var(--primary-color);
         }
 
-        .AT-summary {
-            width: 150px;
-            padding: 10px;
-            background: #f8f8f8;
-            border-radius: 6px;
+        .summary-content h3 {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin: 0;
         }
 
-        .AT-summary p {
-            margin: 8px 0;
-            font-size: 0.9em;
-            color: #333;
+        .summary-content p {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-top: 0.25rem;
         }
 
-        canvas {
-            width: 100% !important;
-            height: 300px !important;
+        /* Dashboard Layout */
+        .dashboard-row {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
         }
 
-        /* Responsive Design */
-        @media (max-width: 1200px) {
-            .AT-chart-row {
-                gap: 20px;
-            }
-
-            .AT-chart-wrapper {
-                padding: 15px;
-            }
+        /* Analytics Cards */
+        .analytics-card {
+            background: var(--bg-primary);
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            overflow: hidden;
         }
 
-        @media (max-width: 992px) {
-            .AT-chart-row {
-                grid-template-columns: 1fr;
-            }
-
-            .AT-chart {
-                height: 250px;
-            }
-
-            canvas {
-                height: 250px !important;
-            }
+        .analytics-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--bg-secondary);
         }
 
-        @media (max-width: 768px) {
-            .AT-alumni-hero-content h1 {
-                font-size: 2em;
-            }
-
-            .AT-chart-summary {
-                flex-direction: column;
-            }
-
-            .AT-summary {
-                width: 100%;
-            }
+        .analytics-header h2 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
         }
 
-        @media (max-width: 576px) {
-            .AT-page-header {
-                flex-direction: column;
-                text-align: center;
-                gap: 10px;
-            }
-
-            .AT-alumni-hero-content h1 {
-                font-size: 1.8em;
-            }
-
-            .AT-chart-wrapper h3 {
-                font-size: 1.1em;
-            }
-        }
-
-        :root {
-            --AT-primary: #006400;
-            --AT-secondary: #004d00;
-            --AT-success: #1cc88a;
-            --AT-info: #36b9cc;
-            --AT-warning: #f6c23e;
-            --AT-danger: #e74a3b;
-            --AT-light: #f8f9fc;
-            --AT-dark: #5a5c69;
-        }
-    </style>
-    <style>
-        /* Filters Container Styling */
-        .filters-container {
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-
-        .filter-section {
-            margin-bottom: 15px;
-        }
-
-        .filter-section h4 {
-            font-size: 16px;
-            color: #333;
-            margin-bottom: 10px;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 5px;
-        }
-
-        .filter-row {
+        /* Filters & Dashboard */
+        .filter-bar {
+            background-color: white;
+            padding: 16px 24px;
+            margin-bottom: 24px;
             display: flex;
             flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 10px;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .filters-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: 0.5rem;
         }
 
         .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
             flex: 1;
-            min-width: 200px;
+            min-width: 150px;
         }
 
-        .filter-group label {
-            display: block;
-            font-size: 14px;
-            margin-bottom: 5px;
-            color: #555;
-        }
-
-        .filter-dropdown,
-        .filter-group input {
+        .filter-select {
             width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 0.5rem;
+            border: 1px solid var(--secondary-color);
+            border-radius: 0.375rem;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: border-color 0.2s ease, background 0.2s ease;
+        }
+
+        .filter-select:hover,
+        .filter-select:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 4px var(--primary-light);
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 8px;
+            margin-left: auto;
+        }
+
+        /* Reset Button */
+        .reset-filter-btn {
+            padding: 8px 12px;
             font-size: 14px;
+            font-weight: bold;
+            color: white;
+            background-color: var(--neutral-gray);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .reset-filter-btn:hover {
+            background-color: var(--dark-gray);
         }
 
         .year-range {
@@ -213,77 +204,109 @@
             color: #777;
         }
 
-        .filter-buttons {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-            margin-top: 15px;
-        }
-
-        .filter-buttons .btn {
-            padding: 8px 16px;
-            border-radius: 4px;
+        /* Buttons */
+        .button {
+            padding: 10px 16px;
+            border-radius: 8px;
             font-size: 14px;
+            font-weight: 500;
             cursor: pointer;
+            transition: all 0.2s ease;
             border: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        #applyFiltersBtn {
-            background-color: #006400;
+        .button-primary {
+            background-color: var(--primary-color);
             color: white;
         }
 
-        #resetFiltersBtn {
-            background-color: #f1f1f1;
-            color: #333;
-            border: 1px solid #ddd;
+        .button-primary:hover {
+            background-color: var(--primary-hover);
         }
 
-        /* Primary vs Secondary Filter Visual Distinction */
-        .primary-filters {
-            background-color: rgba(0, 100, 0, 0.05);
-            border-left: 3px solid #006400;
-            padding-left: 12px;
+        .button-secondary {
+            background-color: white;
+            color: var(--dark-gray);
+            border: 1px solid var(--secondary-color);
         }
 
-        .secondary-filters {
-            background-color: rgba(0, 0, 0, 0.02);
-            border-left: 3px solid #aaa;
-            padding-left: 12px;
+        .button-secondary:hover {
+            background-color: var(--secondary-color);
+            color: white;
         }
 
-        /* Summary Section Enhancement */
-        .AT-summary {
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
+        .analytics-content {
+            padding: 1.5rem;
+            height: 300px;
+            position: relative;
         }
 
-        .summary-item {
-            margin-bottom: 8px;
-            font-size: 14px;
+
+
+        /* Print Report Button */
+        #printReport {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
             display: flex;
             align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
         }
 
-        .summary-item:before {
-            content: "•";
-            color: #006400;
-            font-weight: bold;
-            margin-right: 8px;
+        #printReport:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        /* Dark Mode Support */
+        [data-theme="dark"] .analytics-card,
+        [data-theme="dark"] .summary-card {
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        [data-theme="dark"] .filters-container {
+            background: var(--bg-primary);
+            border: 1px solid var(--secondary-color);
+        }
+
+        [data-theme="dark"] .filter-select {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
         }
 
         /* Responsive Adjustments */
         @media (max-width: 768px) {
-            .filter-row {
+            .filters-container {
                 flex-direction: column;
             }
 
-            .filter-group {
-                width: 100%;
+            .analytics-summary {
+                grid-template-columns: repeat(2, 1fr);
             }
+
+            .dashboard-row {
+                padding: 1rem;
+                grid-template-columns: 1fr;
+            }
+
+            .analytics-content {
+                padding: 1rem;
+                height: 250px;
+            }
+
         }
     </style>
+
 </head>
 
 <body>
@@ -292,230 +315,74 @@
         <h1>Alumni Tracer Information</h1>
         <div class="AT-date-time"></div>
     </header>
-
-    <div class="AT-chart-container">
-        <div class="AT-chart-row">
-            <div class="AT-chart-wrapper">
-                <div id="filterContainer" class="filters-container"></div>
-            </div>
-            <div class="AT-chart-wrapper">
-                <h3>Alumni Employment Status Trend</h3>
-                <div class="AT-chart-summary">
-                    <div class="AT-chart">
-                        <canvas id="employmentChart"></canvas>
-                    </div>
-                    <div class="AT-summary">
-                        <p></p>
+    <div class="dashboard-row">
+        <div class="analytics-card">
+            <div class="filter-bar">
+                <div class="filter-group">
+                    <label class="filter-label" for="campusFilter">Campus:</label>
+                    <select id="campusFilter" class="filter-select"></select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label" for="courseFilter">Course:</label>
+                    <select id="courseFilter" class="filter-select"></select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Graduation Date:</label>
+                    <div class="year-range">
+                        <select id="gradYearFrom" class="filter-select"></select>
+                        <span>to</span>
+                        <select id="gradYearTo" class="filter-select"></select>
                     </div>
                 </div>
-            </div>
-            
-            <div class="AT-chart-wrapper">
-                <h3>Gender Distribution</h3>
-                <div class="AT-chart-summary">
-                    <div class="AT-chart">
-                        <canvas id="genderRespondentChart"></canvas>
-                    </div>
-                    <div class="AT-summary">
-                        <p>Male: 50</p>
-                        <p>Female: 45</p>
-                        <p>Other: 5</p>
-                    </div>
+                <div class="filter-group">
+                    <label class="filter-label" for="employmentStatusFilter">Employment Status:</label>
+                    <select id="employmentStatusFilter" class="filter-select"></select>
                 </div>
-            </div>
-            <div class="AT-chart-wrapper">
-                <h3>Civil Status</h3>
-                <div class="AT-chart-summary">
-                    <div class="AT-chart">
-                        <canvas id="civilStatusChart"></canvas>
-                    </div>
-                    <div class="AT-summary">
-                        <p>Single: 60</p>
-                        <p>Married: 30</p>
-                        <p>Divorced: 5</p>
-                        <p>Widowed: 5</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Year Graduated Row -->
-        <div class="AT-chart-row">
-            <div class="AT-chart-wrapper">
-                <h3>Year Graduated</h3>
-                <div class="AT-chart-summary">
-                    <div class="AT-chart">
-                        <canvas id="yearGraduatedChart"></canvas>
-                    </div>
-                    <div class="AT-summary">
-                        <p>2010: 20</p>
-                        <p>2011: 25</p>
-                        <p>2012: 30</p>
-                        <p>2013: 25</p>
-                    </div>
-                </div>
-            </div>
-            <div class="AT-chart-wrapper">
-                <h3>Program Distribution</h3>
-                <div class="AT-chart-summary">
-                    <div class="AT-chart">
-                        <canvas id="programRespondentsChart"></canvas>
-                    </div>
-                    <div class="AT-summary">
-                        <p>Program A: 40</p>
-                        <p>Program B: 35</p>
-                        <p>Program C: 25</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Post Graduate Studies Row -->
-        <div class="AT-chart-row">
-            <div class="AT-chart-wrapper">
-                <h3>Post Graduate Studies</h3>
-                <div class="AT-chart-summary">
-                    <div class="AT-chart">
-                        <canvas id="postGraduateStudiesChart"></canvas>
-                    </div>
-                    <div class="AT-summary">
-                        <p>Yes: 30</p>
-                        <p>No: 70</p>
-                    </div>
-                </div>
-            </div>
-            <div class="AT-chart-wrapper">
-                <h3>Employment Status</h3>
-                <div class="AT-chart-summary">
-                    <div class="AT-chart">
-                        <canvas id="statusEmploymentChart"></canvas>
-                    </div>
-                    <div class="AT-summary">
-                        <p>Employed: 80</p>
-                        <p>Unemployed: 20</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Length of Stay Row -->
-        <div class="AT-chart-row">
-            <div class="AT-chart-wrapper">
-                <h3>Length of Stay in Present Job</h3>
-                <div class="AT-chart-summary">
-                    <div class="AT-chart">
-                        <canvas id="lengthOfStayChart"></canvas>
-                    </div>
-                    <div class="AT-summary">
-                        <p>Less than 1 year: 20</p>
-                        <p>1-3 years: 50</p>
-                        <p>More than 3 years: 30</p>
-                    </div>
-                </div>
-            </div>
-            <div class="AT-chart-wrapper">
-                <h3>Present Employment Tenure</h3>
-                <div class="AT-chart-summary">
-                    <div class="AT-chart">
-                        <canvas id="presentTenureChart"></canvas>
-                    </div>
-                    <div class="AT-summary">
-                        <p>Permanent: 40</p>
-                        <p>Contractual: 30</p>
-                        <p>Temporary: 30</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Employment Relation Row -->
-        <div class="AT-chart-row">
-            <div class="AT-chart-wrapper">
-                <h3>Employment Relation to Program</h3>
-                <div class="AT-chart-summary">
-                    <div class="AT-chart">
-                        <canvas id="relationEmploymentChart"></canvas>
-                    </div>
-                    <div class="AT-summary">
-                        <p>Related: 70</p>
-                        <p>Not Related: 30</p>
-                    </div>
-                </div>
-            </div>
-            <div class="AT-chart-wrapper">
-                <h3>Employment Location</h3>
-                <div class="AT-chart-summary">
-                    <div class="AT-chart">
-                        <canvas id="locationEmploymentChart"></canvas>
-                    </div>
-                    <div class="AT-summary">
-                        <p>Local: 80</p>
-                        <p>Abroad: 20</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- First Job Row -->
-        <div class="AT-chart-row">
-            <div class="AT-chart-wrapper">
-                <h3>First Job Status</h3>
-                <div class="AT-chart-summary">
-                    <div class="AT-chart">
-                        <canvas id="firstJobChart"></canvas>
-                    </div>
-                    <div class="AT-summary">
-                        <p>Yes: 60</p>
-                        <p>No: 40</p>
-                    </div>
-                </div>
-            </div>
-            <div class="AT-chart-wrapper">
-                <h3>College Experience Relevance</h3>
-                <div class="AT-chart-summary">
-                    <div class="AT-chart">
-                        <canvas id="collegeExperienceChart"></canvas>
-                    </div>
-                    <div class="AT-summary">
-                        <p>Yes: 85</p>
-                        <p>No: 15</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Time to First Job Row -->
-        <div class="AT-chart-row">
-            <div class="AT-chart-wrapper">
-                <h3>Time to First Job</h3>
-                <div class="AT-chart-summary">
-                    <div class="AT-chart">
-                        <canvas id="lengthOfTimeChart"></canvas>
-                    </div>
-                    <div class="AT-summary">
-                        <p>Less than 6 months: 50</p>
-                        <p>6-12 months: 30</p>
-                        <p>More than 1 year: 20</p>
-                    </div>
-                </div>
-            </div>
-            <div class="AT-chart-wrapper">
-                <h3>First Job Finding Method</h3>
-                <div class="AT-chart-summary">
-                    <div class="AT-chart">
-                        <canvas id="methodOfFindingFirstJobChart"></canvas>
-                    </div>
-                    <div class="AT-summary">
-                        <p>Online Job Portal: 12</p>
-                        <p>Campus Placement: 19</p>
-                        <p>Referral: 3</p>
-                        <p>Direct Application: 5</p>
-                        <p>Others: 2</p>
-                    </div>
+                <div class="filter-actions">
+                    <button class="button reset-filter-btn" id="resetFilters">Reset Filters</button>
                 </div>
             </div>
         </div>
     </div>
+    <div class="dashboard-row">
+        <div class="analytics-card">
+            <div class="analytics-header">
+                <h2>Employment Rate</h2>
+            </div>
+            <div class="analytics-content">
+                <canvas id="employmentRateChart"></canvas>
+            </div>
+        </div>
+        <div class="analytics-card">
+            <div class="analytics-header">
+                <h2>Course Relevant to Job vs. Salary Range</h2>
+            </div>
+            <div class="analytics-content">
+                <canvas id="jobRelevanceSalaryChart"></canvas>
+            </div>
+        </div>
+        <div class="analytics-card">
+            <div class="analytics-header">
+                <h2>Employment Type by Location</h2>
+            </div>
+            <div class="analytics-content">
+                <canvas id="employmentLocationChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="dashboard-row">
+        <div class="analytics-card">
+            <div class="analytics-header">
+                <h2>Employment Type by Location</h2>
+            </div>
+            <div class="analytics-content">
+                <canvas id="employmentLocationChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!-- Script Settings  -->
@@ -528,299 +395,111 @@
         }
         setInterval(updateDateTime, 1000);
         updateDateTime();
-
-        // Chart colors
-        const colors = {
-            primary: '#006400',
-            secondary: '#004d00',
-            success: '#1cc88a',
-            info: '#36b9cc',
-            warning: '#f6c23e',
-            danger: '#e74a3b'
-        };
-
-        // Common chart options
-        const commonOptions = {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        padding: 10,
-                        font: {
-                            size: 12
-                        }
-                    }
-                }
-            }
-        };
-
-        // Bar chart specific options
-        const barOptions = {
-            ...commonOptions,
-            scales: {
-                y: {
-                    title: {
-                        display: true,
-                        text: "Number of Graduates"
-                    },
-
-                    beginAtZero: true,
-                    stacked: true, // Ensure stacking on Y-axis
-                    ticks: {
-                        font: {
-                            size: 12
-                        }
-                    }
-                },
-                x: {
-                    title: {
-                        display: true,
-                        text: "Year Graduated"
-                    },
-
-                    stacked: true, // Ensure stacking on X-axis
-                    ticks: {
-                        font: {
-                            size: 12
-                        }
-                    }
-                }
-            },
-            plugins: {
-                legend: {
-                    position: 'top'
-                }
-            }
-        };
-
-
-        // Line chart specific options
-        const lineOptions = {
-            ...barOptions,
-            elements: {
-                line: {
-                    tension: 0.3
-                },
-                point: {
-                    radius: 4
-                },
-
-            }
-        };
-
-        window.onload = function() {
-            console.log('Initializing charts...');
-
-
-
-
-            // Gender Distribution Chart
-            new Chart(document.getElementById('genderRespondentChart'), {
-                type: 'pie',
-                data: {
-                    labels: ['Male', 'Female', 'Other'],
-                    datasets: [{
-                        data: [50, 45, 5],
-                        backgroundColor: [colors.primary, colors.success, colors.info]
-                    }]
-                },
-                options: commonOptions
-            });
-
-            // Civil Status Chart
-            new Chart(document.getElementById('civilStatusChart'), {
-                type: 'bar',
-                data: {
-                    labels: ['Single', 'Married', 'Divorced', 'Widowed'],
-                    datasets: [{
-                        label: 'Civil Status',
-                        data: [60, 30, 5, 5],
-                        backgroundColor: colors.primary
-                    }]
-                },
-                options: barOptions
-            });
-
-            // Year Graduated Chart
-            new Chart(document.getElementById('yearGraduatedChart'), {
-                type: 'line',
-                data: {
-                    labels: ['2010', '2011', '2012', '2013'],
-                    datasets: [{
-                        label: 'Graduates',
-                        data: [20, 25, 30, 25],
-                        borderColor: colors.success,
-                        backgroundColor: colors.success
-                    }]
-                },
-                options: lineOptions
-            });
-
-            // Program Distribution Chart
-            new Chart(document.getElementById('programRespondentsChart'), {
-                type: 'bar',
-                data: {
-                    labels: ['Program A', 'Program B', 'Program C'],
-                    datasets: [{
-                        label: 'Students',
-                        data: [40, 35, 25],
-                        backgroundColor: colors.info
-                    }]
-                },
-                options: barOptions
-            });
-
-            // Post Graduate Studies Chart
-            new Chart(document.getElementById('postGraduateStudiesChart'), {
-                type: 'pie',
-                data: {
-                    labels: ['Yes', 'No'],
-                    datasets: [{
-                        data: [30, 70],
-                        backgroundColor: [colors.primary, colors.danger]
-                    }]
-                },
-                options: commonOptions
-            });
-
-            // Employment Status Chart
-            new Chart(document.getElementById('statusEmploymentChart'), {
-                type: 'bar',
-                data: {
-                    labels: ['Employed', 'Unemployed'],
-                    datasets: [{
-                        label: 'Status',
-                        data: [80, 20],
-                        backgroundColor: colors.success
-                    }]
-                },
-                options: barOptions
-            });
-
-            // Length of Stay Chart
-            new Chart(document.getElementById('lengthOfStayChart'), {
-                type: 'bar',
-                data: {
-                    labels: ['<1 year', '1-3 years', '>3 years'],
-                    datasets: [{
-                        label: 'Length of Stay',
-                        data: [20, 50, 30],
-                        backgroundColor: colors.primary
-                    }]
-                },
-                options: barOptions
-            });
-
-            // Present Tenure Chart
-            new Chart(document.getElementById('presentTenureChart'), {
-                type: 'pie',
-                data: {
-                    labels: ['Permanent', 'Contractual', 'Temporary'],
-                    datasets: [{
-                        data: [40, 30, 30],
-                        backgroundColor: [colors.success, colors.info, colors.primary]
-                    }]
-                },
-                options: commonOptions
-            });
-
-            // Relation Employment Chart
-            new Chart(document.getElementById('relationEmploymentChart'), {
-                type: 'pie',
-                data: {
-                    labels: ['Related', 'Not Related'],
-                    datasets: [{
-                        data: [70, 30],
-                        backgroundColor: [colors.primary, colors.danger]
-                    }]
-                },
-                options: commonOptions
-            });
-
-            // Location Employment Chart
-            new Chart(document.getElementById('locationEmploymentChart'), {
-                type: 'bar',
-                data: {
-                    labels: ['Local', 'Abroad'],
-                    datasets: [{
-                        label: 'Location',
-                        data: [80, 20],
-                        backgroundColor: colors.success
-                    }]
-                },
-                options: barOptions
-            });
-
-            // First Job Chart
-            new Chart(document.getElementById('firstJobChart'), {
-                type: 'pie',
-                data: {
-                    labels: ['Yes', 'No'],
-                    datasets: [{
-                        data: [60, 40],
-                        backgroundColor: [colors.primary, colors.danger]
-                    }]
-                },
-                options: commonOptions
-            });
-
-            // College Experience Chart
-            new Chart(document.getElementById('collegeExperienceChart'), {
-                type: 'bar',
-                data: {
-                    labels: ['Very Helpful', 'Helpful', 'Neutral', 'Not Helpful', 'Not at All'],
-                    datasets: [{
-                        label: 'Experience',
-                        data: [40, 30, 20, 5, 5],
-                        backgroundColor: colors.primary
-                    }]
-                },
-                options: barOptions
-            });
-
-            // Length of Time Chart
-            new Chart(document.getElementById('lengthOfTimeChart'), {
-                type: 'line',
-                data: {
-                    labels: ['<1 month', '1-3 months', '3-6 months', '6-12 months', '>1 year'],
-                    datasets: [{
-                        label: 'Time to First Job',
-                        data: [10, 20, 30, 25, 15],
-                        borderColor: colors.primary,
-                        backgroundColor: colors.primary
-                    }]
-                },
-                options: lineOptions
-            });
-
-            // Method of Finding First Job Chart
-            new Chart(document.getElementById('methodOfFindingFirstJobChart'), {
-                type: 'bar',
-                data: {
-                    labels: ['Online Portal', 'Campus Placement', 'Referral', 'Direct Application', 'Others'],
-                    datasets: [{
-                        label: 'Method',
-                        data: [12, 19, 3, 5, 2],
-                        backgroundColor: [
-                            colors.primary,
-                            colors.success,
-                            colors.info,
-                            colors.warning,
-                            colors.secondary
-                        ]
-                    }]
-                },
-                options: barOptions
-            });
-        };
     </script>
 
-    <!-- Employment Status Trend
-    go to webiste/ajax/analytics.php and remove the extra data -->
-    <script src="/Alumni-CvSU/admin/website/script/analytics.js"></script>
 
+    <script src="/Alumni-CvSU/admin/website/script/tracer_analytics.js"></script>
+
+    <!-- Populate Filter -->
+    <script>
+        function fetchCampuses() {
+            fetch(`/Alumni-CvSU/admin/website/ajax/get_campus_list.php`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const campusFilter = document.getElementById("campusFilter");
+                    campusFilter.innerHTML = "<option value=''>All Campuses</option>";
+                    data.forEach(campus => {
+                        const option = document.createElement("option");
+                        option.value = campus;
+                        option.textContent = campus;
+                        campusFilter.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error("Fetch error:", error.message);
+                });
+        }
+
+        function fetchCourses() {
+            fetch(`/Alumni-CvSU/admin/website/ajax/get_course_list.php`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const courseFilter = document.getElementById("courseFilter");
+                    courseFilter.innerHTML = "<option value=''>All Courses</option>";
+                    data.forEach(course => {
+                        const option = document.createElement("option");
+                        option.value = course;
+                        option.textContent = course;
+                        courseFilter.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error("Fetch error:", error.message);
+                });
+        }
+
+        function fetEmploymentStatus() {
+            fetch(`/Alumni-CvSU/admin/website/ajax/get_employment_status_list.php`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const employmentStatusFilter = document.getElementById("employmentStatusFilter");
+                    employmentStatusFilter.innerHTML = "<option value=''>All Status</option>";
+                    data.forEach(employmentStatus => {
+                        const option = document.createElement("option");
+                        option.value = employmentStatus;
+                        option.textContent = employmentStatus;
+                        employmentStatusFilter.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error("Fetch error:", error.message);
+                });
+        }
+
+        fetchCampuses();
+        fetchCourses();
+        fetEmploymentStatus();
+    </script>
+    <script>
+        document.getElementById("resetFilters").addEventListener("click", function() {
+            // Reset all filter dropdowns to default (assuming first option is default)
+            document.querySelectorAll(".filter-select").forEach(select => {
+                if (select.id === "yearFilter") {
+                    select.selectedIndex = 1;
+                } else {
+                    select.selectedIndex = 0;
+                }
+            });
+
+
+            // Reset all toggles
+            document.querySelectorAll(".toggle-input").forEach(toggle => {
+                toggle.checked = true;
+            });
+
+            // Reset all checkboxes
+            document.querySelectorAll(".report-checkbox-container input[type='checkbox']").forEach(checkbox => {
+                checkbox.checked = true;
+            });
+
+            updateChart();
+        });
+    </script>
 </body>
 
 </html>

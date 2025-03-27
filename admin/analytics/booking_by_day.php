@@ -12,8 +12,6 @@ $roomNumber = isset($_GET['room_number']) ? $mysqli->real_escape_string($_GET['r
 // Apply guest type filter safely
 $roomNumberCondition = ($roomNumber === '') ? "" : "AND b.room_number = '$roomNumber'";
 $guestTypeCondition = ($guestType === '') ? "" : "AND u.user_status = '$guestType'";
-
-// Handle "All Years" and "All Months" conditions
 $yearCondition = ($year === null) ? "" : "AND YEAR(b.arrival_date) = $year";
 $monthCondition = ($month === null) ? "" : "AND MONTH(b.arrival_date) = $month";
 

@@ -322,647 +322,482 @@ $today = date('Y-m-d');
             </div>
         </div>
 
-        <!-- OLD DASHBOARD -->
+    </div>
 
-        <!-- Filter -->
-        <!-- <div class="dashboard-row">
-        <div class="analytics-card">
-            <div class="analytics-header">
-                <h2>Business Overview </h2>
-                <select class="form-select shadow-none bg-light w-auto" onchange="updateAnalytics(this.value)">
-                    <option value="1">Today</option>
-                    <option value="2">Past 7 Days</option>
-                    <option value="3">Past 30 Days</option>
-                    <option value="4">Past 90 Days</option>
-                    <option value="5">Past 1 Year</option>
-                    <option value="6">All time</option>
-                </select>
-            </div>
+
+    <div class="bookings-table-container">
+        <div class="header-content">
+            <h2>Recent Bookings</h2>
+            <a href="?section=view-all-bookings" class="view-all-link">
+                <i class="fas fa-external-link-alt"></i>
+                View All
+            </a>
         </div>
-    </div> -->
-
-        <!-- Users/Bookings/AlumniID -->
-        <!-- <div class="dashboard-stats">
-        <div class="stat-card">
-            <div class="stat-header">
-                <i class="fas fa-users"></i>
-                <span>Users</span>
-            </div>
-            <div class="stat-content">
-                <h3 id="total_users"></h3>
-                <p id="user_footer"></p>
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-header">
-                <i class="fas fa-users"></i>
-                <span>Bookings</span>
-            </div>
-            <div class="stat-content">
-                <h3 id="total_bookings"></h3>
-                <p id="bookings_footer"></p>
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-header">
-                <i class="fas fa-users"></i>
-                <span>Alumni ID Cards</span>
-            </div>
-            <div class="stat-content">
-                <h3 id="total_alumni_id_cards"></h3>
-                <p id="alumni_id_cards_footer"></p>
-            </div>
-        </div>
-    </div> -->
-
-        <!-- Quick report -->
-        <!-- <div class="dashboard-row">
-        <div class="summary-card">
-            <i class="fas fa-chart-line"></i>
-            <div class="summary-content">
-                <h3>Monthly Revenue</h3>
-                <?php
-                $query = "SELECT ROUND(AVG(price), 2) AS monthly_revenue FROM bookings WHERE status = 'Completed'";
-                $result = $mysqli->query($query);
-                $monthly_revenue = $result->fetch_assoc()['monthly_revenue'] ?? 0;
-                ?>
-                <p>₱<?php echo number_format($monthly_revenue, 2); ?>
-            </div>
-
-        </div>
-
-        <div class="summary-card">
-            <i class="fas fa-calendar-check"></i>
-            <div class="summary-content">
-                <h3>Completion Rate</h3>
-                <?php
-                $query = "SELECT 
-                    COUNT(*) AS total_bookings, 
-                    SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) AS completed_bookings,
-                    SUM(CASE WHEN status = 'Cancelled' THEN 1 ELSE 0 END) AS cancelled_bookings
-                    FROM bookings";
-
-                $result = $mysqli->query($query);
-                $data = $result->fetch_assoc();
-
-                $total = $data['total_bookings'] ?? 0;
-                $completed = $data['completed_bookings'] ?? 0;
-                $cancelled = $data['cancelled_bookings'] ?? 0;
-
-                $completion_rate = ($total > 0) ? ($completed / $total) * 100 : 0;
-                ?>
-                <p><?php echo number_format($completion_rate, 2); ?>%
-            </div>
-        </div>
-
-        <div class="summary-card">
-            <i class="fas fa-clock"></i>
-            <div class="summary-content">
-                <h3>Avg Stay Duration</h3>
-                <?php
-                $query = "SELECT AVG(TIMESTAMPDIFF(HOUR, CONCAT(arrival_date, ' ', arrival_time), CONCAT(departure_date, ' ', departure_time))) AS avg_stay_hours
-                    FROM bookings WHERE status = 'Completed'";
-
-                $result = $mysqli->query($query);
-                $data = $result->fetch_assoc();
-
-                $avg_stay_hours = $data['avg_stay_hours'] ?? 0;
-                $avg_stay_days = $avg_stay_hours / 24;
-                ?>
-                <p><?php echo number_format($avg_stay_days, 2); ?> days (<?php echo number_format($avg_stay_hours, 2); ?> hours)</p>
-
-            </div>
-        </div>
-
-        <div class="summary-card">
-            <i class="fas fa-money-bill-wave"></i>
-            <div class="summary-content">
-                <h3>Avg Price per Stay</h3>
-                <?php
-                $query = "SELECT AVG(price / NULLIF(TIMESTAMPDIFF(DAY, arrival_date, departure_date), 0)) AS avg_price_per_day
-                    FROM bookings WHERE status = 'Completed'";
-
-                $result = $mysqli->query($query);
-                $data = $result->fetch_assoc();
-
-                $avg_price_per_day = $data['avg_price_per_day'] ?? 0;
-                ?>
-                <p>₱<?php echo number_format($avg_price_per_day, 2); ?></p>
-            </div>
-        </div>
-    </div> -->
-
-        <!-- Booking Trends & Revenue -->
-        <!-- <div class="dashboard-row">
-        <div class="analytics-card">
-            <div class="analytics-header">
-                <h2>Booking Trends & Revenue</h2>
-                <select id="performanceSelect"></select>
-
-            </div>
-            <div class="analytics-content">
-                <canvas id="bookingChart"></canvas>
-            </div>
-        </div>
-    </div> -->
-
-        <!-- Room Occupancy & Booking Status Distribution -->
-        <!-- <div class="dashboard-row">
-        <div class="analytics-card">
-            <div class="analytics-header">
-                <h2>Room Occupancy Distribution</h2>
-            </div>
-            <div class="analytics-content">
-                <canvas id="roomOccupancyChart"></canvas>
-            </div>
-        </div>
-
-        <div class="analytics-card">
-            <div class="analytics-header">
-                <h2>Booking Status Distribution</h2>
-            </div>
-            <div class="analytics-content">
-                <canvas id="bookingStatusChart"></canvas>
-            </div>
-        </div>
-    </div> -->
-
-
-        <div class="bookings-table-container">
-            <div class="header-content">
-                <h2>Recent Bookings</h2>
-                <a href="?section=view-all-bookings" class="view-all-link">
-                    <i class="fas fa-external-link-alt"></i>
-                    View All
-                </a>
-            </div>
-            <div class="table-responsive">
-                <table class="bookings-table">
-                    <thead>
-                        <tr>
-                            <th>Reference/User</th>
-                            <th>Room</th>
-                            <th class="hide-mobile">Check In</th>
-                            <th class="hide-mobile">Check Out</th>
-                            <th class="hide-mobile">Price</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        // Updated query to include user_id
-                        $query = "SELECT b.*, u.id as user_id 
+        <div class="table-responsive">
+            <table class="bookings-table">
+                <thead>
+                    <tr>
+                        <th>Reference/User</th>
+                        <th>Room</th>
+                        <th class="hide-mobile">Check In</th>
+                        <th class="hide-mobile">Check Out</th>
+                        <th class="hide-mobile">Price</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    // Updated query to include user_id
+                    $query = "SELECT b.*, u.id as user_id 
                              FROM bookings b 
                              LEFT JOIN users u ON b.user_id = u.id 
                              ORDER BY b.created_at DESC LIMIT 3";
-                        $result = $mysqli->query($query);
+                    $result = $mysqli->query($query);
 
-                        if ($result && $result->num_rows > 0) {
-                            while ($booking = $result->fetch_assoc()) {
-                                $statusClass = '';
-                                switch ($booking['status']) {
-                                    case 'pending':
-                                        $statusClass = 'status-pending';
-                                        break;
-                                    case 'approved':
-                                        $statusClass = 'status-approved';
-                                        break;
-                                    case 'completed':
-                                        $statusClass = 'status-completed';
-                                        break;
-                                    case 'cancelled':
-                                        $statusClass = 'status-cancelled';
-                                        break;
-                                }
-                        ?>
-                                <tr data-user-id="<?php echo htmlspecialchars($booking['user_id']); ?>">
-                                    <td><?php echo htmlspecialchars($booking['reference_number']); ?></td>
-                                    <td>
-                                        Room <?php echo htmlspecialchars($booking['room_number']); ?><br>
-                                        <small>Occupancy: <?php echo htmlspecialchars($booking['occupancy']); ?></small>
-                                    </td>
-                                    <td class="hide-mobile">
-                                        <?php
-                                        echo date('M d, Y', strtotime($booking['arrival_date'])) . '<br>';
-                                        echo '<small>' . htmlspecialchars($booking['arrival_time']) . '</small>';
-                                        ?>
-                                    </td>
-                                    <td class="hide-mobile">
-                                        <?php
-                                        echo date('M d, Y', strtotime($booking['departure_date'])) . '<br>';
-                                        echo '<small>' . htmlspecialchars($booking['departure_time']) . '</small>';
-                                        ?>
-                                    </td>
-                                    <td class="hide-mobile">₱<?php echo number_format($booking['price'], 2); ?></td>
-                                    <td>
-                                        <span class="status-badge <?php echo $statusClass; ?>">
-                                            <?php echo ucfirst($booking['status']); ?>
-                                        </span>
-                                    </td>
-                                </tr>
-                            <?php
+                    if ($result && $result->num_rows > 0) {
+                        while ($booking = $result->fetch_assoc()) {
+                            $statusClass = '';
+                            switch ($booking['status']) {
+                                case 'pending':
+                                    $statusClass = 'status-pending';
+                                    break;
+                                case 'approved':
+                                    $statusClass = 'status-approved';
+                                    break;
+                                case 'completed':
+                                    $statusClass = 'status-completed';
+                                    break;
+                                case 'cancelled':
+                                    $statusClass = 'status-cancelled';
+                                    break;
                             }
-                        } else {
-                            ?>
-                            <tr>
-                                <td colspan="7" class="text-center">No bookings found</td>
+                    ?>
+                            <tr data-user-id="<?php echo htmlspecialchars($booking['user_id']); ?>">
+                                <td><?php echo htmlspecialchars($booking['reference_number']); ?></td>
+                                <td>
+                                    Room <?php echo htmlspecialchars($booking['room_number']); ?><br>
+                                    <small>Occupancy: <?php echo htmlspecialchars($booking['occupancy']); ?></small>
+                                </td>
+                                <td class="hide-mobile">
+                                    <?php
+                                    echo date('M d, Y', strtotime($booking['arrival_date'])) . '<br>';
+                                    echo '<small>' . htmlspecialchars($booking['arrival_time']) . '</small>';
+                                    ?>
+                                </td>
+                                <td class="hide-mobile">
+                                    <?php
+                                    echo date('M d, Y', strtotime($booking['departure_date'])) . '<br>';
+                                    echo '<small>' . htmlspecialchars($booking['departure_time']) . '</small>';
+                                    ?>
+                                </td>
+                                <td class="hide-mobile">₱<?php echo number_format($booking['price'], 2); ?></td>
+                                <td>
+                                    <span class="status-badge <?php echo $statusClass; ?>">
+                                        <?php echo ucfirst($booking['status']); ?>
+                                    </span>
+                                </td>
                             </tr>
                         <?php
                         }
+                    } else {
                         ?>
-                    </tbody>
-                </table>
-            </div>
+                        <tr>
+                            <td colspan="7" class="text-center">No bookings found</td>
+                        </tr>
+                    <?php
+                    }
+                    ?>
+                </tbody>
+            </table>
         </div>
+    </div>
 
-        <!-- User Details Modal -->
-        <div id="bookingUserModal" class="booking-user-modal">
-            <div class="booking-modal-content">
-                <div class="booking-modal-header">
-                    <h2>Booking Details</h2>
-                    <span class="booking-modal-close">&times;</span>
-                </div>
-                <div class="booking-modal-body">
-                    <div class="booking-user-details">
-                        <h3>User Information</h3>
-                        <div class="booking-detail-grid">
-                            <div class="booking-detail-item">
-                                <label>Username:</label>
-                                <span id="booking-modal-username"></span>
-                            </div>
-                            <div class="booking-detail-item">
-                                <label>Email:</label>
-                                <span id="booking-modal-email"></span>
-                            </div>
-                            <div class="booking-detail-item">
-                                <label>Full Name:</label>
-                                <span id="booking-modal-fullname"></span>
-                            </div>
-                            <div class="booking-detail-item">
-                                <label>Position:</label>
-                                <span id="booking-modal-position"></span>
-                            </div>
-                            <div class="booking-detail-item">
-                                <label>Address:</label>
-                                <span id="booking-modal-address"></span>
-                            </div>
-                            <div class="booking-detail-item">
-                                <label>Second Address:</label>
-                                <span id="booking-modal-second-address"></span>
-                            </div>
-                            <div class="booking-detail-item">
-                                <label>Telephone:</label>
-                                <span id="booking-modal-telephone"></span>
-                            </div>
-                            <div class="booking-detail-item">
-                                <label>Phone Number:</label>
-                                <span id="booking-modal-phone"></span>
-                            </div>
-                            <div class="booking-detail-item">
-                                <label>Accompanying Persons:</label>
-                                <span id="booking-modal-accompanying"></span>
-                            </div>
-                            <div class="booking-detail-item">
-                                <label>User Status:</label>
-                                <span id="booking-modal-user-status"></span>
-                            </div>
-                            <div class="booking-detail-item">
-                                <label>Verification Status:</label>
-                                <span id="booking-modal-verified"></span>
-                            </div>
+    <!-- User Details Modal -->
+    <div id="bookingUserModal" class="booking-user-modal">
+        <div class="booking-modal-content">
+            <div class="booking-modal-header">
+                <h2>Booking Details</h2>
+                <span class="booking-modal-close">&times;</span>
+            </div>
+            <div class="booking-modal-body">
+                <div class="booking-user-details">
+                    <h3>User Information</h3>
+                    <div class="booking-detail-grid">
+                        <div class="booking-detail-item">
+                            <label>Username:</label>
+                            <span id="booking-modal-username"></span>
+                        </div>
+                        <div class="booking-detail-item">
+                            <label>Email:</label>
+                            <span id="booking-modal-email"></span>
+                        </div>
+                        <div class="booking-detail-item">
+                            <label>Full Name:</label>
+                            <span id="booking-modal-fullname"></span>
+                        </div>
+                        <div class="booking-detail-item">
+                            <label>Position:</label>
+                            <span id="booking-modal-position"></span>
+                        </div>
+                        <div class="booking-detail-item">
+                            <label>Address:</label>
+                            <span id="booking-modal-address"></span>
+                        </div>
+                        <div class="booking-detail-item">
+                            <label>Second Address:</label>
+                            <span id="booking-modal-second-address"></span>
+                        </div>
+                        <div class="booking-detail-item">
+                            <label>Telephone:</label>
+                            <span id="booking-modal-telephone"></span>
+                        </div>
+                        <div class="booking-detail-item">
+                            <label>Phone Number:</label>
+                            <span id="booking-modal-phone"></span>
+                        </div>
+                        <div class="booking-detail-item">
+                            <label>Accompanying Persons:</label>
+                            <span id="booking-modal-accompanying"></span>
+                        </div>
+                        <div class="booking-detail-item">
+                            <label>User Status:</label>
+                            <span id="booking-modal-user-status"></span>
+                        </div>
+                        <div class="booking-detail-item">
+                            <label>Verification Status:</label>
+                            <span id="booking-modal-verified"></span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-        <script>
-            document.querySelectorAll('.bookings-table tbody tr').forEach(row => {
-                row.addEventListener('click', async function(e) {
-                    if (e.target.classList.contains('status-select') ||
-                        e.target.closest('.status-select')) {
-                        return;
+    <script>
+        document.querySelectorAll('.bookings-table tbody tr').forEach(row => {
+            row.addEventListener('click', async function(e) {
+                if (e.target.classList.contains('status-select') ||
+                    e.target.closest('.status-select')) {
+                    return;
+                }
+
+                const userId = this.getAttribute('data-user-id');
+                console.log('Clicked row user ID:', userId);
+
+                if (!userId) {
+                    console.error('No user ID found for this booking');
+                    return;
+                }
+
+                const modal = document.getElementById('bookingUserModal');
+                modal.style.display = "block";
+
+                try {
+                    const formData = new FormData();
+                    formData.append('user_id', userId);
+
+                    console.log('Sending request to get user details...');
+                    const response = await fetch('/Alumni-CvSU/admin/get_user_details.php', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Server returned ${response.status}: ${response.statusText}`);
                     }
 
-                    const userId = this.getAttribute('data-user-id');
-                    console.log('Clicked row user ID:', userId);
+                    const data = await response.json();
 
-                    if (!userId) {
-                        console.error('No user ID found for this booking');
-                        return;
+                    if (!data.success) {
+                        throw new Error(data.message || 'Failed to load user details');
                     }
 
-                    const modal = document.getElementById('bookingUserModal');
-                    modal.style.display = "block";
-
-                    try {
-                        const formData = new FormData();
-                        formData.append('user_id', userId);
-
-                        console.log('Sending request to get user details...');
-                        const response = await fetch('/Alumni-CvSU/admin/get_user_details.php', {
-                            method: 'POST',
-                            body: formData
-                        });
-
-                        if (!response.ok) {
-                            throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+                    const updateField = (id, value, defaultValue = 'N/A') => {
+                        const element = document.getElementById(id);
+                        if (element) {
+                            element.textContent = value || defaultValue;
                         }
+                    };
 
-                        const data = await response.json();
+                    updateField('booking-modal-username', data.user.username);
+                    updateField('booking-modal-email', data.user.email);
 
-                        if (!data.success) {
-                            throw new Error(data.message || 'Failed to load user details');
-                        }
+                    const fullName = [
+                        data.user_details.first_name,
+                        data.user_details.middle_name,
+                        data.user_details.last_name
+                    ].filter(Boolean).join(' ');
+                    updateField('booking-modal-fullname', fullName);
 
-                        const updateField = (id, value, defaultValue = 'N/A') => {
-                            const element = document.getElementById(id);
-                            if (element) {
-                                element.textContent = value || defaultValue;
-                            }
-                        };
+                    updateField('booking-modal-position', data.user_details.position);
+                    updateField('booking-modal-address', data.user_details.address);
+                    updateField('booking-modal-second-address', data.user_details.second_address);
+                    updateField('booking-modal-telephone', data.user_details.telephone);
+                    updateField('booking-modal-phone', data.user_details.phone_number);
+                    updateField('booking-modal-accompanying', data.user_details.accompanying_persons);
+                    updateField('booking-modal-user-status', data.user_details.user_status);
+                    updateField('booking-modal-verified', data.user_details.verified ? 'Verified' : 'Not Verified');
 
-                        updateField('booking-modal-username', data.user.username);
-                        updateField('booking-modal-email', data.user.email);
+                } catch (error) {
+                    console.error('Error fetching user details:', error);
+                    const modalBody = document.querySelector('.booking-modal-body');
 
-                        const fullName = [
-                            data.user_details.first_name,
-                            data.user_details.middle_name,
-                            data.user_details.last_name
-                        ].filter(Boolean).join(' ');
-                        updateField('booking-modal-fullname', fullName);
+                    const errorMessage = document.createElement('div');
+                    errorMessage.className = 'error-message';
+                    errorMessage.style.cssText = 'color: red; padding: 10px; margin: 10px; background-color: #fee2e2; border: 1px solid #ef4444; border-radius: 4px;';
+                    errorMessage.textContent = `Error: ${error.message}. Please try again.`;
 
-                        updateField('booking-modal-position', data.user_details.position);
-                        updateField('booking-modal-address', data.user_details.address);
-                        updateField('booking-modal-second-address', data.user_details.second_address);
-                        updateField('booking-modal-telephone', data.user_details.telephone);
-                        updateField('booking-modal-phone', data.user_details.phone_number);
-                        updateField('booking-modal-accompanying', data.user_details.accompanying_persons);
-                        updateField('booking-modal-user-status', data.user_details.user_status);
-                        updateField('booking-modal-verified', data.user_details.verified ? 'Verified' : 'Not Verified');
-
-                    } catch (error) {
-                        console.error('Error fetching user details:', error);
-                        const modalBody = document.querySelector('.booking-modal-body');
-
-                        const errorMessage = document.createElement('div');
-                        errorMessage.className = 'error-message';
-                        errorMessage.style.cssText = 'color: red; padding: 10px; margin: 10px; background-color: #fee2e2; border: 1px solid #ef4444; border-radius: 4px;';
-                        errorMessage.textContent = `Error: ${error.message}. Please try again.`;
-
-                        modalBody.insertBefore(errorMessage, modalBody.firstChild);
-                    }
-                });
+                    modalBody.insertBefore(errorMessage, modalBody.firstChild);
+                }
             });
+        });
 
-            const bookingModal = document.getElementById('bookingUserModal');
-            const closeBtn = document.querySelector('.booking-modal-close');
+        const bookingModal = document.getElementById('bookingUserModal');
+        const closeBtn = document.querySelector('.booking-modal-close');
 
-            closeBtn.onclick = function() {
+        closeBtn.onclick = function() {
+            bookingModal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == bookingModal) {
                 bookingModal.style.display = "none";
             }
+        }
 
-            window.onclick = function(event) {
-                if (event.target == bookingModal) {
-                    bookingModal.style.display = "none";
+        // Booking status update functionality
+        document.querySelectorAll('.status-select').forEach(select => {
+            select.addEventListener('change', async function() {
+                const bookingId = this.dataset.bookingId;
+                const newStatus = this.value;
+
+                try {
+                    const response = await fetch('update_booking_status.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `booking_id=${bookingId}&status=${newStatus}`
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        // Update the status badge
+                        const statusBadge = this.closest('tr').querySelector('.status-badge');
+                        statusBadge.className = `status-badge status-${newStatus}`;
+                        statusBadge.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+
+                        // Show success message
+                        alert('Status updated successfully!');
+                    } else {
+                        throw new Error(data.message || 'Error updating status');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error updating status. Please try again.');
+                    // Reset select to previous value
+                    this.value = this.querySelector('[selected]').value;
                 }
+            });
+        });
+
+        // Number animation for stat cards
+        document.addEventListener('DOMContentLoaded', function() {
+            const numbers = document.querySelectorAll('.stat-content h3');
+
+            numbers.forEach(number => {
+                const finalValue = parseInt(number.textContent);
+                let startValue = 0;
+                const duration = 1000;
+                const increment = finalValue / (duration / 16);
+
+                function updateNumber() {
+                    startValue += increment;
+                    if (startValue < finalValue) {
+                        number.textContent = Math.floor(startValue);
+                        requestAnimationFrame(updateNumber);
+                    } else {
+                        number.textContent = finalValue;
+                    }
+                }
+
+                updateNumber();
+            });
+        });
+    </script>
+
+    <!-- Booking analytics -->
+    <script src="/Alumni-CvSU/admin/script/business_overview.js"></script>
+
+    <!-- Booking trends and revenue -->
+    <script type="module" src="/Alumni-CvSU/admin/script/booking_performance.js"></script>
+
+    <script type="module" src="/Alumni-CvSU/admin/script/essentials.js"></script>
+
+    <script src="/Alumni-CvSU/admin/script/dashboard.js"></script>
+
+    <script src="/Alumni-CvSU/admin/script/generate_report.js"></script>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const yearFilter = document.getElementById("yearFilter");
+            const monthFilter = document.getElementById("monthFilter");
+            const userTypeFilter = document.getElementById("userTypeFilter");
+            const roomFilter = document.getElementById("roomFilter");
+
+
+            function populateYears() {
+                const currentYear = new Date().getFullYear();
+                const startYear = 2024; // Adjust this if needed
+
+                yearFilter.innerHTML = ""; // Clear existing options
+                let allYearsOption = document.createElement("option");
+                allYearsOption.value = "";
+                allYearsOption.text = "All Years";
+                yearFilter.appendChild(allYearsOption); // Add "All Years"
+
+                for (let year = currentYear; year >= startYear; year--) {
+                    let option = document.createElement("option");
+                    option.value = year;
+                    option.text = year;
+                    yearFilter.appendChild(option);
+                }
+
+                yearFilter.value = currentYear; // ✅ Default to current year
             }
 
-            // Booking status update functionality
-            document.querySelectorAll('.status-select').forEach(select => {
-                select.addEventListener('change', async function() {
-                    const bookingId = this.dataset.bookingId;
-                    const newStatus = this.value;
+            function updateMonths() {
+                const selectedYear = yearFilter.value; // Get selected year
+                const currentYear = new Date().getFullYear();
+                const currentMonth = new Date().getMonth() + 1;
 
-                    try {
-                        const response = await fetch('update_booking_status.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded',
-                            },
-                            body: `booking_id=${bookingId}&status=${newStatus}`
-                        });
+                monthFilter.innerHTML = ""; // Clear previous months
 
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
+                // Add "All Months" option
+                let allMonthsOption = document.createElement("option");
+                allMonthsOption.value = "";
+                allMonthsOption.text = "All Months";
+                monthFilter.appendChild(allMonthsOption);
 
-                        const data = await response.json();
-
-                        if (data.success) {
-                            // Update the status badge
-                            const statusBadge = this.closest('tr').querySelector('.status-badge');
-                            statusBadge.className = `status-badge status-${newStatus}`;
-                            statusBadge.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
-
-                            // Show success message
-                            alert('Status updated successfully!');
-                        } else {
-                            throw new Error(data.message || 'Error updating status');
-                        }
-                    } catch (error) {
-                        console.error('Error:', error);
-                        alert('Error updating status. Please try again.');
-                        // Reset select to previous value
-                        this.value = this.querySelector('[selected]').value;
-                    }
-                });
-            });
-
-            // Number animation for stat cards
-            document.addEventListener('DOMContentLoaded', function() {
-                const numbers = document.querySelectorAll('.stat-content h3');
-
-                numbers.forEach(number => {
-                    const finalValue = parseInt(number.textContent);
-                    let startValue = 0;
-                    const duration = 1000;
-                    const increment = finalValue / (duration / 16);
-
-                    function updateNumber() {
-                        startValue += increment;
-                        if (startValue < finalValue) {
-                            number.textContent = Math.floor(startValue);
-                            requestAnimationFrame(updateNumber);
-                        } else {
-                            number.textContent = finalValue;
-                        }
+                for (let i = 1; i <= 12; i++) {
+                    // If a specific year is selected and it's the current year, prevent future months
+                    if (selectedYear !== "" && parseInt(selectedYear) === currentYear && i > currentMonth) {
+                        break;
                     }
 
-                    updateNumber();
-                });
-            });
-        </script>
-
-        <!-- Booking analytics -->
-        <script src="/Alumni-CvSU/admin/script/business_overview.js"></script>
-
-        <!-- Booking trends and revenue -->
-        <script type="module" src="/Alumni-CvSU/admin/script/booking_performance.js"></script>
-
-        <script type="module" src="/Alumni-CvSU/admin/script/essentials.js"></script>
-
-        <script src="/Alumni-CvSU/admin/script/dashboard.js"></script>
-
-        <script src="/Alumni-CvSU/admin/script/generate_report.js"></script>
-
-
-        <script>
-            document.addEventListener("DOMContentLoaded", function() {
-                const yearFilter = document.getElementById("yearFilter");
-                const monthFilter = document.getElementById("monthFilter");
-                const userTypeFilter = document.getElementById("userTypeFilter");
-                const roomFilter = document.getElementById("roomFilter");
-
-
-                function populateYears() {
-                    const currentYear = new Date().getFullYear();
-                    const startYear = 2024; // Adjust this if needed
-
-                    yearFilter.innerHTML = ""; // Clear existing options
-                    let allYearsOption = document.createElement("option");
-                    allYearsOption.value = "";
-                    allYearsOption.text = "All Years";
-                    yearFilter.appendChild(allYearsOption); // Add "All Years"
-
-                    for (let year = currentYear; year >= startYear; year--) {
-                        let option = document.createElement("option");
-                        option.value = year;
-                        option.text = year;
-                        yearFilter.appendChild(option);
-                    }
-
-                    yearFilter.value = currentYear; // ✅ Default to current year
-                }
-
-                function updateMonths() {
-                    const selectedYear = yearFilter.value; // Get selected year
-                    const currentYear = new Date().getFullYear();
-                    const currentMonth = new Date().getMonth() + 1;
-
-                    monthFilter.innerHTML = ""; // Clear previous months
-
-                    // Add "All Months" option
-                    let allMonthsOption = document.createElement("option");
-                    allMonthsOption.value = "";
-                    allMonthsOption.text = "All Months";
-                    monthFilter.appendChild(allMonthsOption);
-
-                    for (let i = 1; i <= 12; i++) {
-                        // If a specific year is selected and it's the current year, prevent future months
-                        if (selectedYear !== "" && parseInt(selectedYear) === currentYear && i > currentMonth) {
-                            break;
-                        }
-
-                        let option = document.createElement("option");
-                        option.value = i;
-                        option.text = new Date(0, i - 1).toLocaleString("default", {
-                            month: "long"
-                        });
-
-                        monthFilter.appendChild(option);
-                    }
-
-                    // ✅ Always select "All Months" by default
-                    monthFilter.value = "";
-                }
-
-
-                function populateUserTypes() {
-                    fetch('/Alumni-CvSU/admin/analytics/get_user_types.php')
-                        .then(response => response.json())
-                        .then(data => {
-                            const userTypeFilter = document.getElementById("userTypeFilter");
-                            userTypeFilter.innerHTML = "<option value=''>All</option>"; // Default "All" option
-
-                            data.forEach(user => {
-                                let option = document.createElement("option");
-                                option.value = user.user_status;
-                                option.text = user.user_status;
-                                userTypeFilter.appendChild(option);
-                            });
-                        })
-                        .catch(error => console.error("Error fetching user types:", error));
-                }
-
-                // Call the function on page load
-                document.addEventListener("DOMContentLoaded", populateUserTypes);
-
-
-
-                function populateRooms() {
-                    fetch('/Alumni-CvSU/admin/analytics/get_room_number.php')
-                        .then(response => response.json())
-                        .then(data => {
-                            roomFilter.innerHTML = "<option value=''>All Rooms</option>"; // Add "All Rooms"
-
-                            data.forEach(room => {
-                                let option = document.createElement("option");
-                                option.value = room.room_number;
-                                option.text = `Room ${room.room_number}`;
-                                roomFilter.appendChild(option);
-                            });
-                        })
-                        .catch(error => console.error("Error fetching rooms:", error));
-                }
-
-
-                // Initialize filters
-                populateYears();
-                updateMonths();
-                populateUserTypes();
-                populateRooms();
-
-                // Update months when year changes
-                yearFilter.addEventListener("change", updateMonths);
-            });
-        </script>
-
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                // Set up Select All / Deselect All buttons
-                document.getElementById('selectAllCharts').addEventListener('click', function() {
-                    document.querySelectorAll('.report-checkbox').forEach(checkbox => {
-                        checkbox.checked = true;
+                    let option = document.createElement("option");
+                    option.value = i;
+                    option.text = new Date(0, i - 1).toLocaleString("default", {
+                        month: "long"
                     });
-                });
 
-                document.getElementById('deselectAllCharts').addEventListener('click', function() {
-                    document.querySelectorAll('.report-checkbox').forEach(checkbox => {
-                        checkbox.checked = false;
-                    });
-                });
-            });
-        </script>
-        <script>
-            document.getElementById("resetFilters").addEventListener("click", function() {
-                // Reset all filter dropdowns to default (assuming first option is default)
-                document.querySelectorAll(".filter-select").forEach(select => {
-                    if (select.id === "yearFilter") {
-                        select.selectedIndex = 1;
-                    } else {
-                        select.selectedIndex = 0;
-                    }
-                });
+                    monthFilter.appendChild(option);
+                }
+
+                // ✅ Always select "All Months" by default
+                monthFilter.value = "";
+            }
 
 
-                // Reset all toggles
-                document.querySelectorAll(".toggle-input").forEach(toggle => {
-                    toggle.checked = true;
-                });
+            function populateUserTypes() {
+                fetch('/Alumni-CvSU/admin/analytics/get_user_types.php')
+                    .then(response => response.json())
+                    .then(data => {
+                        const userTypeFilter = document.getElementById("userTypeFilter");
+                        userTypeFilter.innerHTML = "<option value=''>All</option>"; // Default "All" option
 
-                // Reset all checkboxes
-                document.querySelectorAll(".report-checkbox-container input[type='checkbox']").forEach(checkbox => {
+                        data.forEach(user => {
+                            let option = document.createElement("option");
+                            option.value = user.user_status;
+                            option.text = user.user_status;
+                            userTypeFilter.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.error("Error fetching user types:", error));
+            }
+
+            // Call the function on page load
+            document.addEventListener("DOMContentLoaded", populateUserTypes);
+
+
+
+            function populateRooms() {
+                fetch('/Alumni-CvSU/admin/analytics/get_room_number.php')
+                    .then(response => response.json())
+                    .then(data => {
+                        roomFilter.innerHTML = "<option value=''>All Rooms</option>"; // Add "All Rooms"
+
+                        data.forEach(room => {
+                            let option = document.createElement("option");
+                            option.value = room.room_number;
+                            option.text = `Room ${room.room_number}`;
+                            roomFilter.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.error("Error fetching rooms:", error));
+            }
+
+
+            // Initialize filters
+            populateYears();
+            updateMonths();
+            populateUserTypes();
+            populateRooms();
+
+            // Update months when year changes
+            yearFilter.addEventListener("change", updateMonths);
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up Select All / Deselect All buttons
+            document.getElementById('selectAllCharts').addEventListener('click', function() {
+                document.querySelectorAll('.report-checkbox').forEach(checkbox => {
                     checkbox.checked = true;
                 });
-
-                updateChart();
             });
-        </script>
+
+            document.getElementById('deselectAllCharts').addEventListener('click', function() {
+                document.querySelectorAll('.report-checkbox').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+            });
+        });
+    </script>
+    <script>
+        document.getElementById("resetFilters").addEventListener("click", function() {
+            // Reset all filter dropdowns to default (assuming first option is default)
+            document.querySelectorAll(".filter-select").forEach(select => {
+                if (select.id === "yearFilter") {
+                    select.selectedIndex = 1;
+                } else {
+                    select.selectedIndex = 0;
+                }
+            });
+
+
+            // Reset all toggles
+            document.querySelectorAll(".toggle-input").forEach(toggle => {
+                toggle.checked = true;
+            });
+
+            // Reset all checkboxes
+            document.querySelectorAll(".report-checkbox-container input[type='checkbox']").forEach(checkbox => {
+                checkbox.checked = true;
+            });
+
+            updateChart();
+        });
+    </script>
 
 </body>
 

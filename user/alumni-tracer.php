@@ -762,7 +762,6 @@ ob_end_flush();
                     <select name="presentEmploymentStatus" id="presentEmploymentStatus" required>
                         <option value="">Select Status</option>
                         <option value="regular">Regular/Permanent</option>
-                        <option value="temporary">Temporary</option>
                         <option value="contractual">Contractual</option>
                         <option value="self_employed">Self-employed</option>
                         <option value="casual">Casual</option>

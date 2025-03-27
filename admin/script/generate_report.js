@@ -335,8 +335,7 @@ document.getElementById("printReport").addEventListener("click", async function 
                     hour: parseInt(row.hour, 10),
                     total: parseInt(row.total, 10)
                 }))
-                .sort((a, b) => b.total - a.total)
-                .slice(0, 5);
+                .sort((a, b) => b.total - a.total);
 
             // Calculate total for percentage
             const totalPeakBookings = formattedPeakHours.reduce((sum, item) => sum + item.total, 0);
@@ -419,7 +418,7 @@ document.getElementById("printReport").addEventListener("click", async function 
         }
     } catch (error) {
         console.error("Error fetching report data:", error);
-        y = checkForNewPage(y, 20);
+        y = pageHeight(y, 20);
         doc.setFont("helvetica", "bold");
         doc.setTextColor(200, 0, 0);
         doc.setFontSize(12);

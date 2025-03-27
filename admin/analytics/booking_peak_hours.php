@@ -9,11 +9,11 @@ $month = isset($_GET['month']) && $_GET['month'] !== '' ? intval($_GET['month'])
 $guestType = isset($_GET['guest_type']) ? $mysqli->real_escape_string($_GET['guest_type']) : '';
 $roomNumber = isset($_GET['room_number']) ? $mysqli->real_escape_string($_GET['room_number']) : '';
 
-// Apply filters
-$yearCondition = ($year !== null) ? "AND YEAR(b.arrival_date) = $year" : "";
-$monthCondition = ($month !== null) ? "AND MONTH(b.arrival_date) = $month" : "";
-$guestTypeCondition = ($guestType !== '') ? "AND u.user_status = '$guestType'" : "";
-$roomNumberCondition = ($roomNumber !== '') ? "AND b.room_number = '$roomNumber'" : "";
+// Apply filters 
+$yearCondition = ($year === null) ? "" : "AND YEAR(b.arrival_date) = $year";
+$monthCondition = ($month === null) ? "" : "AND MONTH(b.arrival_date) = $month";
+$guestTypeCondition = ($guestType === '') ? "" : "AND u.user_status = '$guestType'";
+$roomNumberCondition = ($roomNumber === '') ? "" : "AND b.room_number = '$roomNumber'";
 
 $query = "SELECT 
             HOUR(b.created_at) AS hour, 
@@ -32,12 +32,12 @@ $query = "SELECT
 $result = $mysqli->query($query);
 
 if (!$result) {
-    die(json_encode(["error" => "SQL Error: " . $mysqli->error]));
+  die(json_encode(["error" => "SQL Error: " . $mysqli->error]));
 }
 
 $data = [];
 while ($row = $result->fetch_assoc()) {
-    $data[] = $row;
+  $data[] = $row;
 }
 
 // JSON response

@@ -664,17 +664,10 @@ function fetchPeakBookingHours(year, month, guestType, roomNumber) {
         });
 }
 
-
-// fetchBookingByDay(new Date().getFullYear(), new Date().getMonth() + 1, "All", "");
-// fetchBookingByMonth(new Date().getFullYear(), "All", "");
-// fetchCancellationRate(new Date().getFullYear(), new Date().getMonth() + 1, "All", "");
-// fetchBookingLeadTime(new Date().getFullYear(), new Date().getMonth() + 1, "");
-// fetchPeakBookingHours(new Date().getFullYear(), new Date().getMonth() + 1, "All", "");
-
 document.getElementById("yearFilter").addEventListener("change", updateChart);
 document.getElementById("monthFilter").addEventListener("change", updateChart);
 document.getElementById("userTypeFilter").addEventListener("change", updateChart);
-document.getElementById("roomFilter").addEventListener("change", updateChart);
+document.getElementById("roomFilter").addEventListener("change", updateChart); 
 
 function updateChart() {
     const selectedYear = document.getElementById("yearFilter").value;

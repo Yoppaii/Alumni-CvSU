@@ -3,8 +3,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const summaryElement = document.querySelector('.AT-summary p');
     const filterContainer = document.getElementById('filterContainer');
 
-    let useRealData = false;
-
     // Current filter state
     let currentFilters = {
         course: '',
@@ -12,9 +10,14 @@ document.addEventListener("DOMContentLoaded", function () {
         startYear: '',
         endYear: '',
         employmentStatus: '',
-        jobRelevance: '',
-        business: ''
+        relevance: '',
+        business: '',
+        timeToLand: '',
+        jobFindingMethod: ''
     };
+
+    // Store total graduates count (unfiltered)
+    let totalGraduatesUnfiltered = 0;
 
     if (!chartElement) {
         console.error("Error: Chart element not found!");
@@ -24,7 +27,17 @@ document.addEventListener("DOMContentLoaded", function () {
     // Initialize the chart
     let employmentChart;
 
-    // Chart options for grouped bar chart
+    // Color palette for chart (more visually appealing)
+    const colorPalette = [
+        'rgba(54, 162, 235, 0.8)',   // Blue
+        'rgba(75, 192, 192, 0.8)',   // Teal
+        'rgba(255, 159, 64, 0.8)',   // Orange
+        'rgba(153, 102, 255, 0.8)',  // Purple
+        'rgba(255, 99, 132, 0.8)',   // Pink
+        'rgba(255, 205, 86, 0.8)',   // Yellow
+    ];
+
+    // Chart options for grouped bar chart with enhanced visuals
     const groupedBarOptions = {
         responsive: true,
         maintainAspectRatio: false,
@@ -32,135 +45,89 @@ document.addEventListener("DOMContentLoaded", function () {
             x: {
                 grid: {
                     display: false
+                },
+                ticks: {
+                    font: {
+                        weight: 'bold'
+                    }
                 }
             },
             y: {
                 beginAtZero: true,
                 ticks: {
-                    precision: 0
+                    precision: 0,
+                    callback: function (value) {
+                        return value;
+                    }
+                },
+                grid: {
+                    color: 'rgba(200, 200, 200, 0.3)'
                 }
             }
         },
         plugins: {
             legend: {
                 position: 'top',
+                labels: {
+                    padding: 20,
+                    boxWidth: 15,
+                    usePointStyle: true,
+                    font: {
+                        size: 12
+                    }
+                }
             },
             tooltip: {
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                titleFont: {
+                    size: 14,
+                    weight: 'bold'
+                },
+                bodyFont: {
+                    size: 13
+                },
+                padding: 15,
+                cornerRadius: 6,
                 callbacks: {
                     label: function (context) {
-                        return `${context.dataset.label}: ${context.raw}`;
+                        const value = context.raw;
+                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                        const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                        return `${context.dataset.label}: ${value} (${percentage}%)`;
                     }
                 }
             }
         },
         barPercentage: 0.8,
-        categoryPercentage: 0.9
+        categoryPercentage: 0.9,
+        animation: {
+            duration: 1000,
+            easing: 'easeOutQuart'
+        }
     };
 
-    function addDataSourceButtons() {
-        // Create buttons container
-        const buttonsContainer = document.createElement('div');
-        buttonsContainer.className = 'data-source-buttons';
-        buttonsContainer.innerHTML = `
-            <div class="data-source-label">Data Source:</div>
-            <div class="button-group">
-                <button id="useRealDataBtn" class="data-btn ${useRealData ? 'active' : ''}">Real Data</button>
-                <button id="useSampleDataBtn" class="data-btn ${!useRealData ? 'active' : ''}">Sample Data</button>
-            </div>
-        `;
-
-        // Insert before the filter container
-        filterContainer.parentNode.insertBefore(buttonsContainer, filterContainer);
-
-        // Add event listeners
-        document.getElementById('useRealDataBtn').addEventListener('click', () => setDataSource(true));
-        document.getElementById('useSampleDataBtn').addEventListener('click', () => setDataSource(false));
-
-        // Add some CSS for the buttons
-        const style = document.createElement('style');
-        style.textContent = `
-            .data-source-buttons {
-                margin-bottom: 15px;
-                display: flex;
-                align-items: center;
-                justify-content: flex-end;
-            }
-            
-            .data-source-label {
-                margin-right: 10px;
-                font-weight: bold;
-            }
-            
-            .button-group {
-                display: flex;
-            }
-            
-            .data-btn {
-                padding: 8px 12px;
-                cursor: pointer;
-                font-weight: bold;
-                transition: all 0.3s ease;
-                border: 1px solid #ccc;
-                background-color: #f8f8f8;
-                color: #333;
-            }
-            
-            .data-btn:first-child {
-                border-radius: 4px 0 0 4px;
-            }
-            
-            .data-btn:last-child {
-                border-radius: 0 4px 4px 0;
-            }
-            
-            .data-btn.active {
-                background-color: #4CAF50;
-                color: white;
-                border-color: #3e8e41;
-            }
-            
-            .data-btn:hover:not(.active) {
-                background-color: #e7e7e7;
-            }
-        `;
-        document.head.appendChild(style);
-    }
-
-    // Set data source and update active button
-    function setDataSource(useReal) {
-        useRealData = useReal;
-
-        // Update button styling
-        const realButton = document.getElementById('useRealDataBtn');
-        const sampleButton = document.getElementById('useSampleDataBtn');
-
-        if (useRealData) {
-            realButton.classList.add('active');
-            sampleButton.classList.remove('active');
-        } else {
-            realButton.classList.remove('active');
-            sampleButton.classList.add('active');
-        }
-
-        // Reload data with new source
-        loadChartData();
-    }
-
-    const originalLoadChartData = window.loadChartData || function () { };
-
     // Function to load data and update the chart
-    window.loadChartData = function () {
+    window.loadChartData = function (isInitialLoad = false) {
         // Build query string from filters
         const queryParams = Object.entries(currentFilters)
             .filter(([_, value]) => value !== '')
             .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
             .join('&');
 
-        // Add the dataSource parameter
-        const dataSourceParam = useRealData ? 'useRealData=true' : 'useRealData=false';
-        const separator = queryParams ? '&' : '';
+        // For initial load, we add a parameter to get unfiltered count
+        const urlParams = isInitialLoad ?
+            `${queryParams}&getUnfilteredTotal=true` :
+            queryParams;
 
-        const url = `/Alumni-CvSU/admin/website/ajax/analytics.php?${dataSourceParam}${separator}${queryParams}`;
+        const url = `/Alumni-CvSU/admin/website/ajax/analytics.php?${urlParams}`;
+
+        // Add loading indicator
+        const chartContainer = chartElement.parentElement;
+        chartContainer.classList.add('loading');
+        const loadingIndicator = document.createElement('div');
+        loadingIndicator.className = 'chart-loading';
+        loadingIndicator.innerHTML = '<div class="spinner"></div><p>Loading data...</p>';
+        chartContainer.appendChild(loadingIndicator);
 
         // Fetch from the server
         fetch(url)
@@ -171,19 +138,40 @@ document.addEventListener("DOMContentLoaded", function () {
                 return response.json();
             })
             .then(data => {
-                processData(data);
-
-                // Add the buttons if they don't exist yet
-                if (!document.querySelector('.data-source-buttons')) {
-                    addDataSourceButtons();
+                // Remove loading indicator
+                chartContainer.classList.remove('loading');
+                if (chartContainer.querySelector('.chart-loading')) {
+                    chartContainer.removeChild(loadingIndicator);
                 }
+
+                // If this is initial load, store the unfiltered total
+                if (isInitialLoad && data.unfilteredTotalGraduates) {
+                    totalGraduatesUnfiltered = data.unfilteredTotalGraduates;
+                }
+
+                processData(data);
             })
             .catch(error => {
                 console.warn('Error fetching data:', error);
+                // Remove loading indicator on error
+                chartContainer.classList.remove('loading');
+                if (chartContainer.querySelector('.chart-loading')) {
+                    chartContainer.removeChild(loadingIndicator);
+                }
+                // Show error message
+                const errorMsg = document.createElement('div');
+                errorMsg.className = 'chart-error';
+                errorMsg.innerHTML = '<p>Failed to load data. Please try again.</p>';
+                chartContainer.appendChild(errorMsg);
+                setTimeout(() => {
+                    if (chartContainer.querySelector('.chart-error')) {
+                        chartContainer.removeChild(errorMsg);
+                    }
+                }, 3000);
             });
     };
 
-    // Process and display data from either source
+    // Process and display data
     function processData(data) {
         console.log("Processing Data:", data);
 
@@ -192,25 +180,60 @@ document.addEventListener("DOMContentLoaded", function () {
             populateFilterDropdowns(data.filterOptions);
         }
 
-        // Compute the total for each employment status
-        const summary = {};
-        data.datasets.forEach(dataset => {
-            summary[dataset.label] = dataset.data.reduce((acc, count) => acc + count, 0);
-        });
+        // Get the filtered total graduates
+        const filteredTotalGraduates = data.totalGraduates || data.datasets.reduce((acc, dataset) =>
+            acc + dataset.data.reduce((sum, count) => sum + count, 0), 0);
 
-        // Format the summary into a readable string
-        let summaryHTML = Object.entries(summary)
-            .map(([status, count]) =>
-                `<div class="summary-item">${status.replace(/\b\w/g, c => c.toUpperCase())} : ${count}</div>`
-            )
-            .join("");
+        // If unfiltered total hasn't been set yet, use current total
+        if (totalGraduatesUnfiltered === 0) {
+            totalGraduatesUnfiltered = filteredTotalGraduates;
+        }
+
+        // Check if we're dealing with filtered data
+        const isFiltered = Object.values(currentFilters).some(value => value !== '');
+
+        // Use appropriate total for calculations
+        const displayTotal = filteredTotalGraduates;
+        const percentageBase = isFiltered ? totalGraduatesUnfiltered : filteredTotalGraduates;
+
+        // Format the summary into a readable string with enhanced styling
+        let summaryHTML = `
+            <div class="summary-header">
+                <h4>Summary</h4>
+            </div>
+        `;
+
+        // Add total graduates first with proper percentage
+        const totalPercentage = percentageBase > 0 ?
+            ((displayTotal / percentageBase) * 100).toFixed(1) :
+            '0.0';
+
+        summaryHTML += `
+            <div class="summary-card">
+                <div class="status-label">Total Graduates</div>
+                <div class="status-count">${displayTotal}</div>
+                <div class="status-percentage">${totalPercentage}%</div>
+            </div>
+        `;
 
         summaryElement.innerHTML = summaryHTML;
+
+        // Enhance the datasets with better colors
+        const enhancedDatasets = data.datasets.map((dataset, index) => ({
+            ...dataset,
+            backgroundColor: colorPalette[index % colorPalette.length],
+            borderColor: colorPalette[index % colorPalette.length].replace('0.8', '1'),
+            borderWidth: 1,
+            borderRadius: 4,
+            hoverBackgroundColor: colorPalette[index % colorPalette.length].replace('0.8', '0.9'),
+            hoverBorderColor: colorPalette[index % colorPalette.length].replace('0.8', '1'),
+            hoverBorderWidth: 2
+        }));
 
         // If chart already exists, update it
         if (employmentChart) {
             employmentChart.data.labels = data.labels;
-            employmentChart.data.datasets = data.datasets;
+            employmentChart.data.datasets = enhancedDatasets;
             employmentChart.update();
         } else {
             // Create a new chart - as a grouped bar chart
@@ -218,11 +241,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 type: 'bar',
                 data: {
                     labels: data.labels,
-                    datasets: data.datasets.map(dataset => ({
-                        ...dataset,
-                        // Ensure each dataset has a different color
-                        borderWidth: 1
-                    }))
+                    datasets: enhancedDatasets
                 },
                 options: groupedBarOptions
             });
@@ -231,7 +250,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Function to populate filter dropdowns
     function populateFilterDropdowns(filterOptions) {
-        // Create filter UI
+        // Create filter UI with improved styling
         const filterHTML = `
             <div class="filter-section primary-filters">
                 <h4>Primary Filters</h4>
@@ -264,12 +283,8 @@ document.addEventListener("DOMContentLoaded", function () {
                         <label for="employmentStatusFilter">Employment Status:</label>
                         <select id="employmentStatusFilter" class="filter-dropdown">
                             <option value="">All Statuses</option>
-                            <option value="regular">Regular</option>
-                            <option value="temporary">Temporary</option>
-                            <option value="contractual">Contractual</option>
-                            <option value="self_employed">Self-employed</option>
-                            <option value="casual">Casual</option>
-                        </select>
+                            ${filterOptions.employmentStatuses ? filterOptions.employmentStatuses.map(employmentStatus =>
+            `<option value="${employmentStatus}">${employmentStatus}</option>`).join('') : ''}                        </select>
                     </div>
                 </div>
             </div>
@@ -278,44 +293,85 @@ document.addEventListener("DOMContentLoaded", function () {
                 <h4>Secondary Filters</h4>
                 <div class="filter-row">
                     <div class="filter-group">
-                        <label for="jobRelevanceFilter">Job Relevant to Course:</label>
-                        <select id="jobRelevanceFilter" class="filter-dropdown">
+                        <label for="relevanceFilter">Job Relevant to Course:</label>
+                        <select id="relevanceFilter" class="filter-dropdown">
                             <option value="">All</option>
                             <option value="yes">Yes</option>
                             <option value="no">No</option>
                         </select>
                     </div>
                     <div class="filter-group">
-                        <label for="businessFilter">business:</label>
+                        <label for="businessFilter">Business:</label>
                         <select id="businessFilter" class="filter-dropdown">
                             <option value="">All Industries</option>
                             ${filterOptions.industries ? filterOptions.industries.map(business =>
-            `<option value="${business}">${business}</option>`).join('') : ''}
+                `<option value="${business}">${business}</option>`).join('') : ''}
+                        </select>
+                    </div>
+                </div>
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label for="timeToLandFilter">Time to Land Job:</label>
+                        <select id="timeToLandFilter" class="filter-dropdown">
+                            <option value="">All</option>
+                            ${filterOptions.timeToLand ? filterOptions.timeToLand.map(time =>
+                    `<option value="${time}">${time}</option>`).join('') : ''}
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="jobFindingMethodFilter">Job Finding Method:</label>
+                        <select id="jobFindingMethodFilter" class="filter-dropdown">
+                            <option value="">All Methods</option>
+                            ${filterOptions.jobFindingMethods ? filterOptions.jobFindingMethods.map(method =>
+                        `<option value="${method}">${method}</option>`).join('') : ''}
                         </select>
                     </div>
                 </div>
             </div>
             
             <div class="filter-buttons">
-                <button id="resetFiltersBtn" class="btn">Reset Filters</button>
+                <button id="applyFiltersBtn" class="btn btn-primary">Apply Filters</button>
+                <button id="resetFiltersBtn" class="btn btn-secondary">Reset Filters</button>
             </div>
         `;
 
         filterContainer.innerHTML = filterHTML;
 
-        // Add event listeners for automatic filter updates
+        // Add event listeners for filter updates
         document.querySelectorAll('.filter-dropdown, #startYearFilter, #endYearFilter').forEach(element => {
-            element.addEventListener('change', updateFilters);
+            // Change to input event for immediate feedback but don't trigger load
+            element.addEventListener('change', function () {
+                updateFilterValues();
+            });
         });
 
         // Add debounce to input fields to avoid too many updates while typing
         const yearInputs = document.querySelectorAll('#startYearFilter, #endYearFilter');
         yearInputs.forEach(input => {
-            input.addEventListener('input', debounce(updateFilters, 500));
+            input.addEventListener('input', debounce(function () {
+                updateFilterValues();
+            }, 500));
         });
 
         // Add event listeners for buttons
+        document.getElementById('applyFiltersBtn').addEventListener('click', function () {
+            loadChartData(false);
+        });
+
         document.getElementById('resetFiltersBtn').addEventListener('click', resetFilters);
+    }
+
+    // Function to just update filter values without reloading
+    function updateFilterValues() {
+        currentFilters.course = document.getElementById('courseFilter').value;
+        currentFilters.campus = document.getElementById('campusFilter').value;
+        currentFilters.startYear = document.getElementById('startYearFilter').value;
+        currentFilters.endYear = document.getElementById('endYearFilter').value;
+        currentFilters.employmentStatus = document.getElementById('employmentStatusFilter').value;
+        currentFilters.relevance = document.getElementById('relevanceFilter').value;
+        currentFilters.business = document.getElementById('businessFilter').value;
+        currentFilters.timeToLand = document.getElementById('timeToLandFilter').value;
+        currentFilters.jobFindingMethod = document.getElementById('jobFindingMethodFilter').value;
     }
 
     // Debounce function to limit how often a function can be called
@@ -329,22 +385,6 @@ document.addEventListener("DOMContentLoaded", function () {
         };
     }
 
-    // Function to update filters and refresh data
-    function updateFilters() {
-        currentFilters.course = document.getElementById('courseFilter').value;
-        currentFilters.campus = document.getElementById('campusFilter').value;
-        currentFilters.startYear = document.getElementById('startYearFilter').value;
-        currentFilters.endYear = document.getElementById('endYearFilter').value;
-        currentFilters.employmentStatus = document.getElementById('employmentStatusFilter').value;
-        currentFilters.jobRelevance = document.getElementById('jobRelevanceFilter').value;
-        currentFilters.business = document.getElementById('businessFilter').value;
-
-        // Log filters to help with debugging
-        console.log("Applied filters:", currentFilters);
-
-        loadChartData();
-    }
-
     // Function to reset filters
     function resetFilters() {
         document.getElementById('courseFilter').value = '';
@@ -352,17 +392,19 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById('startYearFilter').value = '';
         document.getElementById('endYearFilter').value = '';
         document.getElementById('employmentStatusFilter').value = '';
-        document.getElementById('jobRelevanceFilter').value = '';
+        document.getElementById('relevanceFilter').value = '';
         document.getElementById('businessFilter').value = '';
+        document.getElementById('timeToLandFilter').value = '';
+        document.getElementById('jobFindingMethodFilter').value = '';
 
         // Reset the currentFilters object
         Object.keys(currentFilters).forEach(key => {
             currentFilters[key] = '';
         });
 
-        loadChartData();
+        loadChartData(false);
     }
 
-    // Initial data load
-    loadChartData();
+    // Initial data load - get both filtered and unfiltered totals
+    loadChartData(true);
 });
