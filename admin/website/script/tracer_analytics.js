@@ -1,6 +1,7 @@
 let employmentRateChart = null;
 let courseRelevanceChart = null;
 let EmploymentByLocation = null;
+let employmentTimeChart = null;
 
 function hexToRgba(hex, alpha = 1) {
     const r = parseInt(hex.slice(1, 3), 16);
@@ -63,7 +64,7 @@ function fetchEmploymentRate(campus, course, employmentStatus) {
                     maintainAspectRatio: false,
                     cutout: "70%",
                     plugins: {
-                        legend: { display: false },
+                        legend: { display: true },
                         tooltip: {
                             enabled: true,
                             backgroundColor: 'rgba(255, 255, 255, 0.9)',
@@ -75,8 +76,8 @@ function fetchEmploymentRate(campus, course, employmentStatus) {
                             callbacks: {
                                 label: function (tooltipItem) {
                                     return tooltipItem.dataIndex === 0
-                                        ? `Employed: ${data.employed} (${employmentRate}%)`
-                                        : `Unemployed: ${data.unemployed} (${unemploymentRate}%)`;
+                                        ? `${data.employed} alumni (${employmentRate}%)`
+                                        : `${data.unemployed} alumni (${unemploymentRate}%)`;
                                 }
                             }
                         }
@@ -173,6 +174,366 @@ function fetchEmploymentRate(campus, course, employmentStatus) {
 //         });
 // }
 
+
+
+function fetchEmploymentByLocation(campus, course, employmentStatus) {
+    const chartContainer = document.getElementById("employmentLocationChart").closest(".analytics-content");
+    const ctx = document.getElementById("employmentLocationChart").getContext("2d");
+
+    // Show loading indicator
+    const loader = document.createElement("div");
+    loader.className = "chart-loading";
+    chartContainer.appendChild(loader);
+
+    fetch(`/Alumni-CvSU/admin/website/ajax/employment_location.php?campus=${campus}&course=${course}&employmentStatus=${employmentStatus}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (!Array.isArray(data) || data.length === 0) {
+                console.warn("No employment data available for the selected filters.");
+                loader.remove();
+                return;
+            }
+
+            // Define the expected order of locations
+            const locationOrder = ["Local", "Abroad", "Work From Home", "Hybrid"];
+
+            // Ensure the data is in the correct order
+            const orderedData = locationOrder.map(location => {
+                const found = data.find(item => item.location === location);
+                return found ? found : { location, total_employees: 0 };
+            });
+
+            // Extract locations and counts
+            const locations = orderedData.map(item => item.location);
+            const counts = orderedData.map(item => parseInt(item.total_employees));
+
+            // Calculate total employees
+            const totalEmployees = counts.reduce((sum, count) => sum + count, 0);
+
+            // Destroy existing chart if it exists
+            if (window.employmentLocationChart instanceof Chart) {
+                window.employmentLocationChart.destroy();
+            }
+
+            // Define colors for each location
+            const colors = ["#4CAF50", "#facc15", "#f97316", "#ef4444"];
+
+            // Create gradient backgrounds
+            const gradients = colors.map((color) => {
+                const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+                gradient.addColorStop(0, color);
+                gradient.addColorStop(1, hexToRgba(color, 0.5));
+                return gradient;
+            });
+
+            // Store visibility state and original data
+            const dataVisibility = [true, true, true, true];
+            const originalData = [...counts];
+
+            // Create the Chart with a single dataset
+            window.employmentLocationChart = new Chart(ctx, {
+                type: "bar",
+                data: {
+                    labels: locations,
+                    datasets: [{
+                        data: counts,
+                        backgroundColor: gradients,
+                        borderRadius: 4,
+                        barPercentage: 0.8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 800,
+                        easing: 'easeOutQuart'
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 1 },
+                            grid: { display: true, drawBorder: false, color: 'rgba(200, 200, 200, 0.15)' },
+                            title: { display: true, text: "Number of Employees" }
+                        },
+                        x: {
+                            grid: { display: false },
+                            title: { display: true, text: "Work Locations" }
+                        }
+                    },
+                    
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                usePointStyle: false,
+                                boxWidth: 40,
+                                boxHeight: 10,
+                                padding: 20,
+                                generateLabels: function (chart) {
+                                    return locationOrder.map((location, index) => {
+                                        return {
+                                            text: location,
+                                            fillStyle: gradients[index],
+                                            strokeStyle: colors[index],
+                                            lineWidth: 1,
+                                            hidden: !dataVisibility[index],
+                                            index: index
+                                        };
+                                    });
+                                }
+                            },
+                            onClick: function (e, legendItem, legend) {
+                                const index = legendItem.index;
+                                const ci = legend.chart;
+
+                                // Toggle visibility state
+                                dataVisibility[index] = !dataVisibility[index];
+
+                                // Apply animation
+                                if (dataVisibility[index]) {
+                                    // Showing with animation - start from 0 and animate to actual value
+                                    ci.data.datasets[0].data[index] = 0;
+                                    ci.update('none');
+
+                                    setTimeout(() => {
+                                        ci.data.datasets[0].data[index] = originalData[index];
+                                        ci.update();
+                                    }, 50);
+                                } else {
+                                    // Hiding with animation - animate to 0
+                                    ci.data.datasets[0].data[index] = 0;
+                                    ci.update();
+                                }
+
+                                // Update legend to reflect new state
+                                ci.update();
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            titleColor: '#333',
+                            bodyColor: '#666',
+                            borderColor: 'rgba(200, 200, 200, 0.5)',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function (context) {
+                                    const count = context.raw;
+                                    const location = locations[context.dataIndex];
+                                    const percentage = totalEmployees > 0 ? ((count / totalEmployees) * 100).toFixed(1) : 0;
+                                    return `${location}: ${count} alumni (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Apply custom rectangle legends after chart initialization
+            const originalLegendAfterDraw = Chart.Legend.prototype.afterDraw;
+            Chart.Legend.prototype.afterDraw = function () {
+                originalLegendAfterDraw.apply(this, arguments);
+
+                const chart = this.chart;
+                const legendItems = chart.legend.legendItems;
+
+                if (legendItems && legendItems.length > 0) {
+                    const legendContainer = chart.legend.legendHitBoxes;
+
+                    legendContainer.forEach((item, index) => {
+                        const ctx = chart.ctx;
+                        const x = item.left - 10;  // Adjusting position
+                        const y = item.top;
+                        const width = 20;
+                        const height = 10;
+
+                        // Only redraw if visible
+                        if (dataVisibility[index]) {
+                            // Create gradient for the rectangle
+                            const gradient = ctx.createLinearGradient(x, y, x, y + height);
+                            gradient.addColorStop(0, colors[index]);
+                            gradient.addColorStop(1, hexToRgba(colors[index], 0.5));
+
+                            // Draw the rectangle
+                            ctx.fillStyle = gradient;
+                            ctx.fillRect(x, y, width, height);
+                            ctx.strokeStyle = colors[index];
+                            ctx.strokeRect(x, y, width, height);
+                        }
+                    });
+                }
+            };
+
+            // Remove loading indicator
+            loader.remove();
+        })
+        .catch(error => {
+            console.error("Fetch error:", error.message);
+            loader.remove();
+            showErrorMessage("employmentLocationChart", "Failed to load employment data");
+        });
+}
+
+function fetchEmploymentTime(campus, course, employmentStatus) {
+    const chartContainer = document.getElementById("employmentTimeChart").closest(".analytics-content");
+    const ctx = document.getElementById("employmentTimeChart").getContext("2d");
+
+    // Show loading indicator
+    const loader = document.createElement("div");
+    loader.className = "chart-loading";
+    chartContainer.appendChild(loader);
+
+    fetch(`/Alumni-CvSU/admin/website/ajax/employment_time.php?campus=${campus}&course=${course}&employmentStatus=${employmentStatus}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Define time categories and their display labels
+            const labels = ["Less than 1 Month", "1-6 Months", "7-11 Months", "1 Year or More"];
+            const timeCategories = ["less_than_1month", "1_6months", "7_11months", "1year_more"];
+
+            // Initialize data map and total count
+            let datasetMap = {};
+            let totalAlumni = 0;
+
+            // Initialize all categories with zero
+            timeCategories.forEach(category => {
+                datasetMap[category] = 0;
+            });
+
+            // Process data from API
+            if (Array.isArray(data) && data.length > 0) {
+                data.forEach(item => {
+                    if (timeCategories.includes(item.time_to_land)) {
+                        datasetMap[item.time_to_land] = parseInt(item.alumni_count);
+                        totalAlumni += parseInt(item.alumni_count);
+                    }
+                });
+            } else {
+                console.warn("No employment time data available for the selected filters.");
+            }
+
+            console.log("Total Alumni:", totalAlumni);
+            console.log("Dataset Map:", datasetMap);
+
+            // Destroy existing chart if it exists
+            if (window.employmentTimeChart instanceof Chart) {
+                window.employmentTimeChart.destroy();
+            }
+
+            // Define colors for each time period
+            const colors = ["#4CAF50", "#facc15", "#f97316", "#ef4444"];
+
+            // Create gradient backgrounds
+            const gradients = colors.map(color => {
+                const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+                gradient.addColorStop(0, color);
+                gradient.addColorStop(1, hexToRgba(color, 0.5));
+                return gradient;
+            });
+
+            // Extract the data into separate arrays for each time category
+            const lessOneMonthData = [datasetMap["less_than_1month"], 0, 0, 0];
+            const oneToSixMonthsData = [0, datasetMap["1_6months"], 0, 0];
+            const sevenToElevenMonthsData = [0, 0, datasetMap["7_11months"], 0];
+            const oneYearMoreData = [0, 0, 0, datasetMap["1year_more"]];
+
+            // Create the Chart with multiple datasets
+            window.employmentTimeChart = new Chart(ctx, {
+                type: "bar",
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: "Less than 1 Month",
+                            backgroundColor: gradients[0],
+                            data: lessOneMonthData,
+                            borderRadius: 4
+                        },
+                        {
+                            label: "1-6 Months",
+                            backgroundColor: gradients[1],
+                            data: oneToSixMonthsData,
+                            borderRadius: 4
+                        },
+                        {
+                            label: "7-11 Months",
+                            backgroundColor: gradients[2],
+                            data: sevenToElevenMonthsData,
+                            borderRadius: 4
+                        },
+                        {
+                            label: "1 Year or More",
+                            backgroundColor: gradients[3],
+                            data: oneYearMoreData,
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 1 },
+                            grid: {
+                                display: true,
+                                drawBorder: false,
+                                color: 'rgba(200, 200, 200, 0.15)',
+                            },
+                            title: { display: true, text: "Number of Alumni" }
+                        },
+                        x: {
+                            grid: { display: false },
+                            title: { display: true, text: "Time to Land First Job" }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            titleColor: '#333',
+                            bodyColor: '#666',
+                            borderColor: 'rgba(200, 200, 200, 0.5)',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function (tooltipItem) {
+                                    const count = tooltipItem.raw;
+                                    if (count === 0) return null;
+                                    const percentage = totalAlumni > 0 ? ((count / totalAlumni) * 100).toFixed(1) : 0;
+                                    return `${tooltipItem.dataset.label}: ${count} alumni (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Remove loading indicator
+            loader.remove();
+        })
+        .catch(error => {
+            console.error("Fetch error:", error.message);
+            loader.remove();
+            showErrorMessage("employmentTimeChart", "Failed to load employment time data");
+        });
+}
+
 function fetchJobRelevanceSalary(campus, course, employmentStatus) {
     const chartContainer = document.getElementById("jobRelevanceSalaryChart").closest(".analytics-content");
     const ctx = document.getElementById("jobRelevanceSalaryChart").getContext("2d");
@@ -203,7 +564,6 @@ function fetchJobRelevanceSalary(campus, course, employmentStatus) {
                         } else if (item.course_related.toLowerCase() === "no") {
                             unrelatedData[index] = parseInt(item.alumni_count);
                         }
-
                     }
                 });
             } else {
@@ -264,7 +624,8 @@ function fetchJobRelevanceSalary(campus, course, employmentStatus) {
                         }
                     },
                     plugins: {
-                        legend: { display: false },
+                        legend: { display: true },
+
                         tooltip: {
                             backgroundColor: 'rgba(255, 255, 255, 0.9)',
                             titleColor: '#333',
@@ -274,10 +635,12 @@ function fetchJobRelevanceSalary(campus, course, employmentStatus) {
                             cornerRadius: 8,
                             callbacks: {
                                 label: function (tooltipItem) {
+                                    const datasetIndex = tooltipItem.datasetIndex;
                                     const count = tooltipItem.raw;
                                     const total = relatedData.reduce((a, b) => a + b, 0) + unrelatedData.reduce((a, b) => a + b, 0);
                                     const percentage = total > 0 ? ((count / total) * 100).toFixed(1) : 0;
-                                    return `${count} alumni (${percentage}%)`;
+                                    const relevance = datasetIndex === 0 ? "Related to Course" : "Unrelated to Course";
+                                    return `${relevance}: ${count} alumni (${percentage}%)`;
                                 }
                             }
                         }
@@ -295,87 +658,75 @@ function fetchJobRelevanceSalary(campus, course, employmentStatus) {
         });
 }
 
-function fetchEmploymentByLocation(campus, course, employmentStatus) {
-    const chartContainer = document.getElementById("employmentLocationChart").closest(".analytics-content");
-    const ctx = document.getElementById("employmentLocationChart").getContext("2d");
+
+function fetchJobSearchMethods(campus, course, graduationYear) {
+    const chartContainer = document.getElementById("jobSearchChart").closest(".analytics-content");
+    const ctx = document.getElementById("jobSearchChart").getContext("2d");
 
     // Show loading indicator
     const loader = document.createElement("div");
     loader.className = "chart-loading";
     chartContainer.appendChild(loader);
 
-    fetch(`/Alumni-CvSU/admin/website/ajax/employment_location.php?campus=${campus}&course=${course}&employmentStatus=${employmentStatus}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Network response was not ok");
-            }
-            return response.json();
-        })
+    fetch(`/Alumni-CvSU/admin/website/ajax/job_search_methods.php?campus=${campus}&course=${course}&graduationYear=${graduationYear}`)
+        .then(response => response.json())
         .then(data => {
-            if (!Array.isArray(data) || data.length === 0) {
-                console.warn("No employment data available for the selected filters.");
+            if (!data || Object.values(data).every(value => value === 0)) {
+                console.warn("No job search method data available.");
                 loader.remove();
                 return;
             }
 
-            const locations = data.map(item => item.location || "Unknown"); // Handle null values
-            const employeeCounts = data.map(item => item.total_employees);
+            const labels = ["Job Fair", "Advertisement", "Recommendation", "Walk-in Application", "Online Job Portal"];
+            const jobMethods = ["job_fair", "advertisement", "recommendation", "walk_in", "online"];
 
-            // Destroy existing chart if it exists
-            if (window.employmentLocationChart instanceof Chart) {
-                window.employmentLocationChart.destroy();
-            }
+            // Ensure dataset map and total count are correctly initialized
+            let datasetMap = {};
+            let totalAlumni = 0;
 
-            // Define colors and gradient backgrounds
-            const colors = ["#4CAF50", "#facc15", "#f97316", "#ef4444", "#3b82f6", "#8b5cf6", "#ec4899"];
-            const gradients = locations.map((_, index) => {
+            jobMethods.forEach(method => {
+                datasetMap[method] = Number(data[method]) || 0;
+                totalAlumni += datasetMap[method]; // Sum correctly
+            });
+
+            console.log("Total Alumni:", totalAlumni);
+            console.log("Dataset Map:", datasetMap);
+
+            // Define colors and create gradients
+            const colors = ["#4CAF50", "#FFC107", "#FF5733", "#36A2EB", "#9C27B0"];
+            const gradients = colors.map((color) => {
                 const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-                const color = colors[index % colors.length]; // Cycle through colors
                 gradient.addColorStop(0, color);
-                gradient.addColorStop(1, hexToRgba(color, 0.5));
+                gradient.addColorStop(1, hexToRgba(color, 0.6)); // Smooth transition
                 return gradient;
             });
 
-            // Create the Chart
-            window.employmentLocationChart = new Chart(ctx, {
-                type: "bar",
+            // Destroy previous chart if it exists
+            if (window.jobSearchChart instanceof Chart) {
+                window.jobSearchChart.destroy();
+            }
+
+            window.jobSearchChart = new Chart(ctx, {
+                type: "pie",
                 data: {
-                    labels: locations,
+                    labels: labels,
                     datasets: [{
-                        label: "Total Employees",
-                        backgroundColor: gradients,
-                        data: employeeCounts,
-                        borderRadius: 4
+                        data: jobMethods.map(method => datasetMap[method]),
+                        backgroundColor: gradients
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: { stepSize: 1 },
-                            grid: { display: true, drawBorder: false, color: 'rgba(200, 200, 200, 0.15)' },
-                            title: { display: true, text: "Number of Employees" }
-                        },
-                        x: {
-                            grid: { display: false },
-                            title: { display: true, text: "Work Locations" }
-                        }
-                    },
                     plugins: {
-                        legend: { display: false },
+                        legend: { display: true },
                         tooltip: {
-                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                            titleColor: '#333',
-                            bodyColor: '#666',
-                            borderColor: 'rgba(200, 200, 200, 0.5)',
-                            borderWidth: 1,
-                            cornerRadius: 8,
                             callbacks: {
                                 label: function (tooltipItem) {
-                                    const count = tooltipItem.raw;
-                                    return `${count} employees`;
+                                    const methodIndex = tooltipItem.dataIndex;
+                                    const count = datasetMap[jobMethods[methodIndex]];
+                                    const percentage = totalAlumni > 0 ? ((count / totalAlumni) * 100).toFixed(1) : 0;
+                                    return `${labels[methodIndex]}: ${count} alumni (${percentage}%)`;
                                 }
                             }
                         }
@@ -389,7 +740,6 @@ function fetchEmploymentByLocation(campus, course, employmentStatus) {
         .catch(error => {
             console.error("Fetch error:", error.message);
             loader.remove();
-            showErrorMessage("employmentLocationChart", "Failed to load employment data");
         });
 }
 
@@ -410,6 +760,8 @@ function updateChart() {
     // fetchCourseRelevance(selectedCampus, selectedCourse, selectedEmploymentStatus);
     fetchJobRelevanceSalary(selectedCampus, selectedCourse, selectedEmploymentStatus);
     fetchEmploymentByLocation(selectedCampus, selectedCourse, selectedEmploymentStatus);
+    fetchEmploymentTime(selectedCampus, selectedCourse, selectedEmploymentStatus);
+    fetchJobSearchMethods(selectedCampus, selectedCourse, selectedEmploymentStatus);
 }
 
 window.onload = function () {

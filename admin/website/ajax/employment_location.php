@@ -12,19 +12,21 @@ $campusCondition = ($campus === '') ? "" : "AND eb.college_university = '$campus
 $courseCondition = ($course === '') ? "" : "AND eb.degree_specialization = '$course'";
 $employmentStatusCondition = ($employmentStatus === '') ? "" : "AND ed.present_employment_status = '$employmentStatus'";
 
-// Fetch data grouped by work location (work_place)
+// Define possible work locations
+$validLocations = ["local", "abroad", "work_from_home", "hybrid"];
+
+// Fetch data grouped by work location
 $query = "SELECT 
-        ed.work_place AS location,
-        COUNT(*) AS total_employees
-    FROM employment_data ed
-    LEFT JOIN educational_background eb 
-        ON ed.user_id = eb.user_id
-    WHERE 1=1
-    $campusCondition
-    $courseCondition
-    $employmentStatusCondition
-    GROUP BY ed.work_place
-    ORDER BY total_employees DESC";
+            ed.work_place, 
+            COUNT(*) AS total_employees
+        FROM employment_data ed
+        LEFT JOIN educational_background eb ON ed.user_id = eb.user_id
+        WHERE ed.work_place IN ('" . implode("','", $validLocations) . "')
+        $campusCondition
+        $courseCondition
+        $employmentStatusCondition
+        GROUP BY ed.work_place
+        ORDER BY total_employees DESC";
 
 $result = $mysqli->query($query);
 
@@ -32,14 +34,26 @@ if (!$result) {
     die(json_encode(["error" => "SQL Error: " . $mysqli->error]));
 }
 
-// Prepare the data array
-$formattedData = [];
+// Map work_place values to readable labels
+$locationLabels = [
+    "local" => "Local",
+    "abroad" => "Abroad",
+    "work_from_home" => "Work From Home",
+    "hybrid" => "Hybrid"
+];
+
+// Initialize data array with all locations to ensure order
+$formattedData = array_fill_keys(array_keys($locationLabels), ["location" => "", "total_employees" => 0]);
+
 while ($row = $result->fetch_assoc()) {
-    $formattedData[] = [
-        "location" => $row['location'],
-        "total_employees" => (int)$row['total_employees']
-    ];
+    $workPlaceKey = $row['work_place'];
+    if (isset($locationLabels[$workPlaceKey])) {
+        $formattedData[$workPlaceKey] = [
+            "location" => $locationLabels[$workPlaceKey],
+            "total_employees" => (int)$row['total_employees']
+        ];
+    }
 }
 
-// Return JSON response
-echo json_encode($formattedData);
+// Return JSON response with sorted data
+echo json_encode(array_values($formattedData));

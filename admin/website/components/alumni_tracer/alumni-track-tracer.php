@@ -108,7 +108,7 @@
         }
 
         .analytics-header {
-            padding: 1.5rem;
+            padding: 1rem;
             border-bottom: 1px solid var(--bg-secondary);
         }
 
@@ -239,10 +239,11 @@
         }
 
         .analytics-content {
-            padding: 1.5rem;
+            padding: 0 1.5rem 1.5rem 1.5rem;
             height: 300px;
             position: relative;
         }
+
 
 
 
@@ -353,9 +354,10 @@
                 <canvas id="employmentRateChart"></canvas>
             </div>
         </div>
+
         <div class="analytics-card">
             <div class="analytics-header">
-                <h2>Course Relevant to Job vs. Salary Range</h2>
+                <h2>Course Relevance and Salary Range</h2>
             </div>
             <div class="analytics-content">
                 <canvas id="jobRelevanceSalaryChart"></canvas>
@@ -363,14 +365,23 @@
         </div>
         <div class="analytics-card">
             <div class="analytics-header">
-                <h2>Employment Type by Location</h2>
+                <h2>Job Search Method</h2>
             </div>
             <div class="analytics-content">
-                <canvas id="employmentLocationChart"></canvas>
+                <canvas id="jobSearchChart"></canvas>
             </div>
         </div>
+
     </div>
     <div class="dashboard-row">
+        <div class="analytics-card">
+            <div class="analytics-header">
+                <h2>Employment Time</h2>
+            </div>
+            <div class="analytics-content">
+                <canvas id="employmentTimeChart"></canvas>
+            </div>
+        </div>
         <div class="analytics-card">
             <div class="analytics-header">
                 <h2>Employment Type by Location</h2>
