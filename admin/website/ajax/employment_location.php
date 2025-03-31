@@ -7,11 +7,27 @@ ini_set('display_errors', 1);
 $campus = isset($_GET['campus']) ? $mysqli->real_escape_string($_GET['campus']) : '';
 $course = isset($_GET['course']) ? $mysqli->real_escape_string($_GET['course']) : '';
 $employmentStatus = isset($_GET['employmentStatus']) ? $mysqli->real_escape_string($_GET['employmentStatus']) : '';
+$fromYear = isset($_GET['fromYear']) ? (int)$_GET['fromYear'] : 0;
+$toYear = isset($_GET['toYear']) ? (int)$_GET['toYear'] : 0;
 
 $campusCondition = ($campus === '') ? "" : "AND eb.college_university = '$campus'";
 $courseCondition = ($course === '') ? "" : "AND eb.degree_specialization = '$course'";
 $employmentStatusCondition = ($employmentStatus === '') ? "" : "AND ed.present_employment_status = '$employmentStatus'";
+// Year Condition Logic
+$yearCondition = "";
+if (!empty($fromYear) && !empty($toYear)) {
+    // Both fromYear and toYear are provided - filter within range
+    $yearCondition = "AND eb.year_graduated BETWEEN '$fromYear' AND '$toYear'";
+} elseif (!empty($fromYear)) {
+    // Only fromYear is provided - filter from that year onward
+    $yearCondition = "AND eb.year_graduated >= '$fromYear'";
+} elseif (!empty($toYear)) {
+    // Only toYear is provided - filter up to that year
+    $yearCondition = "AND eb.year_graduated <= '$toYear'";
+}
 
+// Debugging: Log constructed year condition
+error_log("Year condition: $yearCondition");
 // Define possible work locations
 $validLocations = ["local", "abroad", "work_from_home", "hybrid"];
 
@@ -25,6 +41,7 @@ $query = "SELECT
         $campusCondition
         $courseCondition
         $employmentStatusCondition
+        $yearCondition
         GROUP BY ed.work_place
         ORDER BY total_employees DESC";
 

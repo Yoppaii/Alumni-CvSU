@@ -198,6 +198,15 @@
         .year-range input {
             flex: 1;
             width: calc(50% - 15px);
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--secondary-color);
+            border-radius: 0.375rem;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: border-color 0.2s ease, background 0.2s ease;
         }
 
         .year-range span {
@@ -330,9 +339,12 @@
                 <div class="filter-group">
                     <label class="filter-label">Graduation Date:</label>
                     <div class="year-range">
-                        <select id="gradYearFrom" class="filter-select"></select>
-                        <span>to</span>
-                        <select id="gradYearTo" class="filter-select"></select>
+                        <label for="fromYearFilter">From:</label>
+                        <input type="number" id="fromYearFilter" min="1900" max="2099" placeholder="e.g. 2005">
+
+                        <label for="toYearFilter">To:</label>
+                        <input type="number" id="toYearFilter" min="1900" max="2099" placeholder="e.g. 2023">
+
                     </div>
                 </div>
                 <div class="filter-group">
@@ -459,7 +471,7 @@
                 });
         }
 
-        function fetEmploymentStatus() {
+        function fetchEmploymentStatus() {
             fetch(`/Alumni-CvSU/admin/website/ajax/get_employment_status_list.php`)
                 .then(response => {
                     if (!response.ok) {
@@ -484,7 +496,7 @@
 
         fetchCampuses();
         fetchCourses();
-        fetEmploymentStatus();
+        fetchEmploymentStatus();
     </script>
     <script>
         document.getElementById("resetFilters").addEventListener("click", function() {

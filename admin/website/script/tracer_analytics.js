@@ -10,7 +10,28 @@ function hexToRgba(hex, alpha = 1) {
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-function fetchEmploymentRate(campus, course, employmentStatus) {
+function showErrorMessage(chartId, message) {
+    const container = document.getElementById(chartId).closest('.analytics-content');
+
+    // Remove existing error message if any
+    const existingError = container.querySelector('.chart-error');
+    if (existingError) existingError.remove();
+
+    // Create error display
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'chart-error';
+    errorDiv.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <p>${message}</p>
+    `;
+
+    container.appendChild(errorDiv);
+}
+function fetchEmploymentRate(campus, course, employmentStatus, fromYear, toYear) {
     const chartContainer = document.getElementById("employmentRateChart").closest(".analytics-content");
     const ctx = document.getElementById("employmentRateChart").getContext("2d");
 
@@ -19,7 +40,16 @@ function fetchEmploymentRate(campus, course, employmentStatus) {
     loader.className = "chart-loading";
     chartContainer.appendChild(loader);
 
-    fetch(`/Alumni-CvSU/admin/website/ajax/employment_rate.php?campus=${campus}&course=${course}&employmentStatus=${employmentStatus}`)
+    // Construct query parameters
+    const params = new URLSearchParams({
+        campus: campus,
+        course: course,
+        employmentStatus: employmentStatus,
+        fromYear: fromYear || '',  // Keep as empty string if null/undefined
+        toYear: toYear || ''       // Keep as empty string if null/undefined
+    });
+
+    fetch(`/Alumni-CvSU/admin/website/ajax/employment_rate.php?${params.toString()}`)
         .then(response => {
             if (!response.ok) {
                 throw new Error("Network response was not ok");
@@ -81,7 +111,6 @@ function fetchEmploymentRate(campus, course, employmentStatus) {
                                 }
                             }
                         }
-
                     }
                 }
             });
@@ -122,419 +151,7 @@ function fetchEmploymentRate(campus, course, employmentStatus) {
         });
 }
 
-
-// function fetchCourseRelevance(campus, course, employmentStatus) {
-//     fetch(`/Alumni-CvSU/admin/website/ajax/course_to_job_relevance.php?campus=${campus}&course=${course}&employmentStatus=${employmentStatus}`)
-//         .then(response => {
-//             if (!response.ok) {
-//                 throw new Error('Network response was not ok');
-//             }
-//             return response.json();
-//         })
-//         .then(data => {
-//             const ctx = document.getElementById("courseRelevanceChart").getContext("2d");
-
-//             if (window.courseRelevanceChart instanceof Chart) {
-//                 window.courseRelevanceChart.destroy();
-//             }
-
-//             window.courseRelevanceChart = new Chart(ctx, {
-//                 type: "doughnut",
-//                 data: {
-//                     labels: ["Related", "Not Related"],
-//                     datasets: [{
-//                         data: [data.related, data.not_related],
-//                         backgroundColor: ["#4CAF50", "#FF5733"],
-//                         borderWidth: 1
-//                     }]
-//                 },
-//                 options: {
-//                     responsive: true,
-//                     maintainAspectRatio: false,
-//                     cutout: "70%",
-//                     plugins: {
-//                         legend: { position: false },
-//                         tooltip: {
-//                             enabled: true,
-//                             callbacks: {
-//                                 label: function (tooltipItem) {
-//                                     const value = tooltipItem.raw;
-//                                     const total = data.related + data.not_related;
-//                                     const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
-//                                     return `${value} (${percentage}%)`;
-//                                 }
-//                             }
-//                         }
-//                     }
-//                 }
-//             });
-//         })
-//         .catch(error => {
-//             console.error("Fetch error:", error.message);
-//         });
-// }
-
-
-
-function fetchEmploymentByLocation(campus, course, employmentStatus) {
-    const chartContainer = document.getElementById("employmentLocationChart").closest(".analytics-content");
-    const ctx = document.getElementById("employmentLocationChart").getContext("2d");
-
-    // Show loading indicator
-    const loader = document.createElement("div");
-    loader.className = "chart-loading";
-    chartContainer.appendChild(loader);
-
-    fetch(`/Alumni-CvSU/admin/website/ajax/employment_location.php?campus=${campus}&course=${course}&employmentStatus=${employmentStatus}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Network response was not ok");
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (!Array.isArray(data) || data.length === 0) {
-                console.warn("No employment data available for the selected filters.");
-                loader.remove();
-                return;
-            }
-
-            // Define the expected order of locations
-            const locationOrder = ["Local", "Abroad", "Work From Home", "Hybrid"];
-
-            // Ensure the data is in the correct order
-            const orderedData = locationOrder.map(location => {
-                const found = data.find(item => item.location === location);
-                return found ? found : { location, total_employees: 0 };
-            });
-
-            // Extract locations and counts
-            const locations = orderedData.map(item => item.location);
-            const counts = orderedData.map(item => parseInt(item.total_employees));
-
-            // Calculate total employees
-            const totalEmployees = counts.reduce((sum, count) => sum + count, 0);
-
-            // Destroy existing chart if it exists
-            if (window.employmentLocationChart instanceof Chart) {
-                window.employmentLocationChart.destroy();
-            }
-
-            // Define colors for each location
-            const colors = ["#4CAF50", "#facc15", "#f97316", "#ef4444"];
-
-            // Create gradient backgrounds
-            const gradients = colors.map((color) => {
-                const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-                gradient.addColorStop(0, color);
-                gradient.addColorStop(1, hexToRgba(color, 0.5));
-                return gradient;
-            });
-
-            // Store visibility state and original data
-            const dataVisibility = [true, true, true, true];
-            const originalData = [...counts];
-
-            // Create the Chart with a single dataset
-            window.employmentLocationChart = new Chart(ctx, {
-                type: "bar",
-                data: {
-                    labels: locations,
-                    datasets: [{
-                        data: counts,
-                        backgroundColor: gradients,
-                        borderRadius: 4,
-                        barPercentage: 0.8
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: {
-                        duration: 800,
-                        easing: 'easeOutQuart'
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: { stepSize: 1 },
-                            grid: { display: true, drawBorder: false, color: 'rgba(200, 200, 200, 0.15)' },
-                            title: { display: true, text: "Number of Employees" }
-                        },
-                        x: {
-                            grid: { display: false },
-                            title: { display: true, text: "Work Locations" }
-                        }
-                    },
-                    
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top',
-                            labels: {
-                                usePointStyle: false,
-                                boxWidth: 40,
-                                boxHeight: 10,
-                                padding: 20,
-                                generateLabels: function (chart) {
-                                    return locationOrder.map((location, index) => {
-                                        return {
-                                            text: location,
-                                            fillStyle: gradients[index],
-                                            strokeStyle: colors[index],
-                                            lineWidth: 1,
-                                            hidden: !dataVisibility[index],
-                                            index: index
-                                        };
-                                    });
-                                }
-                            },
-                            onClick: function (e, legendItem, legend) {
-                                const index = legendItem.index;
-                                const ci = legend.chart;
-
-                                // Toggle visibility state
-                                dataVisibility[index] = !dataVisibility[index];
-
-                                // Apply animation
-                                if (dataVisibility[index]) {
-                                    // Showing with animation - start from 0 and animate to actual value
-                                    ci.data.datasets[0].data[index] = 0;
-                                    ci.update('none');
-
-                                    setTimeout(() => {
-                                        ci.data.datasets[0].data[index] = originalData[index];
-                                        ci.update();
-                                    }, 50);
-                                } else {
-                                    // Hiding with animation - animate to 0
-                                    ci.data.datasets[0].data[index] = 0;
-                                    ci.update();
-                                }
-
-                                // Update legend to reflect new state
-                                ci.update();
-                            }
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                            titleColor: '#333',
-                            bodyColor: '#666',
-                            borderColor: 'rgba(200, 200, 200, 0.5)',
-                            borderWidth: 1,
-                            cornerRadius: 8,
-                            callbacks: {
-                                label: function (context) {
-                                    const count = context.raw;
-                                    const location = locations[context.dataIndex];
-                                    const percentage = totalEmployees > 0 ? ((count / totalEmployees) * 100).toFixed(1) : 0;
-                                    return `${location}: ${count} alumni (${percentage}%)`;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-
-            // Apply custom rectangle legends after chart initialization
-            const originalLegendAfterDraw = Chart.Legend.prototype.afterDraw;
-            Chart.Legend.prototype.afterDraw = function () {
-                originalLegendAfterDraw.apply(this, arguments);
-
-                const chart = this.chart;
-                const legendItems = chart.legend.legendItems;
-
-                if (legendItems && legendItems.length > 0) {
-                    const legendContainer = chart.legend.legendHitBoxes;
-
-                    legendContainer.forEach((item, index) => {
-                        const ctx = chart.ctx;
-                        const x = item.left - 10;  // Adjusting position
-                        const y = item.top;
-                        const width = 20;
-                        const height = 10;
-
-                        // Only redraw if visible
-                        if (dataVisibility[index]) {
-                            // Create gradient for the rectangle
-                            const gradient = ctx.createLinearGradient(x, y, x, y + height);
-                            gradient.addColorStop(0, colors[index]);
-                            gradient.addColorStop(1, hexToRgba(colors[index], 0.5));
-
-                            // Draw the rectangle
-                            ctx.fillStyle = gradient;
-                            ctx.fillRect(x, y, width, height);
-                            ctx.strokeStyle = colors[index];
-                            ctx.strokeRect(x, y, width, height);
-                        }
-                    });
-                }
-            };
-
-            // Remove loading indicator
-            loader.remove();
-        })
-        .catch(error => {
-            console.error("Fetch error:", error.message);
-            loader.remove();
-            showErrorMessage("employmentLocationChart", "Failed to load employment data");
-        });
-}
-
-function fetchEmploymentTime(campus, course, employmentStatus) {
-    const chartContainer = document.getElementById("employmentTimeChart").closest(".analytics-content");
-    const ctx = document.getElementById("employmentTimeChart").getContext("2d");
-
-    // Show loading indicator
-    const loader = document.createElement("div");
-    loader.className = "chart-loading";
-    chartContainer.appendChild(loader);
-
-    fetch(`/Alumni-CvSU/admin/website/ajax/employment_time.php?campus=${campus}&course=${course}&employmentStatus=${employmentStatus}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Network response was not ok");
-            }
-            return response.json();
-        })
-        .then(data => {
-            // Define time categories and their display labels
-            const labels = ["Less than 1 Month", "1-6 Months", "7-11 Months", "1 Year or More"];
-            const timeCategories = ["less_than_1month", "1_6months", "7_11months", "1year_more"];
-
-            // Initialize data map and total count
-            let datasetMap = {};
-            let totalAlumni = 0;
-
-            // Initialize all categories with zero
-            timeCategories.forEach(category => {
-                datasetMap[category] = 0;
-            });
-
-            // Process data from API
-            if (Array.isArray(data) && data.length > 0) {
-                data.forEach(item => {
-                    if (timeCategories.includes(item.time_to_land)) {
-                        datasetMap[item.time_to_land] = parseInt(item.alumni_count);
-                        totalAlumni += parseInt(item.alumni_count);
-                    }
-                });
-            } else {
-                console.warn("No employment time data available for the selected filters.");
-            }
-
-            console.log("Total Alumni:", totalAlumni);
-            console.log("Dataset Map:", datasetMap);
-
-            // Destroy existing chart if it exists
-            if (window.employmentTimeChart instanceof Chart) {
-                window.employmentTimeChart.destroy();
-            }
-
-            // Define colors for each time period
-            const colors = ["#4CAF50", "#facc15", "#f97316", "#ef4444"];
-
-            // Create gradient backgrounds
-            const gradients = colors.map(color => {
-                const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-                gradient.addColorStop(0, color);
-                gradient.addColorStop(1, hexToRgba(color, 0.5));
-                return gradient;
-            });
-
-            // Extract the data into separate arrays for each time category
-            const lessOneMonthData = [datasetMap["less_than_1month"], 0, 0, 0];
-            const oneToSixMonthsData = [0, datasetMap["1_6months"], 0, 0];
-            const sevenToElevenMonthsData = [0, 0, datasetMap["7_11months"], 0];
-            const oneYearMoreData = [0, 0, 0, datasetMap["1year_more"]];
-
-            // Create the Chart with multiple datasets
-            window.employmentTimeChart = new Chart(ctx, {
-                type: "bar",
-                data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: "Less than 1 Month",
-                            backgroundColor: gradients[0],
-                            data: lessOneMonthData,
-                            borderRadius: 4
-                        },
-                        {
-                            label: "1-6 Months",
-                            backgroundColor: gradients[1],
-                            data: oneToSixMonthsData,
-                            borderRadius: 4
-                        },
-                        {
-                            label: "7-11 Months",
-                            backgroundColor: gradients[2],
-                            data: sevenToElevenMonthsData,
-                            borderRadius: 4
-                        },
-                        {
-                            label: "1 Year or More",
-                            backgroundColor: gradients[3],
-                            data: oneYearMoreData,
-                            borderRadius: 4
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: { stepSize: 1 },
-                            grid: {
-                                display: true,
-                                drawBorder: false,
-                                color: 'rgba(200, 200, 200, 0.15)',
-                            },
-                            title: { display: true, text: "Number of Alumni" }
-                        },
-                        x: {
-                            grid: { display: false },
-                            title: { display: true, text: "Time to Land First Job" }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top'
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                            titleColor: '#333',
-                            bodyColor: '#666',
-                            borderColor: 'rgba(200, 200, 200, 0.5)',
-                            borderWidth: 1,
-                            cornerRadius: 8,
-                            callbacks: {
-                                label: function (tooltipItem) {
-                                    const count = tooltipItem.raw;
-                                    if (count === 0) return null;
-                                    const percentage = totalAlumni > 0 ? ((count / totalAlumni) * 100).toFixed(1) : 0;
-                                    return `${tooltipItem.dataset.label}: ${count} alumni (${percentage}%)`;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-
-            // Remove loading indicator
-            loader.remove();
-        })
-        .catch(error => {
-            console.error("Fetch error:", error.message);
-            loader.remove();
-            showErrorMessage("employmentTimeChart", "Failed to load employment time data");
-        });
-}
-
-function fetchJobRelevanceSalary(campus, course, employmentStatus) {
+function fetchJobRelevanceSalary(campus, course, employmentStatus, fromYear, toYear) {
     const chartContainer = document.getElementById("jobRelevanceSalaryChart").closest(".analytics-content");
     const ctx = document.getElementById("jobRelevanceSalaryChart").getContext("2d");
 
@@ -543,7 +160,15 @@ function fetchJobRelevanceSalary(campus, course, employmentStatus) {
     loader.className = "chart-loading";
     chartContainer.appendChild(loader);
 
-    fetch(`/Alumni-CvSU/admin/website/ajax/job_relevance_salary.php?campus=${campus}&course=${course}&employmentStatus=${employmentStatus}`)
+    const params = new URLSearchParams({
+        campus: campus,
+        course: course,
+        employmentStatus: employmentStatus,
+        fromYear: fromYear || '',  // Keep as empty string if null/undefined
+        toYear: toYear || ''       // Keep as empty string if null/undefined
+    });
+
+    fetch(`/Alumni-CvSU/admin/website/ajax/job_relevance_salary.php?${params.toString()}`)
         .then(response => {
             if (!response.ok) {
                 throw new Error("Network response was not ok");
@@ -658,8 +283,7 @@ function fetchJobRelevanceSalary(campus, course, employmentStatus) {
         });
 }
 
-
-function fetchJobSearchMethods(campus, course, graduationYear) {
+function fetchJobSearchMethods(campus, course, employmentStatus, fromYear, toYear) {
     const chartContainer = document.getElementById("jobSearchChart").closest(".analytics-content");
     const ctx = document.getElementById("jobSearchChart").getContext("2d");
 
@@ -668,7 +292,15 @@ function fetchJobSearchMethods(campus, course, graduationYear) {
     loader.className = "chart-loading";
     chartContainer.appendChild(loader);
 
-    fetch(`/Alumni-CvSU/admin/website/ajax/job_search_methods.php?campus=${campus}&course=${course}&graduationYear=${graduationYear}`)
+    const params = new URLSearchParams({
+        campus: campus,
+        course: course,
+        employmentStatus: employmentStatus,
+        fromYear: fromYear || '',  // Keep as empty string if null/undefined
+        toYear: toYear || ''       // Keep as empty string if null/undefined
+    });
+
+    fetch(`/Alumni-CvSU/admin/website/ajax/job_search_methods.php?${params.toString()}`)
         .then(response => response.json())
         .then(data => {
             if (!data || Object.values(data).every(value => value === 0)) {
@@ -743,26 +375,404 @@ function fetchJobSearchMethods(campus, course, graduationYear) {
         });
 }
 
+function fetchEmploymentTime(campus, course, employmentStatus, fromYear, toYear) {
+    const chartContainer = document.getElementById("employmentTimeChart").closest(".analytics-content");
+    const ctx = document.getElementById("employmentTimeChart").getContext("2d");
+
+    // Show loading indicator
+    const loader = document.createElement("div");
+    loader.className = "chart-loading";
+    chartContainer.appendChild(loader);
+
+    // Construct query parameters
+    const params = new URLSearchParams({
+        campus: campus,
+        course: course,
+        employmentStatus: employmentStatus,
+        fromYear: fromYear || '',
+        toYear: toYear || ''
+    });
+
+    fetch(`/Alumni-CvSU/admin/website/ajax/employment_time.php?${params.toString()}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (!Array.isArray(data) || data.length === 0) {
+                console.warn("No employment time data available for the selected filters.");
+                loader.remove();
+                return;
+            }
+
+            // Define the expected order of time periods
+            const timeOrder = ["Less than 1 Month", "1-6 Months", "7-11 Months", "1 Year or More"];
+            const timeKeys = ["less_than_1month", "1_6months", "7_11months", "1year_more"];
+
+            // Map API keys to display labels
+            const keyToLabel = {
+                "less_than_1month": "Less than 1 Month",
+                "1_6months": "1-6 Months",
+                "7_11months": "7-11 Months",
+                "1year_more": "1 Year or More"
+            };
+
+            // Process data to standard format
+            const processedData = [];
+            let totalAlumni = 0;
+
+            timeKeys.forEach((key, index) => {
+                const found = data.find(item => item.time_to_land === key);
+                const count = found ? parseInt(found.alumni_count) : 0;
+                totalAlumni += count;
+
+                processedData.push({
+                    time_period: keyToLabel[key],
+                    alumni_count: count
+                });
+            });
+
+            // Extract time periods and counts
+            const timePeriods = processedData.map(item => item.time_period);
+            const counts = processedData.map(item => item.alumni_count);
+
+            // Destroy existing chart if it exists
+            if (window.employmentTimeChart instanceof Chart) {
+                window.employmentTimeChart.destroy();
+            }
+
+            // Define colors for each time period
+            const colors = ["#4CAF50", "#facc15", "#f97316", "#ef4444"];
+
+            // Create gradient backgrounds
+            const gradients = colors.map((color) => {
+                const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+                gradient.addColorStop(0, color);
+                gradient.addColorStop(1, hexToRgba(color, 0.5));
+                return gradient;
+            });
+
+            // Store visibility state and original data
+            const dataVisibility = [true, true, true, true];
+            const originalData = [...counts];
+
+            // Create the Chart with a single dataset
+            window.employmentTimeChart = new Chart(ctx, {
+                type: "bar",
+                data: {
+                    labels: timePeriods,
+                    datasets: [{
+                        data: counts,
+                        backgroundColor: gradients,
+                        borderRadius: 4,
+                        barPercentage: 0.8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 800,
+                        easing: 'easeOutQuart'
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 1 },
+                            grid: { display: true, drawBorder: false, color: 'rgba(200, 200, 200, 0.15)' },
+                            title: { display: true, text: "Number of Alumni" }
+                        },
+                        x: {
+                            grid: { display: false },
+                            title: { display: true, text: "Time to Land First Job" }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                usePointStyle: false,
+                                boxWidth: 40,
+                                boxHeight: 10,
+                                padding: 20,
+                                generateLabels: function (chart) {
+                                    return timeOrder.map((time, index) => {
+                                        return {
+                                            text: time,
+                                            fillStyle: gradients[index],
+                                            strokeStyle: colors[index],
+                                            lineWidth: 1,
+                                            hidden: !dataVisibility[index],
+                                            index: index
+                                        };
+                                    });
+                                }
+                            },
+                            onClick: function (e, legendItem, legend) {
+                                const index = legendItem.index;
+                                const ci = legend.chart;
+
+                                // Toggle visibility state
+                                dataVisibility[index] = !dataVisibility[index];
+
+                                // Apply animation
+                                if (dataVisibility[index]) {
+                                    // Showing with animation - start from 0 and animate to actual value
+                                    ci.data.datasets[0].data[index] = 0;
+                                    ci.update('none');
+
+                                    setTimeout(() => {
+                                        ci.data.datasets[0].data[index] = originalData[index];
+                                        ci.update();
+                                    }, 50);
+                                } else {
+                                    // Hiding with animation - animate to 0
+                                    ci.data.datasets[0].data[index] = 0;
+                                    ci.update();
+                                }
+
+                                // Update legend to reflect new state
+                                ci.update();
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            titleColor: '#333',
+                            bodyColor: '#666',
+                            borderColor: 'rgba(200, 200, 200, 0.5)',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function (context) {
+                                    const count = context.raw;
+                                    const timePeriod = timePeriods[context.dataIndex];
+                                    const percentage = totalAlumni > 0 ? ((count / totalAlumni) * 100).toFixed(1) : 0;
+                                    return `${timePeriod}: ${count} alumni (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Remove loading indicator
+            loader.remove();
+        })
+        .catch(error => {
+            console.error("Fetch error:", error.message);
+            loader.remove();
+            showErrorMessage("employmentTimeChart", "Failed to load employment time data");
+        });
+}
+
+function fetchEmploymentByLocation(campus, course, employmentStatus, fromYear, toYear) {
+    const chartContainer = document.getElementById("employmentLocationChart").closest(".analytics-content");
+    const ctx = document.getElementById("employmentLocationChart").getContext("2d");
+
+    // Show loading indicator
+    const loader = document.createElement("div");
+    loader.className = "chart-loading";
+    chartContainer.appendChild(loader);
+
+    // Construct query parameters
+    const params = new URLSearchParams({
+        campus: campus,
+        course: course,
+        employmentStatus: employmentStatus,
+        fromYear: fromYear || '',
+        toYear: toYear || ''
+    });
+
+    fetch(`/Alumni-CvSU/admin/website/ajax/employment_location.php?${params.toString()}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (!Array.isArray(data) || data.length === 0) {
+                console.warn("No employment data available for the selected filters.");
+                loader.remove();
+                return;
+            }
+
+            // Define the expected order of locations
+            const locationOrder = ["Local", "Abroad", "Work From Home", "Hybrid"];
+
+            // Ensure the data is in the correct order
+            const orderedData = locationOrder.map(location => {
+                const found = data.find(item => item.location === location);
+                return found ? found : { location, total_employees: 0 };
+            });
+
+            // Extract locations and counts
+            const locations = orderedData.map(item => item.location);
+            const counts = orderedData.map(item => parseInt(item.total_employees));
+
+            // Calculate total employees
+            const totalEmployees = counts.reduce((sum, count) => sum + count, 0);
+
+            // Destroy existing chart if it exists
+            if (window.employmentLocationChart instanceof Chart) {
+                window.employmentLocationChart.destroy();
+            }
+
+            // Define colors for each location
+            const colors = ["#4CAF50", "#facc15", "#f97316", "#ef4444"];
+
+            // Create gradient backgrounds
+            const gradients = colors.map((color) => {
+                const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+                gradient.addColorStop(0, color);
+                gradient.addColorStop(1, hexToRgba(color, 0.5));
+                return gradient;
+            });
+
+            // Store visibility state and original data
+            const dataVisibility = [true, true, true, true];
+            const originalData = [...counts];
+
+            // Create the Chart with a single dataset
+            window.employmentLocationChart = new Chart(ctx, {
+                type: "bar",
+                data: {
+                    labels: locations,
+                    datasets: [{
+                        data: counts,
+                        backgroundColor: gradients,
+                        borderRadius: 4,
+                        barPercentage: 0.8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 800,
+                        easing: 'easeOutQuart'
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 1 },
+                            grid: { display: true, drawBorder: false, color: 'rgba(200, 200, 200, 0.15)' },
+                            title: { display: true, text: "Number of Employees" }
+                        },
+                        x: {
+                            grid: { display: false },
+                            title: { display: true, text: "Work Locations" }
+                        }
+                    },
+
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                usePointStyle: false,
+                                boxWidth: 40,
+                                boxHeight: 10,
+                                padding: 20,
+                                generateLabels: function (chart) {
+                                    return locationOrder.map((location, index) => {
+                                        return {
+                                            text: location,
+                                            fillStyle: gradients[index],
+                                            strokeStyle: colors[index],
+                                            lineWidth: 1,
+                                            hidden: !dataVisibility[index],
+                                            index: index
+                                        };
+                                    });
+                                }
+                            },
+                            onClick: function (e, legendItem, legend) {
+                                const index = legendItem.index;
+                                const ci = legend.chart;
+
+                                // Toggle visibility state
+                                dataVisibility[index] = !dataVisibility[index];
+
+                                // Apply animation
+                                if (dataVisibility[index]) {
+                                    // Showing with animation - start from 0 and animate to actual value
+                                    ci.data.datasets[0].data[index] = 0;
+                                    ci.update('none');
+
+                                    setTimeout(() => {
+                                        ci.data.datasets[0].data[index] = originalData[index];
+                                        ci.update();
+                                    }, 50);
+                                } else {
+                                    // Hiding with animation - animate to 0
+                                    ci.data.datasets[0].data[index] = 0;
+                                    ci.update();
+                                }
+
+                                // Update legend to reflect new state
+                                ci.update();
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            titleColor: '#333',
+                            bodyColor: '#666',
+                            borderColor: 'rgba(200, 200, 200, 0.5)',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function (context) {
+                                    const count = context.raw;
+                                    const location = locations[context.dataIndex];
+                                    const percentage = totalEmployees > 0 ? ((count / totalEmployees) * 100).toFixed(1) : 0;
+                                    return `${location}: ${count} alumni (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Remove loading indicator
+            loader.remove();
+        })
+        .catch(error => {
+            console.error("Fetch error:", error.message);
+            loader.remove();
+            showErrorMessage("employmentLocationChart", "Failed to load employment data");
+        });
+}
 
 
 document.getElementById("campusFilter").addEventListener("change", updateChart);
 document.getElementById("courseFilter").addEventListener("change", updateChart);
 document.getElementById("employmentStatusFilter").addEventListener("change", updateChart);
+document.getElementById("fromYearFilter").addEventListener("change", updateChart);
+document.getElementById("toYearFilter").addEventListener("change", updateChart);
 
 
 function updateChart() {
     const selectedCampus = document.getElementById("campusFilter").value;
     const selectedCourse = document.getElementById("courseFilter").value;
     const selectedEmploymentStatus = document.getElementById("employmentStatusFilter").value;
+    let selectedFromYear = document.getElementById("fromYearFilter").value;
+    let selectedToYear = document.getElementById("toYearFilter").value;
 
+    // Ensure years are numbers and valid
+    selectedFromYear = selectedFromYear ? parseInt(selectedFromYear) : null;
+    selectedToYear = selectedToYear ? parseInt(selectedToYear) : null;
 
-    fetchEmploymentRate(selectedCampus, selectedCourse, selectedEmploymentStatus);
-    // fetchCourseRelevance(selectedCampus, selectedCourse, selectedEmploymentStatus);
-    fetchJobRelevanceSalary(selectedCampus, selectedCourse, selectedEmploymentStatus);
-    fetchEmploymentByLocation(selectedCampus, selectedCourse, selectedEmploymentStatus);
-    fetchEmploymentTime(selectedCampus, selectedCourse, selectedEmploymentStatus);
-    fetchJobSearchMethods(selectedCampus, selectedCourse, selectedEmploymentStatus);
+    fetchEmploymentRate(selectedCampus, selectedCourse, selectedEmploymentStatus, selectedFromYear, selectedToYear);
+    fetchJobRelevanceSalary(selectedCampus, selectedCourse, selectedEmploymentStatus, selectedFromYear, selectedToYear);
+    fetchJobSearchMethods(selectedCampus, selectedCourse, selectedEmploymentStatus, selectedFromYear, selectedToYear);
+    fetchEmploymentByLocation(selectedCampus, selectedCourse, selectedEmploymentStatus, selectedFromYear, selectedToYear);
+    fetchEmploymentTime(selectedCampus, selectedCourse, selectedEmploymentStatus, selectedFromYear, selectedToYear);
 }
+
 
 window.onload = function () {
     updateChart();
