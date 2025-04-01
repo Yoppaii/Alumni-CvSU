@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 17, 2025 at 07:32 AM
+-- Generation Time: Apr 01, 2025 at 04:34 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -42,7 +42,9 @@ INSERT INTO `accepting_reasons` (`id`, `user_id`, `personal_info_id`, `reason`) 
 (4, 73, 6, 'related_to_course'),
 (5, 75, 8, 'related_to_course'),
 (6, 76, 9, 'salaryBenefits'),
-(7, 76, 9, 'careerChallenge');
+(7, 76, 9, 'careerChallenge'),
+(8, 78, 10, 'salaryBenefits'),
+(9, 78, 10, 'related_to_course');
 
 -- --------------------------------------------------------
 
@@ -170,7 +172,7 @@ CREATE TABLE `admin_users` (
 --
 
 INSERT INTO `admin_users` (`admin_id`, `username`, `first_name`, `last_name`, `email`, `password_hash`, `role`, `is_active`, `last_login`, `created_at`, `updated_at`) VALUES
-(4, 'keith joshua.bungalso', 'Keith Joshua', 'Bungalso', 'keithjoshuabungalso123@gmail.com', '$2y$10$G7XzE6o4lsMaR.9t.xHLAuOUU9t5Kyp2vbWmTunUqftEMHeK/TOJq', 'admin', 1, '2025-03-07 17:29:24', '2025-01-09 12:21:29', '2025-03-07 17:29:24');
+(4, 'keith joshua.bungalso', 'Keith Joshua', 'Bungalso', 'keithjoshuabungalso123@gmail.com', '$2y$10$G7XzE6o4lsMaR.9t.xHLAuOUU9t5Kyp2vbWmTunUqftEMHeK/TOJq', 'admin', 1, '2025-03-30 13:57:51', '2025-01-09 12:21:29', '2025-03-30 13:57:51');
 
 -- --------------------------------------------------------
 
@@ -225,7 +227,8 @@ CREATE TABLE `alumni_id_cards` (
 --
 
 INSERT INTO `alumni_id_cards` (`id`, `user_id`, `last_name`, `first_name`, `middle_name`, `email`, `course`, `year_graduated`, `highschool_graduated`, `membership_type`, `status`, `created_at`, `price`) VALUES
-(71, 75, 'Bungalso', 'Keith Joshua', 'D', 'bungalsokeith@gmail.com', 'qwqeqwe', 2000, '123', 'lifetime', 'paid', '2025-02-23 12:35:23', 1500.00);
+(71, 75, 'Bungalso', 'Keith Joshua', 'D', 'bungalsokeith@gmail.com', 'qwqeqwe', 2000, '123', 'lifetime', 'paid', '2025-02-23 12:35:23', 1500.00),
+(72, 78, 'Abaño', 'Sac Macross', 'Rollamas', 'sacmacross.abano@cvsu.edu.ph', 'Bachelor Of Science in Computer Science', 2021, '2014', '5_years', 'paid', '2025-04-01 13:29:52', 500.00);
 
 --
 -- Triggers `alumni_id_cards`
@@ -414,7 +417,7 @@ INSERT INTO `bookings` (`id`, `reference_number`, `user_id`, `room_number`, `occ
 (17, 'REF890136', 73, 9, 2, 5000.00, 2500.00, '2025-01-20', '13:10:00', '2025-01-22', '11:15:00', 'completed', '2025-01-15 02:55:00'),
 (18, 'REF890137', 75, 2, 1, 2500.00, 2500.00, '2025-02-28', '14:00:00', '2025-03-01', '10:45:00', 'cancelled', '2025-02-25 08:35:00'),
 (19, 'REF890138', 76, 7, 3, 7500.00, 2500.00, '2025-02-05', '15:45:00', '2025-02-08', '12:00:00', 'completed', '2025-02-01 00:30:00'),
-(20, 'REF890139', 77, 1, 2, 5000.00, 2500.00, '2025-03-15', '12:20:00', '2025-03-17', '11:30:00', 'cancelled', '2025-03-12 06:50:00'),
+(20, 'REF890139', 77, 1, 2, 5000.00, 2500.00, '2025-04-05', '12:20:00', '2025-04-10', '11:30:00', 'confirmed', '2025-03-12 06:50:00'),
 (21, 'REF890140', 73, 3, 1, 2500.00, 2500.00, '2025-01-08', '14:10:00', '2025-01-09', '12:00:00', 'completed', '2025-01-05 01:15:00'),
 (22, 'REF890141', 75, 4, 3, 7500.00, 2500.00, '2025-02-18', '15:00:00', '2025-02-21', '11:30:00', 'completed', '2025-02-13 04:40:00'),
 (23, 'REF890142', 76, 10, 2, 5000.00, 2500.00, '2025-03-09', '13:45:00', '2025-03-10', '10:30:00', 'cancelled', '2025-03-06 03:25:00'),
@@ -474,15 +477,98 @@ INSERT INTO `bookings` (`id`, `reference_number`, `user_id`, `room_number`, `occ
 (78, 'REF890078', 77, 1, 1, 2500.00, 2500.00, '2024-09-09', '14:20:00', '2024-09-10', '11:00:00', 'completed', '2024-09-05 01:50:00'),
 (79, 'BK14195846', 73, 4, 1, 1800.00, 1800.00, '2025-02-22', '12:00:00', '2025-02-23', '12:00:00', 'completed', '2025-02-22 08:49:55'),
 (82, 'BK78054867', 76, 2, 3, 10500.00, 3500.00, '2025-03-08', '12:00:00', '2025-03-15', '15:00:00', 'completed', '2025-03-06 16:20:54'),
-(88, 'REF123461', 76, 12, 2, 6000.00, 1200.00, '2025-03-21', '14:45:00', '2025-03-28', '11:00:00', 'completed', '2025-03-08 04:28:52'),
 (95, 'REF123473', 76, 4, 1, 2800.00, 1400.00, '2025-01-10', '13:30:00', '2025-01-12', '10:30:00', 'completed', '2025-03-08 04:35:03'),
+(96, 'REF890096', 73, 2, 1, 2500.00, 2500.00, '2024-01-05', '14:00:00', '2024-01-06', '11:00:00', 'completed', '2024-01-03 01:00:00'),
+(97, 'REF890097', 75, 6, 2, 5000.00, 2500.00, '2024-01-18', '13:30:00', '2024-01-20', '12:00:00', 'cancelled', '2024-01-02 02:15:00'),
+(98, 'REF890098', 76, 9, 3, 7500.00, 2500.00, '2024-02-12', '15:00:00', '2024-02-15', '11:30:00', 'completed', '2024-02-10 06:30:00'),
+(99, 'REF890099', 77, 11, 1, 2500.00, 2500.00, '2024-02-28', '12:45:00', '2024-02-29', '11:00:00', 'cancelled', '2024-02-27 00:45:00'),
+(100, 'REF890100', 73, 5, 2, 5000.00, 2500.00, '2024-03-07', '14:30:00', '2024-03-09', '10:45:00', 'completed', '2024-02-25 03:50:00'),
+(101, 'REF890101', 75, 8, 3, 7500.00, 2500.00, '2024-03-24', '15:15:00', '2024-03-27', '11:30:00', 'cancelled', '2024-03-22 04:10:00'),
+(102, 'REF890102', 76, 12, 1, 2500.00, 2500.00, '2024-04-09', '14:00:00', '2024-04-10', '11:00:00', 'completed', '2024-04-02 02:30:00'),
+(103, 'REF890103', 77, 3, 2, 5000.00, 2500.00, '2024-04-18', '12:30:00', '2024-04-20', '11:45:00', 'cancelled', '2024-04-15 01:50:00'),
+(104, 'REF890104', 73, 7, 3, 7500.00, 2500.00, '2024-05-02', '15:45:00', '2024-05-05', '10:30:00', 'completed', '2024-04-27 05:20:00'),
+(105, 'REF890105', 75, 10, 1, 2500.00, 2500.00, '2024-05-29', '14:15:00', '2024-05-30', '11:00:00', 'cancelled', '2024-05-12 03:40:00'),
+(106, 'REF890106', 76, 4, 2, 5000.00, 2500.00, '2024-06-10', '12:50:00', '2024-06-12', '12:00:00', 'completed', '2024-06-09 02:45:00'),
+(107, 'REF890107', 77, 1, 3, 7500.00, 2500.00, '2024-06-26', '15:30:00', '2024-06-29', '10:15:00', 'cancelled', '2024-06-23 06:00:00'),
+(108, 'REF890108', 73, 6, 1, 2500.00, 2500.00, '2024-07-14', '14:00:00', '2024-07-15', '11:30:00', 'completed', '2024-07-01 01:10:00'),
+(109, 'REF890109', 75, 9, 2, 5000.00, 2500.00, '2024-07-30', '13:45:00', '2024-08-01', '11:00:00', 'cancelled', '2024-07-28 02:20:00'),
+(110, 'REF890110', 76, 12, 3, 7500.00, 2500.00, '2024-08-15', '12:15:00', '2024-08-18', '10:45:00', 'completed', '2024-08-05 03:30:00'),
+(111, 'REF890111', 77, 2, 1, 2500.00, 2500.00, '2024-08-25', '14:30:00', '2024-08-26', '11:15:00', 'cancelled', '2024-08-15 00:55:00'),
+(112, 'REF890112', 73, 5, 2, 5000.00, 2500.00, '2024-09-12', '12:50:00', '2024-09-14', '11:30:00', 'completed', '2024-08-25 02:10:00'),
+(113, 'REF890113', 75, 8, 3, 7500.00, 2500.00, '2024-09-27', '15:10:00', '2024-09-30', '12:00:00', 'cancelled', '2024-09-15 05:40:00'),
+(114, 'REF890114', 76, 10, 1, 2500.00, 2500.00, '2024-10-10', '14:00:00', '2024-10-11', '11:00:00', 'completed', '2024-09-28 01:30:00'),
+(115, 'REF890115', 77, 3, 2, 5000.00, 2500.00, '2024-10-25', '12:40:00', '2024-10-27', '10:30:00', 'cancelled', '2024-10-20 00:45:00'),
+(116, 'REF890116', 73, 9, 3, 7500.00, 2500.00, '2024-11-15', '15:25:00', '2024-11-18', '11:00:00', 'completed', '2024-11-05 06:00:00'),
+(117, 'REF890117', 75, 11, 1, 2500.00, 2500.00, '2024-11-28', '14:10:00', '2024-11-29', '12:00:00', 'cancelled', '2024-11-26 01:40:00'),
+(118, 'REF890118', 76, 2, 2, 5000.00, 2500.00, '2024-12-10', '12:55:00', '2024-12-12', '11:15:00', 'completed', '2024-12-01 03:20:00'),
+(119, 'REF890119', 77, 12, 3, 7500.00, 2500.00, '2024-12-29', '15:35:00', '2024-12-31', '12:00:00', 'cancelled', '2024-12-19 05:50:00'),
 (146, 'REF-023', 76, 3, 3, 7200.00, 3600.00, '2024-05-05', '12:30:00', '2024-05-10', '10:00:00', 'cancelled', '2024-10-04 23:45:00'),
 (147, 'REF-024', 75, 7, 4, 8800.00, 4400.00, '2024-06-10', '11:15:00', '2024-06-15', '09:45:00', 'completed', '2024-11-09 22:30:00'),
 (148, 'REF-025', 73, 5, 2, 5400.00, 2700.00, '2024-07-18', '13:00:00', '2024-07-23', '10:30:00', 'completed', '2025-02-18 01:00:00'),
+(149, 'REF890149', 77, 11, 1, 2500.00, 2500.00, '2024-02-26', '15:15:00', '2024-02-27', '10:45:00', 'cancelled', '2024-02-12 01:55:00'),
+(150, 'REF890150', 73, 4, 2, 5000.00, 2500.00, '2024-03-11', '14:30:00', '2024-03-13', '11:15:00', 'completed', '2024-02-25 02:30:00'),
+(151, 'REF890151', 75, 8, 3, 7500.00, 2500.00, '2024-03-30', '15:00:00', '2024-04-02', '12:00:00', 'cancelled', '2024-03-29 05:00:00'),
+(152, 'REF890152', 76, 12, 1, 2500.00, 2500.00, '2024-04-06', '14:00:00', '2024-04-07', '11:00:00', 'completed', '2024-03-29 00:45:00'),
+(153, 'REF890153', 77, 3, 2, 5000.00, 2500.00, '2024-04-21', '12:30:00', '2024-04-23', '11:45:00', 'cancelled', '2024-04-15 01:30:00'),
+(154, 'REF890154', 73, 7, 3, 7500.00, 2500.00, '2024-05-10', '15:45:00', '2024-05-13', '10:30:00', 'completed', '2024-05-03 05:20:00'),
+(155, 'REF890155', 75, 10, 1, 2500.00, 2500.00, '2024-05-27', '14:15:00', '2024-05-28', '11:00:00', 'cancelled', '2024-05-15 03:40:00'),
+(156, 'REF890156', 76, 6, 2, 5000.00, 2500.00, '2024-06-14', '12:50:00', '2024-06-16', '12:00:00', 'completed', '2024-06-08 02:45:00'),
+(157, 'REF890157', 77, 2, 3, 7500.00, 2500.00, '2024-06-29', '15:30:00', '2024-07-02', '10:15:00', 'cancelled', '2024-06-27 06:00:00'),
+(158, 'REF890158', 73, 5, 1, 2500.00, 2500.00, '2024-07-11', '14:00:00', '2024-07-12', '11:30:00', 'completed', '2024-07-02 01:10:00'),
+(159, 'REF890159', 75, 9, 2, 5000.00, 2500.00, '2024-07-25', '13:45:00', '2024-07-27', '11:00:00', 'cancelled', '2024-07-15 02:20:00'),
+(160, 'REF890160', 76, 12, 3, 7500.00, 2500.00, '2024-08-08', '12:15:00', '2024-08-11', '10:45:00', 'completed', '2024-08-01 03:30:00'),
+(161, 'REF890161', 77, 4, 1, 2500.00, 2500.00, '2024-08-21', '14:30:00', '2024-08-22', '11:15:00', 'cancelled', '2024-08-15 00:55:00'),
+(162, 'REF890162', 73, 6, 2, 5000.00, 2500.00, '2024-09-14', '12:50:00', '2024-09-16', '11:30:00', 'completed', '2024-09-07 02:10:00'),
+(163, 'REF890163', 75, 8, 3, 7500.00, 2500.00, '2024-09-29', '15:10:00', '2024-10-02', '12:00:00', 'cancelled', '2024-09-20 05:40:00'),
+(164, 'REF890164', 76, 10, 1, 2500.00, 2500.00, '2024-10-11', '14:00:00', '2024-10-12', '11:00:00', 'completed', '2024-10-02 01:30:00'),
+(165, 'REF890165', 77, 3, 2, 5000.00, 2500.00, '2024-10-27', '12:40:00', '2024-10-29', '10:30:00', 'cancelled', '2024-10-22 00:45:00'),
+(166, 'REF890166', 73, 9, 3, 7500.00, 2500.00, '2024-11-17', '15:25:00', '2024-11-20', '11:00:00', 'completed', '2024-11-07 06:00:00'),
+(167, 'REF890167', 75, 11, 1, 2500.00, 2500.00, '2024-11-26', '14:10:00', '2024-11-27', '12:00:00', 'cancelled', '2024-11-18 01:40:00'),
+(168, 'REF890168', 76, 2, 2, 5000.00, 2500.00, '2024-12-09', '12:55:00', '2024-12-11', '11:15:00', 'completed', '2024-12-01 03:20:00'),
+(169, 'REF890169', 77, 12, 3, 7500.00, 2500.00, '2024-12-30', '15:35:00', '2024-12-31', '12:00:00', 'cancelled', '2024-12-20 05:50:00'),
 (177, 'ee028541-fc43-11ef-9', 76, 4, 4, 10000.00, 2500.00, '2024-03-14', '14:00:00', '2024-03-17', '12:00:00', 'completed', '2025-03-08 17:36:52'),
-(178, 'ee0285a4-fc43-11ef-9', 76, 4, 3, 7500.00, 2500.00, '2024-04-20', '14:00:00', '2024-04-22', '12:00:00', 'completed', '2025-03-08 17:36:52'),
 (179, 'ee02860d-fc43-11ef-9', 76, 5, 2, 5000.00, 2500.00, '2024-01-01', '14:00:00', '2024-01-03', '12:00:00', 'completed', '2025-03-08 17:36:52'),
-(180, 'ee028668-fc43-11ef-9', 73, 6, 3, 7500.00, 2500.00, '2024-02-05', '14:00:00', '2024-02-07', '12:00:00', 'completed', '2025-03-08 17:36:52');
+(180, 'ee028668-fc43-11ef-9', 73, 6, 3, 7500.00, 2500.00, '2024-02-05', '14:00:00', '2024-02-07', '12:00:00', 'completed', '2025-03-08 17:36:52'),
+(181, 'BNK100181', 73, 1, 1, 2500.00, 2500.00, '2025-01-12', '14:00:00', '2025-01-13', '11:00:00', 'completed', '2024-12-29 01:00:00'),
+(182, 'BNK100182', 75, 3, 2, 5000.00, 2500.00, '2025-01-28', '12:30:00', '2025-01-30', '11:30:00', 'cancelled', '2025-01-10 02:20:00'),
+(183, 'BNK100183', 76, 7, 3, 7500.00, 2500.00, '2025-02-10', '13:15:00', '2025-02-13', '12:00:00', 'completed', '2025-01-25 03:40:00'),
+(184, 'BNK100184', 77, 10, 1, 2500.00, 2500.00, '2025-02-22', '15:00:00', '2025-02-23', '11:00:00', 'cancelled', '2025-02-06 00:30:00'),
+(185, 'BNK100185', 73, 4, 2, 5000.00, 2500.00, '2025-03-14', '14:45:00', '2025-03-16', '11:15:00', 'completed', '2025-02-27 02:30:00'),
+(186, 'BNK100186', 75, 3, 2, 5000.00, 2500.00, '2025-03-10', '12:30:00', '2025-03-12', '11:30:00', 'completed', '2025-02-25 02:20:00'),
+(187, 'BNK100187', 76, 7, 3, 7500.00, 2500.00, '2025-03-01', '13:15:00', '2025-03-04', '12:00:00', 'cancelled', '2025-02-12 03:40:00'),
+(188, 'BNK100188', 77, 10, 1, 2500.00, 2500.00, '2025-02-20', '15:00:00', '2025-02-21', '11:00:00', 'completed', '2025-02-06 00:30:00'),
+(189, 'BNK100189', 73, 4, 2, 5000.00, 2500.00, '2025-02-05', '14:45:00', '2025-02-07', '11:15:00', 'cancelled', '2025-01-25 02:30:00'),
+(190, 'BNK100190', 75, 8, 3, 7500.00, 2500.00, '2025-01-28', '12:00:00', '2025-01-31', '10:45:00', 'completed', '2025-01-10 04:00:00'),
+(191, 'BNK100191', 76, 6, 1, 2500.00, 2500.00, '2025-01-15', '14:00:00', '2025-01-16', '11:30:00', 'cancelled', '2025-01-02 03:10:00'),
+(192, 'BNK100192', 77, 9, 2, 5000.00, 2500.00, '2024-12-25', '13:40:00', '2024-12-27', '12:30:00', 'completed', '2024-12-10 01:50:00'),
+(193, 'BNK100193', 73, 11, 3, 7500.00, 2500.00, '2024-12-10', '15:30:00', '2024-12-12', '11:20:00', 'cancelled', '2024-11-22 06:50:00'),
+(194, 'BNK100194', 75, 2, 1, 2500.00, 2500.00, '2024-11-20', '14:10:00', '2024-11-21', '11:00:00', 'completed', '2024-11-06 02:40:00'),
+(195, 'BNK100195', 76, 5, 2, 5000.00, 2500.00, '2024-10-15', '12:50:00', '2024-10-17', '10:50:00', 'cancelled', '2024-09-28 03:20:00'),
+(196, 'BNK100196', 77, 7, 3, 7500.00, 2500.00, '2024-09-10', '15:20:00', '2024-09-13', '11:30:00', 'completed', '2024-08-23 05:30:00'),
+(197, 'BNK100197', 73, 12, 1, 2500.00, 2500.00, '2024-08-08', '14:00:00', '2024-08-09', '11:30:00', 'cancelled', '2024-07-22 01:30:00'),
+(198, 'BNK100198', 75, 4, 2, 5000.00, 2500.00, '2024-07-15', '13:30:00', '2024-07-17', '12:00:00', 'completed', '2024-07-01 02:00:00'),
+(199, 'BNK100199', 76, 9, 3, 7500.00, 2500.00, '2024-06-25', '12:20:00', '2024-06-28', '10:40:00', 'cancelled', '2024-06-08 03:50:00'),
+(200, 'BNK100200', 77, 6, 1, 2500.00, 2500.00, '2024-05-30', '14:10:00', '2024-05-31', '11:20:00', 'completed', '2024-05-13 01:40:00'),
+(201, 'BNK100201', 73, 7, 2, 5000.00, 2500.00, '2025-03-14', '14:00:00', '2025-03-16', '11:00:00', 'confirmed', '2025-03-06 01:00:00'),
+(202, 'BNK100202', 75, 11, 3, 7500.00, 2500.00, '2025-03-10', '12:45:00', '2025-03-13', '10:30:00', 'pending', '2025-02-27 03:20:00'),
+(203, 'BNK100203', 76, 3, 1, 2500.00, 2500.00, '2025-03-07', '15:15:00', '2025-03-08', '12:00:00', 'completed', '2025-02-26 06:40:00'),
+(204, 'BNK100204', 77, 6, 2, 5000.00, 2500.00, '2025-02-28', '14:30:00', '2025-03-02', '11:30:00', 'cancelled', '2025-02-15 02:00:00'),
+(205, 'BNK100205', 73, 10, 3, 7500.00, 2500.00, '2025-02-15', '12:20:00', '2025-02-18', '11:10:00', 'confirmed', '2025-02-02 05:50:00'),
+(206, 'BNK100206', 75, 5, 1, 2500.00, 2500.00, '2025-01-27', '13:50:00', '2025-01-28', '10:50:00', 'pending', '2025-01-12 00:40:00'),
+(207, 'BNK100207', 76, 8, 2, 5000.00, 2500.00, '2025-01-12', '15:10:00', '2025-01-15', '11:20:00', 'cancelled', '2024-12-28 04:30:00'),
+(208, 'BNK100208', 77, 12, 3, 7500.00, 2500.00, '2024-12-22', '12:40:00', '2024-12-24', '10:40:00', 'completed', '2024-12-08 03:10:00'),
+(209, 'BNK100209', 73, 2, 1, 2500.00, 2500.00, '2024-12-10', '14:00:00', '2024-12-11', '11:30:00', 'confirmed', '2024-11-28 01:30:00'),
+(210, 'BNK100210', 75, 9, 2, 5000.00, 2500.00, '2024-11-28', '13:20:00', '2024-11-30', '10:30:00', 'pending', '2024-11-14 02:00:00'),
+(211, 'BNK100211', 76, 4, 3, 7500.00, 2500.00, '2024-11-12', '12:30:00', '2024-11-14', '11:10:00', 'completed', '2024-10-29 03:20:00'),
+(212, 'BNK100212', 77, 7, 1, 2500.00, 2500.00, '2024-10-07', '14:50:00', '2024-10-08', '11:40:00', 'cancelled', '2024-09-24 01:50:00'),
+(213, 'BNK100213', 73, 11, 2, 5000.00, 2500.00, '2024-09-25', '15:30:00', '2024-09-27', '12:00:00', 'confirmed', '2024-09-11 06:10:00'),
+(214, 'BNK100214', 75, 6, 3, 7500.00, 2500.00, '2024-09-10', '12:10:00', '2024-09-12', '11:20:00', 'pending', '2024-08-26 03:30:00'),
+(215, 'BNK100215', 76, 1, 1, 2500.00, 2500.00, '2024-08-15', '14:20:00', '2024-08-16', '11:00:00', 'completed', '2024-08-01 02:40:00'),
+(216, 'BNK100216', 77, 3, 2, 5000.00, 2500.00, '2024-07-30', '13:40:00', '2024-08-01', '10:50:00', 'cancelled', '2024-07-14 00:50:00'),
+(217, 'BNK100217', 73, 5, 3, 7500.00, 2500.00, '2024-07-10', '12:30:00', '2024-07-12', '11:30:00', 'confirmed', '2024-06-26 05:20:00'),
+(218, 'BNK100218', 75, 9, 1, 2500.00, 2500.00, '2024-06-15', '15:10:00', '2024-06-16', '12:00:00', 'pending', '2024-06-01 03:50:00'),
+(219, 'BNK100219', 76, 2, 2, 5000.00, 2500.00, '2024-05-28', '14:10:00', '2024-05-30', '11:20:00', 'completed', '2024-05-14 01:40:00'),
+(220, 'BNK100220', 77, 8, 3, 7500.00, 2500.00, '2024-04-10', '13:50:00', '2024-04-13', '10:30:00', 'cancelled', '2024-03-26 02:50:00');
 
 -- --------------------------------------------------------
 
@@ -616,7 +702,8 @@ INSERT INTO `competencies` (`id`, `user_id`, `personal_info_id`, `competency`) V
 (8, 74, 7, 'problem_solving'),
 (9, 75, 8, 'problem_solving'),
 (10, 76, 9, 'communication'),
-(11, 76, 9, 'entrepreneurial');
+(11, 76, 9, 'entrepreneurial'),
+(12, 78, 10, 'problem_solving');
 
 -- --------------------------------------------------------
 
@@ -678,10 +765,11 @@ CREATE TABLE `educational_background` (
 --
 
 INSERT INTO `educational_background` (`id`, `user_id`, `personal_info_id`, `professional_exams`, `highest_education`, `reason_for_taking`, `degree_specialization`, `college_university`, `year_graduated`, `honors_or_awards`) VALUES
-(6, 73, 6, 'licensure', 'post_doctorate', 'good_grades_hs', 'BS Computer', 'Cavite State', 2000, '0'),
-(7, 74, 7, 'licensure', 'doctorate', 'peer_influence', 'BS Com', 'Cavite City', 2000, '0'),
-(8, 75, 8, 'licensure', 'bachelors', 'good_grades_hs', 'BS Computer', 'Cavite State', 2000, '0'),
-(9, 76, 9, 'none', 'bachelors', 'high_grades_course', 'BS Computer Science', 'Cavite State University - Cavite City Campus', 2021, '0');
+(6, 73, 6, 'licensure', 'post_doctorate', 'good_grades_hs', 'BS Electric', 'Cavite State University - Main Campus', 2000, '0'),
+(7, 74, 7, 'licensure', 'doctorate', 'peer_influence', 'BS Education', 'Cavite State University - Bacoor City Campus', 2000, '0'),
+(8, 75, 8, 'licensure', 'bachelors', 'good_grades_hs', 'BS Hospitality Management', 'Cavite State University - Cavite City Campus', 2000, '0'),
+(9, 76, 9, 'none', 'bachelors', 'high_grades_course', 'BS Computer Science', 'Cavite State University - Cavite City Campus', 2021, '0'),
+(10, 78, 10, 'licensure', 'masters', 'role_model', 'BS Computer Science', 'Cavite State University - Carmona Campus', 2003, '0');
 
 -- --------------------------------------------------------
 
@@ -709,7 +797,8 @@ INSERT INTO `employment_data` (`id`, `user_id`, `personal_info_id`, `employment_
 (6, 73, 6, 'yes', 'contractual', '', 'dwadwa', 'Public Administration and Defense', 'abroad'),
 (7, 74, 7, 'yes', 'contractual', '', 'jsis', 'Electricity, Gas and Water Supply', 'work_from_home'),
 (8, 75, 8, 'yes', 'temporary', '', 'dwadwa', 'Transport Storage and Communication', 'abroad'),
-(9, 76, 9, 'no', 'regular', '', 'Software Engineer', 'Hotels and Restaurants', 'abroad');
+(9, 76, 9, 'no', 'regular', '', 'Software Engineer', 'Hotels and Restaurants', 'abroad'),
+(10, 78, 10, 'yes', 'contractual', '', 'Software Engineer', 'Fishing', 'local');
 
 -- --------------------------------------------------------
 
@@ -836,7 +925,8 @@ INSERT INTO `job_duration` (`id`, `user_id`, `personal_info_id`, `first_job_dura
 (6, 73, 6, '6months_1year', 'recommendation', '1_6months', 'mid', 'contractual', '21k_30k', 'no', 'WALA'),
 (7, 74, 7, '1_2years', 'walk_in', '7_11months', 'senior', 'Self-employed', 'above_40k', 'no', ''),
 (8, 75, 8, 'less_than_6months', 'advertisement', '1_6months', 'junior', 'project_based', '10k_20k', 'no', ''),
-(9, 76, 9, '6months_1year', 'advertisement', '1_6months', 'entry', 'permanent', '31k_40k', 'yes', 'ASDASDASDASD');
+(9, 76, 9, '6months_1year', 'advertisement', '1_6months', 'entry', 'permanent', '31k_40k', 'yes', 'ASDASDASDASD'),
+(10, 78, 10, '6months_1year', 'job_fair', 'less_than_1month', 'entry', 'permanent', '10k_20k', 'no', 'dasdsadas');
 
 -- --------------------------------------------------------
 
@@ -860,7 +950,8 @@ INSERT INTO `job_experience` (`id`, `user_id`, `personal_info_id`, `first_job`, 
 (6, 73, 6, 'yes', 'yes'),
 (7, 74, 7, 'no', 'no'),
 (8, 75, 8, 'yes', 'yes'),
-(9, 76, 9, 'yes', 'yes');
+(9, 76, 9, 'yes', 'yes'),
+(10, 78, 10, 'yes', 'yes');
 
 -- --------------------------------------------------------
 
@@ -964,7 +1055,8 @@ INSERT INTO `other_alumni` (`id`, `user_id`, `personal_info_id`, `name`, `addres
 (8, 76, 9, 'Sac Macross Abaño', '1112 Cabuco Street Caridad', '09915594654'),
 (9, 76, 9, 'Sac Macross Abaño', '1112 Cabuco Street Caridad', '09915594654'),
 (10, 76, 9, 'Sac Macross Abaño', '1112 Cabuco Street Caridad', '09915594654'),
-(11, 76, 9, 'Sac Macross Abaño', '1112 Cabuco Street Caridad', '09915594654');
+(11, 76, 9, 'Sac Macross Abaño', '1112 Cabuco Street Caridad', '09915594654'),
+(12, 78, 10, 'Sac Macross Abaño', '1112 Cabuco Street Caridad', '09915594654');
 
 -- --------------------------------------------------------
 
@@ -1012,7 +1104,8 @@ INSERT INTO `personal_info` (`id`, `user_id`, `civil_status`, `sex`, `birthday`,
 (6, 73, 'widowed', 'male', '2025-02-04', 'BS Business Administration', 'Bacoor Campus', 'maragondon', '2025-02-04 10:02:15'),
 (7, 74, 'married', 'female', '2025-02-04', 'BS Agricultural Engineering', 'Tanza Campus', 'trece_martires', '2025-02-04 12:36:50'),
 (8, 75, 'married', 'female', '2025-02-05', 'BS Electrical Engineering', 'Gen. Mariano Alvarez Campus', 'mendez', '2025-02-17 13:13:52'),
-(9, 76, 'single', 'male', '2003-01-25', 'BS Computer Science', 'Cavite City Campus', 'cavite_city', '2025-03-06 01:46:48');
+(9, 76, 'single', 'male', '2003-01-25', 'BS Computer Science', 'Cavite City Campus', 'cavite_city', '2025-03-06 01:46:48'),
+(10, 78, 'single', 'male', '2000-01-01', 'BS Electronics Engineering', 'main', 'indang', '2025-03-23 16:00:44');
 
 -- --------------------------------------------------------
 
@@ -1155,7 +1248,9 @@ INSERT INTO `staying_reasons` (`id`, `user_id`, `personal_info_id`, `reason`) VA
 (4, 73, 6, 'career_growth'),
 (5, 75, 8, 'career_growth'),
 (6, 76, 9, 'salary'),
-(7, 76, 9, 'work_life_balance');
+(7, 76, 9, 'work_life_balance'),
+(8, 78, 10, 'salary'),
+(9, 78, 10, 'work_life_balance');
 
 -- --------------------------------------------------------
 
@@ -1211,7 +1306,8 @@ INSERT INTO `training_studies` (`id`, `user_id`, `personal_info_id`, `training_t
 (6, 73, 6, 'dwdwad', '1 month', 'Ney Anne Bungalso', 'academic_interest'),
 (7, 74, 7, 'na', '6 months', 'Cavite City', 'job_requirement'),
 (8, 75, 8, 'dwdwad', '1 month', 'NEY-ANNE LARIOSA TADOY', 'personal_growth'),
-(9, 76, 9, 'None', 'None', 'None', 'career_advancement');
+(9, 76, 9, 'None', 'None', 'None', 'career_advancement'),
+(10, 78, 10, 'None', 'None', 'asdads', 'professional_development');
 
 -- --------------------------------------------------------
 
@@ -1264,7 +1360,8 @@ INSERT INTO `user` (`id`, `user_id`, `alumni_id_card_no`, `first_name`, `last_na
 (100, 73, '001237', 'Keith Joshua', 'Bungalso', 'D', 'n/a', 'awdwa', '09156036419', '09156036419', 'dawdwa', 'awdawd', 'Alumni', 1),
 (120, 75, '001231', 'Keith Joshua', 'Bungalso', 'D', 'n/a', '#140 Bliss Site Homer Homes', '09156036419', '09156036419', 'dawd', 'dwaad', 'Alumni', 1),
 (121, 76, NULL, 'Sac Macross', 'Abaño', NULL, 'Software Engineer', '1112 Cabuco Street Caridad', '09915594654', '09915594654', NULL, 'Angelica Surio', 'Guest', 1),
-(122, 77, NULL, 'Sac Macross', 'Abaño', NULL, 'AI Engineer', '1112 Cabuco Street Caridad', '09915594654', '09915594654', NULL, NULL, 'Guest', 1);
+(122, 77, NULL, 'Sac Macross', 'Abaño', NULL, 'AI Engineer', '1112 Cabuco Street Caridad', '09915594654', '09915594654', NULL, NULL, 'Guest', 1),
+(124, 78, NULL, 'Sac Macross', 'Abaño', 'Rollamas', 'AI Engineer', '1112 Cabuco Street Caridad', '09915594654', '09915594654', NULL, NULL, 'Guest', 1);
 
 -- --------------------------------------------------------
 
@@ -1292,7 +1389,8 @@ INSERT INTO `users` (`id`, `username`, `email`, `password`, `created_at`, `first
 (74, 'Yow', 'lyricflow123@gmail.com', '$2y$10$oqk9IYK9t.CSZqp1swaeuOE.yW1e.kxNms.3xw6cMCpz4XGwzSsd.', '2025-01-20 13:24:49', 0, NULL, 0),
 (75, 'qwe', 'bungalsokeith@gmail.com', '$2y$10$SC//JVDOCxKS7ZT.JAsihe4CK.uiHcIgur0lvzf4mRZTZPVpVbd8K', '2025-02-01 03:45:55', 0, NULL, 0),
 (76, 'Sac Macross', 'sacmacrossxxv@gmail.com', '$2y$10$aXW/w28aMWRiqK2LZP4g2eFpnVTHC7J7C1mAH8762xDgvK.R7qYUO', '2025-03-02 16:15:30', 0, NULL, 0),
-(77, 'Macross', 'sac.macross1@gmail.com', '$2y$10$dPoaEBMLzr4Y.VWhp3Rw2OTtIHJQ2q9PW2ffpEvf8lSDSItpT3pCa', '2025-03-05 02:14:26', 0, '3211d53a22ad09b5c0e062be39ecc845746c55cb835d54f5fac7f5a7c9e30cea', 0);
+(77, 'Macross', 'sac.macross1@gmail.com', '$2y$10$dPoaEBMLzr4Y.VWhp3Rw2OTtIHJQ2q9PW2ffpEvf8lSDSItpT3pCa', '2025-03-05 02:14:26', 0, NULL, 0),
+(78, 'sacross', 'sacmacross.abano@cvsu.edu.ph', '$2y$10$WLl8Ztq1v4zZPxalWr4Ycer.VpKl8IdC/n/KdES95/kJlWGKZsz.u', '2025-03-22 06:31:44', 0, 'd58b53179452c1898ef8ecc7b49e9f835f357ada20966ef6ea467f2c5ae98458', 0);
 
 --
 -- Indexes for dumped tables
@@ -1653,7 +1751,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `accepting_reasons`
 --
 ALTER TABLE `accepting_reasons`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `admin_activity_logs`
@@ -1695,7 +1793,7 @@ ALTER TABLE `alumni`
 -- AUTO_INCREMENT for table `alumni_id_cards`
 --
 ALTER TABLE `alumni_id_cards`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=72;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
 
 --
 -- AUTO_INCREMENT for table `announcements`
@@ -1725,7 +1823,7 @@ ALTER TABLE `board_pricing`
 -- AUTO_INCREMENT for table `bookings`
 --
 ALTER TABLE `bookings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=190;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=221;
 
 --
 -- AUTO_INCREMENT for table `booking_status_logs`
@@ -1755,7 +1853,7 @@ ALTER TABLE `cancelled_bookings`
 -- AUTO_INCREMENT for table `competencies`
 --
 ALTER TABLE `competencies`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `conference_pricing`
@@ -1773,13 +1871,13 @@ ALTER TABLE `device_history`
 -- AUTO_INCREMENT for table `educational_background`
 --
 ALTER TABLE `educational_background`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `employment_data`
 --
 ALTER TABLE `employment_data`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `events`
@@ -1797,13 +1895,13 @@ ALTER TABLE `it_support`
 -- AUTO_INCREMENT for table `job_duration`
 --
 ALTER TABLE `job_duration`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `job_experience`
 --
 ALTER TABLE `job_experience`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `lobby_pricing`
@@ -1827,7 +1925,7 @@ ALTER TABLE `news_likes`
 -- AUTO_INCREMENT for table `other_alumni`
 --
 ALTER TABLE `other_alumni`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `password_history`
@@ -1839,7 +1937,7 @@ ALTER TABLE `password_history`
 -- AUTO_INCREMENT for table `personal_info`
 --
 ALTER TABLE `personal_info`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `recovery_emails`
@@ -1869,7 +1967,7 @@ ALTER TABLE `security_logs`
 -- AUTO_INCREMENT for table `staying_reasons`
 --
 ALTER TABLE `staying_reasons`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `support_chats`
@@ -1887,7 +1985,7 @@ ALTER TABLE `support_messages`
 -- AUTO_INCREMENT for table `training_studies`
 --
 ALTER TABLE `training_studies`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `unemployment_reasons`
@@ -1899,13 +1997,13 @@ ALTER TABLE `unemployment_reasons`
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=124;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=125;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=78;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=79;
 
 --
 -- Constraints for dumped tables
