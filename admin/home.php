@@ -212,7 +212,7 @@ $today = date('Y-m-d');
 
 <body>
     <!-- NEW DASHBOARD -->
-
+ 
     <!-- Filters -->
 
     <div class="dashboard-container">

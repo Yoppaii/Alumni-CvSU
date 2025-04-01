@@ -616,7 +616,7 @@
 .analytics-dashboard {
     margin: 2rem 0;
 }
-
+ 
 .analytics-summary {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));

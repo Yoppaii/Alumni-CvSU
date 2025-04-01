@@ -876,7 +876,10 @@ if (!isset($_SESSION['admin_id'])) {
                         <i class="fas fa-user"></i>Alumni Tracker
                     </a>
                     <div class="dropdown">
-                        <a href="?section=Alumni-tracker" class="nav-item <?php echo (isset($_GET['section']) && $_GET['section'] == 'user-live-chat') ? 'active' : ''; ?>">
+                        <a href="?section=Alumni-analytics" class="dropdown-item">
+                            <i class="fas fa-user"></i>Alumni Tracer Analytics
+                        </a>
+                        <a href="?section=Alumni-tracker" class="dropdown-item">
                             <i class="fas fa-user"></i>Alumni Total Response
                         </a>
                         <a href="?section=charts" class="dropdown-item">
@@ -1041,6 +1044,9 @@ if (!isset($_SESSION['admin_id'])) {
             switch ($section) {
                 case 'Dashboard':
                     include 'admin/home.php';
+                    break;
+                case 'Alumni-analytics':
+                    include 'admin/alumni-tracer/alumni-analytics.php';
                     break;
                 case 'Alumni-tracker':
                     include 'admin/alumni-tracer/alumni-tracker.php';
