@@ -470,7 +470,7 @@
 <body>
     <div class="dashboard-container">
         <div class="dashboard-header">
-            <h1 class="dashboard-title">Analytics</h1>
+            <h1 class="dashboard-title">Data Analytics</h1>
             <div class="report-controls">
                 <button id="printReportTracer">Print Report</button>
             </div>
