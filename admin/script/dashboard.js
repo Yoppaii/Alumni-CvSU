@@ -195,7 +195,7 @@ function fetchBookingByDay(year, month, guestType, roomNumber) {
                                 }
                             }
                         }
-                        
+
                     }
                 }
             });
@@ -350,10 +350,20 @@ function fetchCancellationRate(year, month, guestType, roomNumber) {
                 return;
             }
 
-            const rate = Math.min(100, Math.max(0, data.rate)).toFixed(2);
-            const cancelledCount = data.cancelled;
-            const successfulCount = data.successful;
-            const remaining = (100 - rate).toFixed(2);
+            const cancelled = data.cancelled ? parseInt(data.cancelled) : 0;
+            const noShows = data.no_shows ? parseInt(data.no_shows) : 0;
+            const successful = data.successful ? parseInt(data.successful) : 0;
+
+            const totalBookings = successful + cancelled + noShows;
+
+            // Corrected rate calculation
+            const rate = totalBookings > 0
+                ? (((cancelled + noShows) / totalBookings) * 100).toFixed(2)
+                : "0.00";
+
+            const remaining = (100 - parseFloat(rate)).toFixed(2);
+
+
 
             const ctx = document.getElementById("cancellationChart").getContext("2d");
 
@@ -390,13 +400,23 @@ function fetchCancellationRate(year, month, guestType, roomNumber) {
                     plugins: {
                         legend: { display: false },
                         tooltip: {
-                            enabled: true,
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            titleColor: '#333',
+                            bodyColor: '#666',
+                            borderColor: 'rgba(200, 200, 200, 0.5)',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            displayColors: true,
+                            boxWidth: 10,
+                            boxHeight: 10,
+                            boxPadding: 3,
+                            padding: 10,
                             callbacks: {
                                 label: function (tooltipItem) {
                                     const index = tooltipItem.dataIndex;
                                     return index === 0
-                                        ? `Cancelled: ${cancelledCount} (${rate}%)`
-                                        : `Successful: ${successfulCount} (${remaining}%)`;
+                                        ? `Cancelled: ${cancelled} (${rate}%)`
+                                        : `Successful: ${successful} (${remaining}%)`;
                                 }
                             }
                         }
@@ -645,6 +665,17 @@ function fetchPeakBookingHours(year, month, guestType, roomNumber) {
                     plugins: {
                         legend: { display: false },
                         tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            titleColor: '#333',
+                            bodyColor: '#666',
+                            borderColor: 'rgba(200, 200, 200, 0.5)',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            displayColors: true,
+                            boxWidth: 10,
+                            boxHeight: 10,
+                            boxPadding: 3,
+                            padding: 10,
                             callbacks: {
                                 label: function (tooltipItem) {
                                     const count = tooltipItem.raw;
@@ -667,7 +698,7 @@ function fetchPeakBookingHours(year, month, guestType, roomNumber) {
 document.getElementById("yearFilter").addEventListener("change", updateChart);
 document.getElementById("monthFilter").addEventListener("change", updateChart);
 document.getElementById("userTypeFilter").addEventListener("change", updateChart);
-document.getElementById("roomFilter").addEventListener("change", updateChart); 
+document.getElementById("roomFilter").addEventListener("change", updateChart);
 
 function updateChart() {
     const selectedYear = document.getElementById("yearFilter").value;

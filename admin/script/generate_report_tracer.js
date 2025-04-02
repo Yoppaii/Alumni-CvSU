@@ -119,7 +119,7 @@ document.getElementById("printReportTracer").addEventListener("click", async fun
     };
     // Get all selected charts
     const selectedCharts = Array.from(document.querySelectorAll('.report-checkbox:checked')).map(cb => cb.value);
-    console.log("Selected charts:", selectedCharts); // For debugging
+    // console.log("Selected charts:", selectedCharts); // For debugging
 
     let dataDisplayed = false;
 
@@ -166,12 +166,12 @@ document.getElementById("printReportTracer").addEventListener("click", async fun
     doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
     // First row
-    doc.text(`Campus: ${shortenCampusName(filters.campus) || "All Campus"}`, margin + 2, y + 5);
-    doc.text(`Employment Status: ${filters.employmentStatus || "All Status"}`, margin + (contentWidth / 2), y + 5);
+    doc.text(`Campus: ${shortenCampusName(filters.campus) || "All"}`, margin + 2, y + 5);
+    doc.text(`Employment Status: ${filters.employmentStatus || "All"}`, margin + (contentWidth / 2), y + 5);
     y += 8;
     // Second row
-    doc.text(`Course: ${filters.course || "All Course"}`, margin + 2, y + 5);
-    doc.text(`From Year: ${filters.fromYear || "All Year"}  To Year: ${filters.toYear || "All Year"}`, margin + (contentWidth / 2), y + 5);
+    doc.text(`Course: ${filters.course || "All"}`, margin + 2, y + 5);
+    doc.text(`From Year: ${filters.fromYear || "All"}  -  To Year: ${filters.toYear || "All"}`, margin + (contentWidth / 2), y + 5);
     y += 10;
     try {
         // Define API endpoints using the filters
@@ -195,7 +195,7 @@ document.getElementById("printReportTracer").addEventListener("click", async fun
                     return response.json();
                 })
                 .catch(error => {
-                    console.error(`Error fetching ${key}:`, error);
+                    // console.error(`Error fetching ${key}:`, error);
                     if (key === 'graduatesData') {
 
                         return fetch('/Alumni-CvSU/admin/website/ajax/get_campus_list.php')
@@ -328,7 +328,6 @@ document.getElementById("printReportTracer").addEventListener("click", async fun
                 const rowHeight = 10;
                 const boxHeight = rowsNeeded * rowHeight;
 
-                doc.setFillColor(245, 245, 245);
                 doc.rect(margin, y, contentWidth, boxHeight, 'F');
 
 
@@ -628,7 +627,7 @@ document.getElementById("printReportTracer").addEventListener("click", async fun
             doc.text(`Page ${i} of ${pageCount}`, pageWidth - margin, doc.internal.pageSize.height - 10, { align: 'right' });
         }
     } catch (error) {
-        console.error("Error generating report:", error);
+        // console.error("Error generating report:", error);
         y = checkForNewPage(y, 20);
         doc.setFont("helvetica", "bold");
         doc.setTextColor(200, 0, 0);

@@ -81,6 +81,7 @@ document.getElementById("printReport").addEventListener("click", async function 
             doc.text("100.0%", margin + 100, y, { align: 'left' });
             y += 10;
         }
+        y += 5;
 
         return y;
     }
@@ -216,6 +217,73 @@ document.getElementById("printReport").addEventListener("click", async function 
             { text: "Percentage", x: margin + 100 }
         ];
 
+        // Draw Summary Section if we have data
+        if (selectedCharts.length > 0) {
+            const summaryItems = [];
+
+            // Cancellations & No-Shows
+            if (selectedCharts.includes('cancellationData') && data.cancellationData) {
+                const cancelled = data.cancellationData.cancelled ? parseInt(data.cancellationData.cancelled) : 0;
+                const noShows = data.cancellationData.no_shows ? parseInt(data.cancellationData.no_shows) : 0;
+                const successful = data.cancellationData.successful ? parseInt(data.cancellationData.successful) : 0;
+
+
+                // Manually calculate the total instead of using the API's total
+                const totalBookings = successful + cancelled + noShows;
+
+                // Recalculate the rate
+                const rate = successful > 0
+                    ? (((cancelled + noShows) / totalBookings) * 100).toFixed(2)
+                    : "0.00";
+                summaryItems.push({
+                    label: "Total Bookings:",
+                    value: totalBookings.toLocaleString()
+                });
+                summaryItems.push({
+                    label: "Cancellations:",
+                    value: cancelled.toLocaleString()
+                });
+                summaryItems.push({
+                    label: "Successful:",
+                    value: successful.toLocaleString()
+                });
+                summaryItems.push({
+                    label: "Cancellation Rate:",
+                    value: `${rate}%`
+                });
+            }
+
+            // Check if there are any summary items to display
+            if (summaryItems.length > 0) {
+                y = checkForNewPage(y, 40); // Ensure there's enough space before drawing
+                y = drawSectionHeader("REPORT SUMMARY", y); // Draw the section header
+
+                // Draw the summary items in a two-column format
+                const rowsNeeded = Math.ceil(summaryItems.length / 2);
+                const rowHeight = 10;
+                const boxHeight = rowsNeeded * rowHeight;
+
+                doc.rect(margin, y, contentWidth, boxHeight, 'F'); // Draw the box
+
+                // Display summary items
+                for (let i = 0; i < summaryItems.length; i++) {
+                    const row = Math.floor(i / 2);
+                    const col = i % 2;
+                    const xPos = margin + (col * (contentWidth / 2)) + 5;
+                    const yPos = y + (row * rowHeight) + 8;
+
+                    doc.setFont("helvetica", "bold");
+                    doc.text(summaryItems[i].label, xPos, yPos);
+
+                    doc.setFont("helvetica", "normal");
+                    doc.text(summaryItems[i].value, xPos + 45, yPos);
+                }
+
+                doc.setFont("helvetica", "normal");
+                y += boxHeight + 10; // Move down for the next section
+            }
+        }
+
         // Section: Booking by Day
         if (data.dailyBookings && hasNonZeroData(data.dailyBookings)) {
             dataDisplayed = true;
@@ -245,7 +313,7 @@ document.getElementById("printReport").addEventListener("click", async function 
                 ];
             });
 
-            y = drawTable(standardHeaders, rows, y);
+            y = drawTable(standardHeaders, rows, y, false);
         }
 
         // Section: Booking by Month
@@ -278,7 +346,7 @@ document.getElementById("printReport").addEventListener("click", async function 
                 ];
             });
 
-            y = drawTable(standardHeaders, rows, y);
+            y = drawTable(standardHeaders, rows, y, false);
         }
 
         // Section: Lead Time Analysis
@@ -320,7 +388,7 @@ document.getElementById("printReport").addEventListener("click", async function 
                 ];
             });
 
-            y = drawTable(standardHeaders, rows, y);
+            y = drawTable(standardHeaders, rows, y, false);
         }
 
         // Section: Peak Booking Hours
@@ -353,8 +421,9 @@ document.getElementById("printReport").addEventListener("click", async function 
                 ];
             });
 
-            y = drawTable(standardHeaders, rows, y);
+            y = drawTable(standardHeaders, rows, y, false);
         }
+
 
         // Section: Cancellation & No-Show Rate
         if (data.cancellationData && hasCancellationData(data.cancellationData)) {
@@ -364,8 +433,15 @@ document.getElementById("printReport").addEventListener("click", async function 
 
             const cancelled = data.cancellationData.cancelled ? parseInt(data.cancellationData.cancelled) : 0;
             const noShows = data.cancellationData.no_shows ? parseInt(data.cancellationData.no_shows) : 0;
-            const totalBookings = data.cancellationData.total_bookings ? parseInt(data.cancellationData.total_bookings) : 0;
-            const rate = isNaN(data.cancellationData.rate) ? 0 : parseFloat(data.cancellationData.rate).toFixed(2);
+            const successful = data.cancellationData.successful ? parseInt(data.cancellationData.successful) : 0;
+
+            // Manually calculate the total instead of using the API's total
+            const totalBookings = successful + cancelled + noShows;
+
+            // Recalculate the rate
+            const rate = successful > 0
+                ? (((cancelled + noShows) / totalBookings) * 100).toFixed(2)
+                : "0.00";
 
             // Table style presentation
             y += 10;
@@ -373,7 +449,8 @@ document.getElementById("printReport").addEventListener("click", async function 
             doc.setFontSize(9);
 
             const tableData = [
-                { label: "Total Bookings", value: totalBookings },
+                // { label: "Total Bookings", value: totalBookings },
+                { label: "Successful Bookings", value: successful },
                 { label: "Cancellations", value: cancelled },
                 { label: "No-Shows", value: noShows },
                 { label: "Combined Rate", value: `${rate}%` },
@@ -392,6 +469,7 @@ document.getElementById("printReport").addEventListener("click", async function 
 
             y += 8;
         }
+
 
         // No data message
         if (!selectedCharts.length || !dataDisplayed) {
