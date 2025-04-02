@@ -168,7 +168,7 @@ function fetchJobRelevanceSalary(campus, course, employmentStatus, fromYear, toY
         toYear: toYear || ''       // Keep as empty string if null/undefined
     });
 
-    fetch(`/Alumni-CvSU/admin/website/ajax/job_relevance_salary.php?${params.toString()}`)
+    fetch(`/Alumni-CvSU/admin/website/ajax/course_relevance_salary.php?${params.toString()}`)
         .then(response => {
             if (!response.ok) {
                 throw new Error("Network response was not ok");

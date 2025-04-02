@@ -151,9 +151,9 @@ function fetchEmploymentRate(campus, course, employmentStatus, fromYear, toYear)
         });
 }
 
-function fetchJobRelevanceSalary(campus, course, employmentStatus, fromYear, toYear) {
-    const chartContainer = document.getElementById("jobRelevanceSalaryChart").closest(".analytics-content");
-    const ctx = document.getElementById("jobRelevanceSalaryChart").getContext("2d");
+function fetchCourseRelevanceSalary(campus, course, employmentStatus, fromYear, toYear) {
+    const chartContainer = document.getElementById("courseRelevanceSalaryChart").closest(".analytics-content");
+    const ctx = document.getElementById("courseRelevanceSalaryChart").getContext("2d");
 
     // Show loading indicator
     const loader = document.createElement("div");
@@ -168,7 +168,7 @@ function fetchJobRelevanceSalary(campus, course, employmentStatus, fromYear, toY
         toYear: toYear || ''       // Keep as empty string if null/undefined
     });
 
-    fetch(`/Alumni-CvSU/admin/website/ajax/job_relevance_salary.php?${params.toString()}`)
+    fetch(`/Alumni-CvSU/admin/website/ajax/course_relevance_salary.php?${params.toString()}`)
         .then(response => {
             if (!response.ok) {
                 throw new Error("Network response was not ok");
@@ -192,12 +192,12 @@ function fetchJobRelevanceSalary(campus, course, employmentStatus, fromYear, toY
                     }
                 });
             } else {
-                console.warn("No job relevance salary data available for the selected filters.");
+                console.warn("No course relevance salary data available for the selected filters.");
             }
 
             // Destroy existing chart if it exists
-            if (window.jobRelevanceSalaryChart instanceof Chart) {
-                window.jobRelevanceSalaryChart.destroy();
+            if (window.courseRelevanceSalaryChart instanceof Chart) {
+                window.courseRelevanceSalaryChart.destroy();
             }
 
             // Create gradient backgrounds
@@ -210,7 +210,7 @@ function fetchJobRelevanceSalary(campus, course, employmentStatus, fromYear, toY
             });
 
             // Create the Chart
-            window.jobRelevanceSalaryChart = new Chart(ctx, {
+            window.courseRelevanceSalaryChart = new Chart(ctx, {
                 type: "bar",
                 data: {
                     labels: salaryLabels,
@@ -279,7 +279,7 @@ function fetchJobRelevanceSalary(campus, course, employmentStatus, fromYear, toY
         .catch(error => {
             console.error("Fetch error:", error.message);
             loader.remove();
-            showErrorMessage("jobRelevanceSalaryChart", "Failed to load job relevance salary data");
+            showErrorMessage("courseRelevanceSalaryChart", "Failed to load course relevance salary data");
         });
 }
 
@@ -969,7 +969,7 @@ function updateChart() {
     selectedToYear = selectedToYear ? parseInt(selectedToYear) : null;
 
     fetchEmploymentRate(selectedCampus, selectedCourse, selectedEmploymentStatus, selectedFromYear, selectedToYear);
-    fetchJobRelevanceSalary(selectedCampus, selectedCourse, selectedEmploymentStatus, selectedFromYear, selectedToYear);
+    fetchCourseRelevanceSalary(selectedCampus, selectedCourse, selectedEmploymentStatus, selectedFromYear, selectedToYear);
     fetchJobSearchMethods(selectedCampus, selectedCourse, selectedEmploymentStatus, selectedFromYear, selectedToYear);
     fetchEmploymentByLocation(selectedCampus, selectedCourse, selectedEmploymentStatus, selectedFromYear, selectedToYear);
     fetchEmploymentTime(selectedCampus, selectedCourse, selectedEmploymentStatus, selectedFromYear, selectedToYear);

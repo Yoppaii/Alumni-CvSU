@@ -92,13 +92,13 @@
 
         /* Dashboard Layout */
         .dashboard-row {
-            max-width: 1600px;
-            margin: 0 auto;
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 1.5rem;
             margin-bottom: 1.5rem;
         }
+
+
 
         /* Analytics Cards */
         .analytics-card {
@@ -584,7 +584,7 @@
                     </label>
                 </div>
                 <div class="analytics-content">
-                    <canvas id="jobRelevanceSalaryChart"></canvas>
+                    <canvas id="courseRelevanceSalaryChart"></canvas>
                 </div>
             </div>
         </div>
@@ -592,9 +592,10 @@
 
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-    <script src="/Alumni-CvSU/admin/script/tracer_analytics.js"></script>
     <script src="/Alumni-CvSU/admin/script/generate_report_tracer.js"></script>
+    <script src="/Alumni-CvSU/admin/script/tracer_analytics.js"></script>
 
 
     <!-- Populate Filter -->
