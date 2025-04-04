@@ -10,23 +10,20 @@
         /* Root Variables - Color Theme */
         :root {
             --primary: #10b981;
-            --primary: #059669;
-            --primary: #d1fae5;
+            --primary-hover: #0d8c65;
             --secondary: #64748b;
             --success: #22c55e;
-            --danger: #ef4444;
+            --danger: #dc3545;
             --warning: #f59e0b;
             --text-primary: #1e293b;
             --text-secondary: #64748b;
             --bg-primary: #ffffff;
             --bg-secondary: #f8fafc;
-            --neutral-gray: #6b7280;
-            --dark-gray: #4b5563;
+            --neutral-gray: #6c757d;
+            --medium-gray: #e9ecef;
+            --dark-gray: #495057;
             --shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
         }
-
-
 
         /* Page Header */
         .AT-page-header {
@@ -47,6 +44,19 @@
         .AT-date-time {
             color: #666;
             font-size: 1.1em;
+        }
+
+        /* Dashboard Header */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .dashboard-title {
+            font-size: 24px;
+            font-weight: 700;
         }
 
         /* Analytics Dashboard */
@@ -98,8 +108,6 @@
             margin-bottom: 1.5rem;
         }
 
-
-
         /* Analytics Cards */
         .analytics-card {
             background: var(--bg-primary);
@@ -122,6 +130,12 @@
             font-size: 1.25rem;
             font-weight: 600;
             color: var(--text-primary);
+        }
+
+        .analytics-content {
+            padding: 0 1.5rem 1.5rem 1.5rem;
+            height: 300px;
+            position: relative;
         }
 
         /* Filters & Dashboard */
@@ -177,23 +191,6 @@
             margin-left: auto;
         }
 
-        /* Reset Button */
-        .reset-filter-btn {
-            padding: 8px 12px;
-            font-size: 14px;
-            font-weight: bold;
-            color: white;
-            background-color: var(--neutral-gray);
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .reset-filter-btn:hover {
-            background-color: var(--dark-gray);
-        }
-
         .year-range {
             display: flex;
             align-items: center;
@@ -216,6 +213,65 @@
 
         .year-range span {
             color: #777;
+        }
+
+        /* Toggle Switch */
+        .toggle-report {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .toggle-input {
+            appearance: none;
+            width: 36px;
+            height: 20px;
+            background-color: var(--medium-gray);
+            border-radius: 20px;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .toggle-input:checked {
+            background-color: var(--primary);
+        }
+
+        .toggle-input:before {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: white;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .toggle-input:checked:before {
+            transform: translateX(16px);
+        }
+
+        .toggle-label {
+            font-size: 1rem;
+            color: var(--dark-gray);
+        }
+
+        /* Report Controls */
+        .report-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .report-checkbox-container {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 0.85rem;
         }
 
         /* Buttons */
@@ -252,14 +308,32 @@
             color: white;
         }
 
-        .analytics-content {
-            padding: 0 1.5rem 1.5rem 1.5rem;
-            height: 300px;
-            position: relative;
+        .reset-filter-btn {
+            background-color: var(--neutral-gray);
+            color: white;
         }
 
+        .reset-filter-btn:hover {
+            background-color: var(--dark-gray);
+        }
 
+        .select-all-btn {
+            background-color: var(--primary);
+            color: white;
+        }
 
+        .select-all-btn:hover {
+            background-color: #0d8c65;
+        }
+
+        .select-none-btn {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .select-none-btn:hover {
+            background-color: #c82333;
+        }
 
         /* Print Report Button */
         #printReportTracer {
@@ -318,151 +392,6 @@
                 padding: 1rem;
                 height: 250px;
             }
-
-        }
-    </style>
-    <style>
-        :root {
-            --primary: #10b981;
-            /* Green for primary actions */
-            --danger: #dc3545;
-            /* Red for destructive actions */
-            --neutral-gray: #6c757d;
-            /* Neutral gray for reset */
-            --medium-gray: #e9ecef;
-            /* Light gray for inputs */
-            --dark-gray: #495057;
-            /* Darker gray for text */
-        }
-
-        /* Toggle Switch */
-        .toggle-report {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-        }
-
-        .toggle-input {
-            appearance: none;
-            width: 36px;
-            height: 20px;
-            background-color: var(--medium-gray);
-            border-radius: 20px;
-            position: relative;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-
-        .toggle-input:checked {
-            background-color: var(--primary);
-        }
-
-        .toggle-input:before {
-            content: '';
-            position: absolute;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background-color: white;
-            top: 2px;
-            left: 2px;
-            transition: transform 0.2s ease;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-
-        .toggle-input:checked:before {
-            transform: translateX(16px);
-        }
-
-        .toggle-label {
-            font-size: 1rem;
-            color: var(--dark-gray);
-        }
-
-        .report-checkbox-container {
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            font-size: 0.85rem;
-        }
-
-        /* Filter Actions */
-        .filter-actions {
-            display: flex;
-            gap: 8px;
-            margin-left: auto;
-        }
-
-        /* Button Styling */
-        .button {
-            padding: 10px 16px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .reset-filter-btn {
-            background-color: var(--neutral-gray);
-            color: white;
-        }
-
-        .select-all-btn {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        .select-none-btn {
-            background-color: var(--danger);
-            color: white;
-        }
-
-        /* Hover Effects */
-        .reset-filter-btn:hover {
-            background-color: var(--dark-gray);
-        }
-
-        .select-all-btn:hover {
-            background-color: #0d8c65;
-            /* Darker green */
-        }
-
-        .select-none-btn:hover {
-            background-color: #c82333;
-            /* Darker red */
-        }
-    </style>
-    <style>
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-
-        .dashboard-title {
-            font-size: 24px;
-            font-weight: 700;
-        }
-
-        /* Report Controls */
-        .report-controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .report-checkbox-container {
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            font-size: 0.85rem;
         }
     </style>
 </head>
