@@ -24,8 +24,8 @@ if (session_status() === PHP_SESSION_NONE) {
             --cvsu-light-green: #90EE90;
             --cvsu-hover-green: #008000;
             --cvsu-text-light: #ffffff;
-            --cvsu-text-dark: #333333;
-            --cvsu-gray-light: #f5f5f5;
+            --cvsu-text-dark:rgb(248, 248, 248);
+            --cvsu-gray-light:rgb(245, 245, 245);
             --cvsu-border-color: rgba(0, 0, 0, 0.1);
             --cvsu-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
             --cvsu-shadow-md: 0 2px 5px rgba(0, 0, 0, 0.10);
@@ -94,7 +94,7 @@ if (session_status() === PHP_SESSION_NONE) {
             align-items: center;
             text-decoration: none;
             color: var(--cvsu-text-light);
-            gap: 1rem;
+            gap: 0.5rem;
         }
 
         .cvsu-logo img {
@@ -221,7 +221,7 @@ if (session_status() === PHP_SESSION_NONE) {
         }
 
         .cvsu-secondary-nav {
-            background-color: white;
+            background-color: black;
             padding: 0.5rem 0;
             box-shadow: var(--cvsu-shadow-sm);
             position: sticky;
@@ -246,7 +246,7 @@ if (session_status() === PHP_SESSION_NONE) {
         }
 
         .cvsu-nav-list li a {
-            color: var(--cvsu-text-dark);
+            color: white; 
             text-decoration: none;
             padding: 0.5rem 1rem;
             display: flex;
