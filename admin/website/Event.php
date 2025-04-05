@@ -14,6 +14,7 @@
             position: relative;  
             overflow: hidden; 
             min-height: 300px;
+            height: 500px;
         }
 
         .ev-hero h2 {
@@ -45,7 +46,7 @@
             transition: all 0.3s ease;
             margin-top: 40px;
             position: absolute;
-            bottom: 25px;
+            bottom: 100px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 2;
@@ -64,10 +65,12 @@
             left: 0;
             right: 0;
             bottom: 0;
+            height: 500px;
             background-image: url('asset/images/bg.jpg');
             background-size: cover;
             background-position: center;
-            filter: blur(4px) brightness(0.7);
+            background-repeat: no-repeat;
+            filter: blur(4px) brightness(0.5); 
             z-index: 1;
         }
 

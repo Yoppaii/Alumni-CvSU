@@ -28,7 +28,7 @@ if (session_status() === PHP_SESSION_NONE) {
             --cvsu-gray-light: #f5f5f5;
             --cvsu-border-color: rgba(0, 0, 0, 0.1);
             --cvsu-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
-            --cvsu-shadow-md: 0 2px 5px rgba(0, 0, 0, 0.1);
+            --cvsu-shadow-md: 0 2px 5px rgba(0, 0, 0, 0.10);
             --cvsu-transition: all 0.3s ease;
         }
 
@@ -61,7 +61,13 @@ if (session_status() === PHP_SESSION_NONE) {
         }
 
         .cvsu-header {
-            background-color: var(--cvsu-primary-green);
+            background-image: url('https://png.pngtree.com/thumb_back/fh260/background/20210430/pngtree-modern-green-techno-background-image_689325.jpg');
+            background-size: cover; 
+            background-position: center bottom;
+            width: 100%; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
             padding: 0.75rem 0;
             box-shadow: var(--cvsu-shadow-md);
             position: sticky;
@@ -98,9 +104,12 @@ if (session_status() === PHP_SESSION_NONE) {
         }
 
         .cvsu-logo span {
-            font-size: 1.3rem;
-            font-weight: bold;
+            font-family: 'Montserrat';
+            font-size: 1.1rem;
+            /*font-weight: bold;*/
             white-space: nowrap;
+            line-height: 1;
+            
         }
 
         .cvsu-profile-dropdown {
@@ -418,7 +427,7 @@ if (session_status() === PHP_SESSION_NONE) {
         <div class="cvsu-container cvsu-header-content">
             <a href="index" class="cvsu-logo">
                 <img src="asset/images/res1.png" alt="CSU Logo">
-                <span>Alumni Cavite State University</span>
+                <span>Cavite State University<br>Office of Alumni Affairs</span>
             </a>
 
             <?php if (!isset($_SESSION['user_id'])): ?>

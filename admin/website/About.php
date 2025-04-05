@@ -14,6 +14,7 @@
             position: relative;  
             overflow: hidden; 
             min-height: 300px;
+            height: 500px;
         }
 
         .cvsu-event-hero h2 {
@@ -45,7 +46,7 @@
             transition: all 0.3s ease;
             margin-top: 40px;
             position: absolute;
-            bottom: 25px;
+            bottom: 100px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 2;
@@ -64,10 +65,12 @@
             left: 0;
             right: 0;
             bottom: 0;
+            height: 500px;
             background-image: url('asset/images/bg.jpg');
             background-size: cover;
             background-position: center;
-            filter: blur(4px) brightness(0.7);
+            background-repeat: no-repeat;
+            filter: blur(4px) brightness(0.5); 
             z-index: 1;
         }
 
@@ -117,9 +120,9 @@
     </style>
 <body>
     <section class="cvsu-event-hero">
-        <h2>CvSU Campus Satellite Network</h2>
-        <p>Explore our diverse network of Cavite State University campuses, each offering unique programs and opportunities for academic excellence across the province.</p>
-        <a href="#services" class="cvsu-cta-btn">View Campuses</a>
+        <h2>About</h2>
+        <p>Explore our information that offers visitors insight into the organization or individual behind the site, including its mission, values, and goals.</p>
+        <a href="#services" class="cvsu-cta-btn">View About</a>
     </section>
 
     <?php include('components/about/organization.php'); ?>
