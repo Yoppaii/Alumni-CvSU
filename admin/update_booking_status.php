@@ -7,6 +7,9 @@ use PHPMailer\PHPMailer\Exception;
 
 header('Content-Type: application/json');
 
+// Set Manila timezone
+date_default_timezone_set('Asia/Manila');
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(['success' => false, 'message' => 'Invalid request method']);
     exit;
@@ -53,9 +56,13 @@ try {
         ($booking['middle_name'] ? $booking['middle_name'] . ' ' : '') .
         $booking['last_name']);
 
+    // Handle both early_checkout and checked_out differently
     if ($status === 'early_checkout') {
         $current_date = date('Y-m-d');
         $current_time = date('H:i:s');
+
+        // Change status to completed
+        $status = 'completed';
 
         $update_query = "UPDATE bookings SET status = ?, departure_date = ?, departure_time = ? WHERE id = ?";
         $update_stmt = $mysqli->prepare($update_query);
@@ -63,6 +70,13 @@ try {
 
         $booking['departure_date'] = $current_date;
         $booking['departure_time'] = $current_time;
+    } else if ($status === 'checked_out') {
+        // For checked_out, just change status to completed without updating departure date/time
+        $status = 'completed';
+
+        $update_query = "UPDATE bookings SET status = ? WHERE id = ?";
+        $update_stmt = $mysqli->prepare($update_query);
+        $update_stmt->bind_param('si', $status, $booking_id);
     } else {
         $update_query = "UPDATE bookings SET status = ? WHERE id = ?";
         $update_stmt = $mysqli->prepare($update_query);

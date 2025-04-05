@@ -149,7 +149,6 @@ body {
     overflow-x: auto;
     gap: 1rem;
     padding: .5rem;
-    justify-content: space-between;
     align-items: center;
     margin-bottom: 1.5rem;
     border-bottom: 2px solid var(--border-color);

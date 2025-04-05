@@ -9,8 +9,6 @@ $tabs = [
     'pending' => 'Pending',
     'confirmed' => 'Confirmed',
     'checked_in' => 'Checked In',
-    'checked_out' => 'Checked Out',
-    'early_checkout' => 'Early Checkout',
     'cancelled' => 'Cancelled',
     'no_show' => 'No Show',
     'completed' => 'Completed',
@@ -65,8 +63,6 @@ $bookingsResult = $mysqli->query($baseQuery);
                         'pending' => 'fas fa-clock',
                         'confirmed' => 'fas fa-check',
                         'checked_in' => 'fas fa-door-open',
-                        'checked_out' => 'fas fa-door-closed',
-                        'early_checkout' => 'fas fa-sign-out-alt',
                         'cancelled' => 'fas fa-times-circle',
                         'no_show' => 'fas fa-user-slash',
                         'completed' => 'fas fa-check-double',
@@ -100,7 +96,9 @@ $bookingsResult = $mysqli->query($baseQuery);
                         <th class="alm-hide-mobile"><i class="fas fa-sign-out-alt"></i> Check Out</th>
                         <th class="alm-hide-mobile"><i class="fas fa-tags"></i> Price</th>
                         <th><i class="fas fa-info-circle"></i> Status</th>
-                        <th class="alm-hide-mobile"><i class="fas fa-cog"></i> Action</th>
+                        <?php if ($current_tab !== 'all'): ?>
+                            <th class="alm-hide-mobile"><i class="fas fa-cog"></i> Action</th>
+                        <?php endif; ?>
                     </tr>
                 </thead>
                 <tbody>
@@ -112,8 +110,6 @@ $bookingsResult = $mysqli->query($baseQuery);
                                 'pending' => '<i class="fas fa-clock"></i>',
                                 'confirmed' => '<i class="fas fa-check"></i>',
                                 'checked_in' => '<i class="fas fa-door-open"></i>',
-                                'checked_out' => '<i class="fas fa-door-closed"></i>',
-                                'early_checkout' => '<i class="fas fa-sign-out-alt"></i>',
                                 'cancelled' => '<i class="fas fa-times-circle"></i>',
                                 'no_show' => '<i class="fas fa-user-slash"></i>',
                                 'completed' => '<i class="fas fa-check-double"></i>',
@@ -145,62 +141,57 @@ $bookingsResult = $mysqli->query($baseQuery);
                                         <?php echo $statusIcon . ' ' . ucfirst($booking['status']); ?>
                                     </span>
                                 </td>
-                                <td class="alm-hide-mobile alm-actions-cell">
-                                    <div class="alm-action-buttons">
-                                        <?php if ($booking['status'] !== 'cancelled' && $booking['status'] !== 'completed'): ?>
-                                            <select class="alm-status-select" data-booking-id="<?php echo $booking['id']; ?>">
-                                                <option value="<?php echo $booking['status']; ?>" selected>
-                                                    Change Status
-                                                </option>
-                                                <?php
-                                                $statuses = [];
-
-                                                switch ($booking['status']) {
-                                                    case 'pending':
-                                                        $statuses = ['confirmed', 'cancelled'];
-                                                        break;
-                                                    case 'confirmed':
-                                                        $statuses = ['checked_in', 'cancelled', 'no_show'];
-                                                        break;
-                                                    case 'checked_in':
-                                                        $statuses = ['checked_out', 'early_checkout'];
-                                                        break;
-                                                    case 'checked_out':
-                                                        $statuses = ['completed'];
-                                                        break;
-                                                    case 'early_checkout':
-                                                        $statuses = ['completed'];
-                                                        break;
-                                                    case 'cancelled':
-                                                        $statuses = [];
-                                                        break;
-                                                    case 'no_show':
-                                                        $statuses = ['cancelled', 'confirmed'];
-                                                        break;
-                                                    case 'completed':
-                                                        $statuses = [];
-                                                        break;
-                                                }
-
-                                                foreach ($statuses as $newStatus):
-                                                ?>
-                                                    <option value="<?php echo $newStatus; ?>">
-                                                        <?php echo ucfirst(str_replace('_', ' ', $newStatus)); ?>
+                                <?php if ($current_tab !== 'all'): ?>
+                                    <td class="alm-hide-mobile alm-actions-cell">
+                                        <div class="alm-action-buttons">
+                                            <?php if ($booking['status'] !== 'cancelled' && $booking['status'] !== 'completed'): ?>
+                                                <select class="alm-status-select" data-booking-id="<?php echo $booking['id']; ?>">
+                                                    <option value="<?php echo $booking['status']; ?>" selected>
+                                                        Change Status
                                                     </option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        <?php endif; ?>
+                                                    <?php
+                                                    $statuses = [];
 
-                                        <button class="alm-delete-btn" onclick="deleteBooking('<?php echo $booking['id']; ?>', event)">
-                                            <i class="fas fa-trash-alt"></i> Delete
-                                        </button>
-                                    </div>
-                                </td>
+                                                    switch ($booking['status']) {
+                                                        case 'pending':
+                                                            $statuses = ['confirmed', 'cancelled'];
+                                                            break;
+                                                        case 'confirmed':
+                                                            $statuses = ['checked_in', 'cancelled', 'no_show'];
+                                                            break;
+                                                        case 'checked_in':
+                                                            $statuses = ['completed', 'early_checkout'];
+                                                            break;
+                                                        case 'cancelled':
+                                                            $statuses = [];
+                                                            break;
+                                                        case 'no_show':
+                                                            $statuses = ['cancelled', 'confirmed'];
+                                                            break;
+                                                        case 'completed':
+                                                            $statuses = [];
+                                                            break;
+                                                    }
+                                                    foreach ($statuses as $newStatus):
+                                                    ?>
+                                                        <option value="<?php echo $newStatus; ?>">
+                                                            <?php echo ucfirst(str_replace('_', ' ', $newStatus)); ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            <?php endif; ?>
+
+                                            <button class="alm-delete-btn" onclick="deleteBooking('<?php echo $booking['id']; ?>', event)">
+                                                <i class="fas fa-trash-alt"></i> Delete
+                                            </button>
+                                        </div>
+                                    </td>
+                                <?php endif; ?>
                             </tr>
                         <?php endwhile; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="7" class="alm-text-center">
+                            <td colspan="<?php echo ($current_tab === 'all') ? '6' : '7'; ?>" class="alm-text-center">
                                 <i class="fas fa-inbox fa-2x"></i><br>
                                 No bookings found for this status
                             </td>
@@ -697,14 +688,10 @@ $bookingsResult = $mysqli->query($baseQuery);
                 };
             };
 
-            window.checkoutBooking = function(bookingId, event) {
-                event.stopPropagation();
-                changeBookingStatus(bookingId, 'checked_out', 'Checking out guest...', event);
-            };
 
             window.earlyCheckout = function(bookingId, event) {
                 event.stopPropagation();
-                changeBookingStatus(bookingId, 'early_checkout', 'Processing early checkout...', event);
+                changeBookingStatus(bookingId, 'completed', 'Processing checkout as completed...', event);
             };
 
             window.completeBooking = function(bookingId, event) {
