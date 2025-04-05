@@ -853,6 +853,18 @@ if (!isset($_SESSION['admin_id'])) {
                     <a href="?section=Dashboard" class="nav-item <?php echo (!isset($_GET['section']) || $_GET['section'] == 'Dashboard') ? 'active' : ''; ?>">
                         <i class="fas fa-chart-line"></i>Dashboard
                     </a>
+                    <a href="#" class="nav-item has-dropdown">
+                        <i class="fas fa-bolt"></i> Quick Booking
+                    </a>
+                    <div class="dropdown">
+                        <a href="?section=Check-Available-Rooms" class="dropdown-item">
+                            <i class="fas fa-bed"></i> Check Available Rooms
+                        </a>
+                        <a href="?section=Walk-in-Booking" class="dropdown-item">
+                            <i class="fas fa-walking"></i> Walk-in Booking
+                        </a>
+                    </div>
+
                 </div>
                 <div class="nav-section">
                     <a href="#" class="nav-item has-dropdown">
@@ -1044,6 +1056,12 @@ if (!isset($_SESSION['admin_id'])) {
             switch ($section) {
                 case 'Dashboard':
                     include 'admin/home.php';
+                    break;
+                case 'Check-Available-Rooms':
+                    include 'admin/check-available-rooms.php';
+                    break;
+                case 'Walk-in-Booking':
+                    include 'admin/walk-in-booking.php';
                     break;
                 case 'Alumni-analytics':
                     include 'admin/alumni-tracer/alumni-analytics.php';

@@ -396,7 +396,7 @@ $bookingsResult = $mysqli->query($baseQuery);
                     toast.style.display = 'none';
                 };
             };
-
+ 
             const showErrorMessage = (modalBody, error) => {
                 const existingError = modalBody.querySelector('.alm-error-message');
                 if (existingError) {

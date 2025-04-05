@@ -17,7 +17,8 @@ if (isset($_SESSION['user_id'])) {
     $check_tracer_stmt->close();
 }
 
-function isLoggedIn() {
+function isLoggedIn()
+{
     if (!isset($_SESSION['user_id']) || !isset($_SESSION['session_token'])) {
         return false;
     }
@@ -31,11 +32,11 @@ function isLoggedIn() {
     $result = $stmt->get_result();
     $user = $result->fetch_assoc();
     $stmt->close();
-    
+
     if (!$user || $user['session_token'] !== $_SESSION['session_token']) {
         return false;
     }
-    
+
     return true;
 }
 
@@ -59,7 +60,7 @@ if (isset($_SESSION['user_id'])) {
     $login_stmt->execute();
     $login_result = $login_stmt->get_result();
     $login_data = $login_result->fetch_assoc();
-    
+
     if ($login_data) {
         $firstLogin = ($login_data['first_login'] === 1 || $login_data['first_login'] === '1') ? 1 : 0;
         $_SESSION['first_login'] = $firstLogin;
@@ -71,14 +72,14 @@ $section = isset($_GET['section']) ? $_GET['section'] : 'home';
 if (requiresSecurityVerification($section) && !isSecurityVerified()) {
     header("Location: Account?section=security-settings");
     exit();
-}    
+}
 
 if (isset($_GET['section']) && $_GET['section'] === 'Room-Reservation') {
     $check_booking = $mysqli->prepare("SELECT id FROM bookings WHERE user_id = ? AND status = 'pending'");
     $check_booking->bind_param("i", $_SESSION['user_id']);
     $check_booking->execute();
     $result = $check_booking->get_result();
-    
+
     if ($result->num_rows > 0) {
         header("Location: Account?section=booking_history");
         exit();
@@ -86,8 +87,8 @@ if (isset($_GET['section']) && $_GET['section'] === 'Room-Reservation') {
 }
 
 $sql = "SELECT id, user_id, first_name, last_name, middle_name, position, address, telephone, phone_number, second_address, accompanying_persons, user_status, verified, alumni_id_card_no FROM user WHERE user_id = ?";
-$stmt = $mysqli->prepare($sql); 
-$stmt->bind_param("i", $_SESSION['user_id']); 
+$stmt = $mysqli->prepare($sql);
+$stmt->bind_param("i", $_SESSION['user_id']);
 $stmt->execute();
 $result = $stmt->get_result();
 $user = $result->fetch_assoc();
@@ -100,17 +101,21 @@ if ($user) {
     $userStatus = 'Guest';
 }
 
-$booking_sql = "SELECT id FROM bookings WHERE user_id = ?";
+$booking_sql = "SELECT id FROM bookings 
+                WHERE user_id = ? 
+                AND status NOT IN ('completed', 'cancelled', 'no_show')";
 $booking_stmt = $mysqli->prepare($booking_sql);
 $booking_stmt->bind_param("i", $_SESSION['user_id']);
 $booking_stmt->execute();
 $booking_result = $booking_stmt->get_result();
 $hasBooking = $booking_result->num_rows > 0;
 $_SESSION['has_booking'] = $hasBooking;
+
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -118,280 +123,412 @@ $_SESSION['has_booking'] = $hasBooking;
     <link rel="icon" href="user/bg/res1.png" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
-    <style>
-        :root {
-            --primary-color: #006400;
-            --secondary-color: #008000;
-            --background-color: #f5f5f5;
-            --text-color: #333333;
-            --border-color: #e0e0e0;
-            --header-height: 60px;
-            --sidebar-width: 250px;
-        }
+<style>
+    :root {
+        --primary-color: #006400;
+        --secondary-color: #008000;
+        --background-color: #f5f5f5;
+        --text-color: #333333;
+        --border-color: #e0e0e0;
+        --header-height: 60px;
+        --sidebar-width: 250px;
+    }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
 
-        body {
-            font-family: Arial, sans-serif;
-            background: var(--background-color);
-            min-height: 100vh;
-        }
+    body {
+        font-family: Arial, sans-serif;
+        background: var(--background-color);
+        min-height: 100vh;
+    }
 
-        .main-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: var(--header-height);
-            background: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 1.5rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-        }
+    .main-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: var(--header-height);
+        background: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 1.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+    }
 
-        .menu-toggle {
-            background: none;
-            border: none;
-            font-size: 1.2rem;
-            cursor: pointer;
-            color: var(--text-color);
-            display: none;
-        }
+    .menu-toggle {
+        background: none;
+        border: none;
+        font-size: 1.2rem;
+        cursor: pointer;
+        color: var(--text-color);
+        display: none;
+    }
 
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-left: auto;
+        padding-right: 1rem;
+    }
+
+    .header-right>* {
+        display: flex;
+        align-items: center;
+    }
+
+    @media (min-width: 769px) {
         .header-right {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-left: auto;
-            padding-right: 1rem;
+            margin-right: 0;
         }
+    }
 
-        .header-right > * {
-            display: flex;
-            align-items: center;
-        }
+    .notification-btn {
+        background: none;
+        border: none;
+        font-size: 1.2rem;
+        cursor: pointer;
+        color: var(--text-color);
+        position: relative;
+    }
 
-        @media (min-width: 769px) {
-            .header-right {
-                margin-right: 0;
-            }
-        }
+    .notification-badge {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background: #dc3545;
+        color: white;
+        border-radius: 50%;
+        padding: 2px 6px;
+        font-size: 0.75rem;
+    }
 
-        .notification-btn {
-            background: none;
-            border: none;
-            font-size: 1.2rem;
-            cursor: pointer;
-            color: var(--text-color);
-            position: relative;
-        }
+    .main-sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: var(--sidebar-width);
+        background: white;
+        box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+        z-index: 1001;
+        transition: transform 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
 
-        .notification-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: #dc3545;
-            color: white;
-            border-radius: 50%;
-            padding: 2px 6px;
-            font-size: 0.75rem;
+    .sidebar-header {
+        padding: 1rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .close-sidebar {
+        display: none;
+        background: none;
+        border: none;
+        font-size: 1.2rem;
+        cursor: pointer;
+        color: var(--text-color);
+        position: absolute;
+        right: 1rem;
+        top: 1rem;
+    }
+
+    .user-profile {
+        text-align: center;
+        padding: 1rem 0;
+    }
+
+    .profile-image-container {
+        position: relative;
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 1rem;
+    }
+
+    .profile-image {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid var(--primary-color);
+    }
+
+    .online-indicator {
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        width: 12px;
+        height: 12px;
+        background: #28a745;
+        border-radius: 50%;
+        border: 2px solid white;
+    }
+
+    .user-name {
+        font-weight: bold;
+        color: var(--text-color);
+        margin-bottom: 0.5rem;
+    }
+
+    .user-status {
+        margin-top: 0.5rem;
+    }
+
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .status-badge.alumni {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .status-badge.guest {
+        background: #6c757d;
+        color: white;
+    }
+
+    .verify-section {
+        padding: 1rem;
+        text-align: center;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .verify-button {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        background: var(--primary-color);
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        transition: background 0.3s ease;
+    }
+
+    .verify-button:hover {
+        background: var(--secondary-color);
+    }
+
+    .nav-menu {
+        padding: 1rem 0;
+        height: calc(100vh - 200px);
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(0, 100, 0, 0.5) transparent;
+    }
+
+    .nav-menu::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .nav-menu::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .nav-menu::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 100, 0, 0.5);
+        border-radius: 3px;
+    }
+
+    .nav-menu::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(0, 100, 0, 0.7);
+    }
+
+    .nav-menu ul {
+        list-style: none;
+    }
+
+    .nav-item {
+        margin-bottom: 0.25rem;
+    }
+
+    .nav-link {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1.5rem;
+        color: var(--text-color);
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-size: 0.95rem;
+    }
+
+    .nav-link:hover {
+        background: rgba(0, 100, 0, 0.05);
+        color: var(--primary-color);
+    }
+
+    .nav-link i {
+        margin-right: 0.75rem;
+        width: 20px;
+        text-align: center;
+    }
+
+    .main-content {
+        margin-left: var(--sidebar-width);
+        padding: 0;
+        margin-top: var(--header-height);
+        min-height: calc(100vh - var(--header-height));
+        background-color: #f5f5f5;
+        position: relative;
+    }
+
+    .main-content>div,
+    .main-content>section {
+        padding: 0;
+    }
+
+    .main-content>*:first-child {
+        margin-top: 0;
+    }
+
+    .main-content>*:last-child {
+        margin-bottom: 0;
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        align-items: center;
+        justify-content: center;
+        z-index: 1100;
+    }
+
+    .modal-content {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        max-width: 400px;
+        width: 90%;
+        text-align: center;
+    }
+
+    .modal-title {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        color: var(--text-color);
+    }
+
+    .modal-body {
+        margin-bottom: 1.5rem;
+        color: #666;
+    }
+
+    .modal-button {
+        padding: 0.75rem 2rem;
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+
+    .modal-button:hover {
+        background: var(--secondary-color);
+    }
+
+    .new-user-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 1100;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .new-user-modal-content {
+        max-width: 800px;
+        width: 90%;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .user-video {
+        width: 100%;
+        display: block;
+    }
+
+    #playVideoButton {
+        display: none;
+        margin: 1rem auto;
+        padding: 0.75rem 2rem;
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .chat-floating-btn {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+        z-index: 1000;
+    }
+
+    .chat-floating-btn:hover {
+        transform: scale(1.1);
+        background: var(--secondary-color);
+    }
+
+    .version-info {
+        position: fixed;
+        bottom: 1rem;
+        left: 1rem;
+        font-size: 0.8rem;
+        color: #666;
+        z-index: 900;
+    }
+
+    @media (max-width: 768px) {
+        .main-content {
+            margin-left: 0;
+
         }
 
         .main-sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: var(--sidebar-width);
-            background: white;
-            box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
-            z-index: 1001;
-            transition: transform 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
+            transform: translateX(-100%);
         }
 
-        .sidebar-header {
-            padding: 1rem;
-            border-bottom: 1px solid var(--border-color);
+        .menu-toggle {
+            display: block;
         }
 
         .close-sidebar {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 1.2rem;
-            cursor: pointer;
-            color: var(--text-color);
-            position: absolute;
-            right: 1rem;
-            top: 1rem;
+            display: block;
         }
 
-        .user-profile {
-            text-align: center;
-            padding: 1rem 0;
-        }
-
-        .profile-image-container {
-            position: relative;
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 1rem;
-        }
-
-        .profile-image {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid var(--primary-color);
-        }
-
-        .online-indicator {
-            position: absolute;
-            bottom: 5px;
-            right: 5px;
-            width: 12px;
-            height: 12px;
-            background: #28a745;
-            border-radius: 50%;
-            border: 2px solid white;
-        }
-
-        .user-name {
-            font-weight: bold;
-            color: var(--text-color);
-            margin-bottom: 0.5rem;
-        }
-
-        .user-status {
-            margin-top: 0.5rem;
-        }
-
-        .status-badge {
-            padding: 0.25rem 0.75rem;
-            border-radius: 50px;
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-
-        .status-badge.alumni {
-            background: var(--primary-color);
-            color: white;
-        }
-
-        .status-badge.guest {
-            background: #6c757d;
-            color: white;
-        }
-
-        .verify-section {
-            padding: 1rem;
-            text-align: center;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .verify-button {
-            display: inline-block;
-            padding: 0.5rem 1rem;
-            background: var(--primary-color);
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            font-size: 0.9rem;
-            transition: background 0.3s ease;
-        }
-
-        .verify-button:hover {
-            background: var(--secondary-color);
-        }
-
-        .nav-menu {
-            padding: 1rem 0;
-            height: calc(100vh - 200px);
-            overflow-y: auto;
-            scrollbar-width: thin;
-            scrollbar-color: rgba(0, 100, 0, 0.5) transparent;
-        }
-
-        .nav-menu::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .nav-menu::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .nav-menu::-webkit-scrollbar-thumb {
-            background-color: rgba(0, 100, 0, 0.5);
-            border-radius: 3px;
-        }
-
-        .nav-menu::-webkit-scrollbar-thumb:hover {
-            background-color: rgba(0, 100, 0, 0.7);
-        }
-
-        .nav-menu ul {
-            list-style: none;
-        }
-
-        .nav-item {
-            margin-bottom: 0.25rem;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            padding: 0.75rem 1.5rem;
-            color: var(--text-color);
-            text-decoration: none;
-            transition: all 0.3s ease;
-            font-size: 0.95rem;
-        }
-
-        .nav-link:hover {
-            background: rgba(0, 100, 0, 0.05);
-            color: var(--primary-color);
-        }
-
-        .nav-link i {
-            margin-right: 0.75rem;
-            width: 20px;
-            text-align: center;
-        }
-
-        .main-content {
-            margin-left: var(--sidebar-width);
-            padding: 0;
-            margin-top: var(--header-height);
-            min-height: calc(100vh - var(--header-height));
-            background-color: #f5f5f5;
-            position: relative;
-        }
-
-        .main-content > div,
-        .main-content > section {
-            padding: 0;
-        }
-
-        .main-content > *:first-child {
-            margin-top: 0;
-        }
-
-        .main-content > *:last-child {
-            margin-bottom: 0;
-        }
-
-        .modal {
+        .sidebar-overlay {
             display: none;
             position: fixed;
             top: 0;
@@ -399,259 +536,130 @@ $_SESSION['has_booking'] = $hasBooking;
             right: 0;
             bottom: 0;
             background: rgba(0, 0, 0, 0.5);
-            align-items: center;
-            justify-content: center;
-            z-index: 1100;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            max-width: 400px;
-            width: 90%;
-            text-align: center;
-        }
-
-        .modal-title {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            color: var(--text-color);
-        }
-
-        .modal-body {
-            margin-bottom: 1.5rem;
-            color: #666;
-        }
-
-        .modal-button {
-            padding: 0.75rem 2rem;
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-
-        .modal-button:hover {
-            background: var(--secondary-color);
-        }
-
-        .new-user-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 1100;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .new-user-modal-content {
-            max-width: 800px;
-            width: 90%;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .user-video {
-            width: 100%;
-            display: block;
-        }
-
-        #playVideoButton {
-            display: none;
-            margin: 1rem auto;
-            padding: 0.75rem 2rem;
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .chat-floating-btn {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
             z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
-        .chat-floating-btn:hover {
-            transform: scale(1.1);
-            background: var(--secondary-color);
+        .sidebar-open .sidebar-overlay {
+            display: block;
+            opacity: 1;
         }
 
         .version-info {
-            position: fixed;
-            bottom: 1rem;
-            left: 1rem;
-            font-size: 0.8rem;
-            color: #666;
-            z-index: 900;
-        }
-
-        @media (max-width: 768px) {
-            .main-content {
-                margin-left: 0;
-
-            }
-
-            .main-sidebar {
-                transform: translateX(-100%);
-            }
-
-            .menu-toggle {
-                display: block;
-            }
-
-            .close-sidebar {
-                display: block;
-            }
-
-            .sidebar-overlay {
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: rgba(0, 0, 0, 0.5);
-                z-index: 1000;
-                opacity: 0;
-                transition: opacity 0.3s ease;
-            }
-
-            .sidebar-open .sidebar-overlay {
-                display: block;
-                opacity: 1;
-            }
-
-            .version-info {
-                display: none;
-            }
-        }
-
-        .user-dropdown {
-            position: relative;
-        }
-
-        .dropdown-trigger {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            cursor: pointer;
-            padding: 0.5rem;
-        }
-
-        .dropdown-trigger i {
-            transition: transform 0.3s ease;
-        }
-
-        .dropdown-menu {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            background: white;
-            border-radius: 4px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            min-width: 180px;
             display: none;
-            z-index: 1000;
         }
+    }
 
-        .dropdown-menu.active {
-            display: block;
-        }
+    .user-dropdown {
+        position: relative;
+    }
 
-        .dropdown-menu a {
-            display: block;
-            padding: 0.75rem 1rem;
-            color: var(--text-color);
-            text-decoration: none;
-            transition: background 0.3s ease;
-        }
+    .dropdown-trigger {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        padding: 0.5rem;
+    }
 
-        .dropdown-menu a:hover {
-            background: rgba(0, 100, 0, 0.05);
-            color: var(--primary-color);
-        }
-            .nav-link i {
-            width: 28px;  
-        }
+    .dropdown-trigger i {
+        transition: transform 0.3s ease;
+    }
 
-        .settings-dropdown {
-            position: relative;
-        }
+    .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: white;
+        border-radius: 4px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        min-width: 180px;
+        display: none;
+        z-index: 1000;
+    }
 
-        .settings-trigger {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    .dropdown-menu.active {
+        display: block;
+    }
 
-        .settings-arrow {
-            transition: transform 0.3s ease;
-            width: auto !important;
-            margin-left: auto;
-        }
+    .dropdown-menu a {
+        display: block;
+        padding: 0.75rem 1rem;
+        color: var(--text-color);
+        text-decoration: none;
+        transition: background 0.3s ease;
+    }
 
-        .settings-dropdown.active .settings-arrow {
-            transform: rotate(180deg);
-        }
+    .dropdown-menu a:hover {
+        background: rgba(0, 100, 0, 0.05);
+        color: var(--primary-color);
+    }
 
-        .settings-menu {
-            display: none;
-            background: #f8f9fa;
-            overflow: hidden;
-            max-height: 0;
-            transition: max-height 0.3s ease-out;
-        }
+    .nav-link i {
+        width: 28px;
+    }
 
-        .settings-dropdown.active .settings-menu {
-            display: block;
-            max-height: 500px;
-        }
+    .settings-dropdown {
+        position: relative;
+    }
 
-        .settings-menu li {
-            list-style: none;
-        }
+    .settings-trigger {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 
-        .settings-menu a {
-            display: flex;
-            align-items: center;
-            padding: 12px 32px 12px 48px;
-            color: #4b5563;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            font-size: 0.95rem;
-            gap: 12px;
-        }
+    .settings-arrow {
+        transition: transform 0.3s ease;
+        width: auto !important;
+        margin-left: auto;
+    }
 
-        .settings-menu a:hover {
-            background: #f3f4f6;
-            color: var(--primary-color);
-        }
-        .alumni-id {
-            margin-top: 0.5rem;
-            font-size: 0.85rem;
-            color: #666;
-        }
-    </style>
+    .settings-dropdown.active .settings-arrow {
+        transform: rotate(180deg);
+    }
+
+    .settings-menu {
+        display: none;
+        background: #f8f9fa;
+        overflow: hidden;
+        max-height: 0;
+        transition: max-height 0.3s ease-out;
+    }
+
+    .settings-dropdown.active .settings-menu {
+        display: block;
+        max-height: 500px;
+    }
+
+    .settings-menu li {
+        list-style: none;
+    }
+
+    .settings-menu a {
+        display: flex;
+        align-items: center;
+        padding: 12px 32px 12px 48px;
+        color: #4b5563;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-size: 0.95rem;
+        gap: 12px;
+    }
+
+    .settings-menu a:hover {
+        background: #f3f4f6;
+        color: var(--primary-color);
+    }
+
+    .alumni-id {
+        margin-top: 0.5rem;
+        font-size: 0.85rem;
+        color: #666;
+    }
+</style>
+
 <body>
     <header class="main-header">
         <button class="menu-toggle" aria-label="Toggle menu">
@@ -677,7 +685,7 @@ $_SESSION['has_booking'] = $hasBooking;
     </header>
 
     <div class="sidebar-overlay"></div>
-    
+
     <aside class="main-sidebar">
         <div class="sidebar-header">
             <button class="close-sidebar" aria-label="Close menu">
@@ -719,9 +727,8 @@ $_SESSION['has_booking'] = $hasBooking;
                 <?php endif; ?>
                 <?php if (!$hasBooking): ?>
                     <li class="nav-item"><a href="?section=Room-Reservation" class="nav-link booking-link"><i class="fas fa-calendar-check"></i> Booking</a></li>
-                <?php else: ?>
-                    <li class="nav-item"><a href="?section=booking_history" class="nav-link"><i class="fas fa-calendar-check"></i> Booking History</a></li>
                 <?php endif; ?>
+                <li class="nav-item"><a href="?section=booking_history" class="nav-link"><i class="fas fa-calendar-check"></i> Booking History</a></li>
 
                 <?php if (!$hasSubmittedTracer && $verified == 1): ?>
                     <li class="nav-item"><a href="?section=Alumni-Tracer-Form" class="nav-link"><i class="fas fa-user"></i> Alumni Tracer Form</a></li>
@@ -747,7 +754,7 @@ $_SESSION['has_booking'] = $hasBooking;
     </aside>
 
     <main class="main-content">
-        <?php 
+        <?php
         switch ($section) {
             case 'Verify-Account':
                 include 'user/profile.php';
@@ -761,9 +768,7 @@ $_SESSION['has_booking'] = $hasBooking;
                 }
                 break;
             case 'booking_history':
-                if ($hasBooking) {
-                    include 'user/booking_history.php';
-                }
+                include 'user/booking_history.php';
                 break;
             case 'account-information-settings':
                 include 'user/information-settings.php';
@@ -799,8 +804,8 @@ $_SESSION['has_booking'] = $hasBooking;
                 include 'user/privacy-settings.php';
                 break;
             case 'Alumni-Tracer-Form':
-                    include 'user/alumni-tracer.php';
-                    break;
+                include 'user/alumni-tracer.php';
+                break;
             case '2-step-verification':
                 include 'user/security-page/2_step_verification.php';
                 break;
@@ -945,7 +950,7 @@ $_SESSION['has_booking'] = $hasBooking;
                     } else {
                         hideSidebarForMobile();
                     }
-                }, 250); 
+                }, 250);
             });
 
             const dropdownTrigger = document.querySelector('.dropdown-trigger');
@@ -992,26 +997,26 @@ $_SESSION['has_booking'] = $hasBooking;
                 function closeVideoAndUpdate() {
                     newUserModal.style.opacity = '0';
                     fetch('user/update_first_login.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                        body: 'user_id=<?php echo $user_id; ?>'
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            <?php $_SESSION['first_login'] = 0; ?>
-                            setTimeout(() => {
-                                newUserModal.style.display = 'none';
-                                newUserModal.style.opacity = '1';
-                            }, 500);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        newUserModal.style.display = 'none';
-                    });
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: 'user_id=<?php echo $user_id; ?>'
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                <?php $_SESSION['first_login'] = 0; ?>
+                                setTimeout(() => {
+                                    newUserModal.style.display = 'none';
+                                    newUserModal.style.opacity = '1';
+                                }, 500);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            newUserModal.style.display = 'none';
+                        });
                 }
                 if (<?php echo $firstLogin; ?> === 1) {
                     newUserModal.style.display = 'flex';
@@ -1027,30 +1032,30 @@ $_SESSION['has_booking'] = $hasBooking;
 
                     userVideo.addEventListener('ended', closeVideoAndUpdate);
                 }
-                <?php endif; ?>
+            <?php endif; ?>
 
 
             function checkSessionStatus() {
                 fetch('/Alumni-CvSU/user/check_session.php', {
-                    credentials: 'same-origin'
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.logout) {
-                        document.getElementById('logoutModal').style.display = 'flex';
-                        setTimeout(() => {
-                            window.location.href = 'login.php';
-                        }, 3000);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error checking session:', error);
-                });
+                        credentials: 'same-origin'
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.logout) {
+                            document.getElementById('logoutModal').style.display = 'flex';
+                            setTimeout(() => {
+                                window.location.href = 'login.php';
+                            }, 3000);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error checking session:', error);
+                    });
             }
 
             setInterval(checkSessionStatus, 30000);
@@ -1070,4 +1075,5 @@ $_SESSION['has_booking'] = $hasBooking;
         });
     </script>
 </body>
+
 </html>
