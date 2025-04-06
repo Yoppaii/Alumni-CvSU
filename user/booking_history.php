@@ -103,7 +103,7 @@ $history_result = $history_stmt->get_result();
                                     </td>
                                     <td data-label="Action">
                                         <?php
-                                        $allowed_statuses = ['confirmed', 'checked_in', 'completed'];
+                                        $allowed_statuses = ['pending', 'confirmed', 'checked_in', 'completed'];
                                         if (in_array($status, $allowed_statuses)) {
                                             if ($status === 'confirmed') {
                                                 $current_time = time();
@@ -118,11 +118,16 @@ $history_result = $history_stmt->get_result();
                                                     $tooltip = "Cancellation available for {$remaining_hours} hrs {$remaining_minutes} mins more";
 
                                                     echo '<button class="cancel-btn" onclick="showCancelModal(\'' . $booking['id'] . '\', \'' . $booking['reference_number'] . '\', \'' . $tooltip . '\')" title="' . $tooltip . '">
-                                                        Cancel
-                                                    </button>';
+                                                            Cancel
+                                                        </button>';
                                                 } else {
                                                     echo '<i class="fas fa-ban text-gray-400" title="Cannot be cancelled"></i>';
                                                 }
+                                            } elseif ($status === 'pending') {
+                                                $tooltip = "You can cancel this booking";
+                                                echo '<button class="cancel-btn" onclick="showCancelModal(\'' . $booking['id'] . '\', \'' . $booking['reference_number'] . '\', \'' . $tooltip . '\')" title="' . $tooltip . '">
+                                                        Cancel
+                                                    </button>';
                                             } else {
                                                 echo '<i class="fas fa-ban text-gray-400" title="No actions available"></i>';
                                             }
@@ -131,6 +136,7 @@ $history_result = $history_stmt->get_result();
                                         }
                                         ?>
                                     </td>
+
 
 
                                     <td data-label="Invoice">
