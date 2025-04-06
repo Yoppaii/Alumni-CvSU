@@ -37,7 +37,7 @@
 
         .ats-hero .cta-btn {
             padding: 12px 25px;
-            background: #006400;
+            background:#00b100;
             color: white;
             border-radius: 25px;
             font-size: 16px;

@@ -37,11 +37,13 @@ $book_rooms = [
         .calendar-container {
             margin: 20px;
             padding: 20px;
+            width: 1000px;
             background: #fff;
             max-width: auto;
             margin: 0 auto;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             border-radius: 8px;
+
         }
 
         .room-selector {
@@ -66,7 +68,7 @@ $book_rooms = [
         .month-header {
             text-align: center;
             margin-bottom: 20px;
-            color: #006400;
+            color: #00b100;
             font-size: 24px;
             font-weight: bold;
         }
@@ -165,6 +167,46 @@ $book_rooms = [
         .booked:hover {
             box-shadow: inset 0 0 0 2px #d32f2f;
         }
+
+            /* Responsive Styles */
+    @media (max-width: 768px) {
+        .calendar-container {
+            width: 90%; /* Make container responsive */
+            padding: 10px; /* Adjust padding */
+        }
+
+        .room-selector select {
+            width: 100%; /* Make select full width */
+            font-size: 14px; /* Adjust font size */
+        }
+
+        .month-header {
+            font-size: 20px; /* Adjust font size for smaller screens */
+        }
+
+        .calendar th, .calendar td {
+            padding: 10px; /* Adjust cell padding */
+            font-size: 14px; /* Adjust font size */
+        }
+
+        .calendar td {
+            height: auto; /* Allow height to adjust */
+        }
+
+        .calendar-legend {
+            flex-direction: column; /* Stack legend items */
+        }
+    }
+
+    @media (max-width: 480px) {
+        .month-header {
+            font-size: 18px; /* Further adjust font size */
+        }
+
+        .calendar th, .calendar td {
+            font-size: 12px; /* Further adjust font size */
+        }
+    }
     </style>
 </head>
 <body>
