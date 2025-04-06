@@ -62,24 +62,20 @@
         background-color: #ffffff;
         color: black;
         border-radius: 8px 8px 0 0;
-        margin-bottom: 50px;
+        margin-bottom: 20px;
     }
 
     .alumni-id-logo-container {
         display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
+        justify-content: flex-start;
+        flex: 0 0 120px; 
+        margin-left: 20px; 
     }
 
     .alumni-id-logo {
         width: 120px;  
         height: 120px;
         border-radius: 50%;
-        margin: 0;
-        margin-right: 0;
-        margin-left: 0;
     }
 
     .alumni-id-text-container {
@@ -92,28 +88,24 @@
         font-size: 20px;
         font-weight: 600;
         margin-bottom: 5px;
-        text-align: center;
     }
 
     .alumni-id-campus-name {
         font-size: 18px;
         font-weight: 400;
         margin-bottom: 5px;
-        text-align: center;
     }
 
     .alumni-id-alumni-association {
         font-size: 16px;
         font-weight: 300;
         margin-bottom: 5px;
-        text-align: center;
     }
 
     .alumni-id-sec-registration,
     .alumni-id-location {
         font-size: 12px;
         font-weight: 200;
-        text-align: center;
     }
 
     .alumni-id-form {
@@ -129,9 +121,10 @@
 
     .alumni-id-form h2 {
         text-align: center;
-        font-size: 24px;
-        color: #4CAF50;
+        color: #3C8D40;
         margin-bottom: 20px;
+        font-size: 20px;
+        font-weight: 600;
     }
 
     .alumni-form-row {
@@ -180,17 +173,16 @@
     }
 
     .alumni-id-form button {
-        width: 200px;
-        padding: 12px;
+        width: 100%;
+        padding: 10px;
         background-color: #3C8D40;
         color: white;
         font-size: 16px;
+        font-weight: 600;
         border: none;
         border-radius: 6px;
         cursor: pointer;
-        transition: background-color 0.3s ease;
-        margin: 20px auto;
-        display: block;
+        transition: background-color 0.3s ease, transform 0.3s ease;
     }
 
     .alumni-id-form button:hover {

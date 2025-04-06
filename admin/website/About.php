@@ -37,7 +37,7 @@
 
         .cvsu-event-hero .cvsu-cta-btn {
             padding: 12px 25px;
-            background: #00b100;
+            background: #006400;
             color: white;
             border-radius: 25px;
             font-size: 16px;

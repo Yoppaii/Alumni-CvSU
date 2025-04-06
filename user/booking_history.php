@@ -54,12 +54,10 @@ $history_result = $history_stmt->get_result();
 
     <div class="booking-card">
         <div class="booking-header">
-            <h1><i class="fas fa-calendar-alt"></i> Booking History</h1>
+            <h1><i class="fas fa-calendar-alt"></i> Active Booking</h1>
         </div>
-
         <div class="booking-content">
             <div class="booking-section">
-                <h2>Active Bookings</h2>
                 <?php if ($active_result->num_rows > 0): ?>
                     <table class="booking-table">
                         <thead>
@@ -158,69 +156,83 @@ $history_result = $history_stmt->get_result();
                     </div>
                 <?php endif; ?>
             </div>
-
-            <div class="booking-section">
-                <h2>Booking History</h2>
-                <?php if ($history_result->num_rows > 0): ?>
-                    <table class="booking-table" id="booking-history">
-                        <thead>
-                            <tr>
-                                <th>Reference No.</th>
-                                <th>Room</th>
-                                <th>Occupancy</th>
-                                <th>Price</th>
-                                <th>Check In</th>
-                                <th>Check Out</th>
-                                <th>Status</th>
-                                <th>Created At</th>
-                                <th>Invoice</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php while ($booking = $history_result->fetch_assoc()): ?>
-                                <?php $status = strtolower($booking['status']); ?>
-                                <tr>
-                                    <td data-label="Reference No."><?php echo htmlspecialchars($booking['reference_number']); ?></td>
-                                    <td data-label="Room">Room <?php echo htmlspecialchars($booking['room_number']); ?></td>
-                                    <td data-label="Occupancy"><?php echo htmlspecialchars($booking['occupancy']); ?> Person</td>
-                                    <td data-label="Price"><?php echo number_format($booking['price'], 2); ?></td>
-                                    <td data-label="Check In"><?php echo date('M d, Y', strtotime($booking['arrival_date'])) . ' ' . date('h:i A', strtotime($booking['arrival_time'])); ?></td>
-                                    <td data-label="Check Out"><?php echo date('M d, Y', strtotime($booking['departure_date'])) . ' ' . date('h:i A', strtotime($booking['departure_time'])); ?></td>
-                                    <td data-label="Status">
-                                        <span class="status-pill status-<?php echo $status; ?>">
-                                            <?php
-                                            echo isset($status_icons[$status]) ? $status_icons[$status] . ' ' : '';
-                                            echo ucfirst($status);
-                                            ?>
-                                        </span>
-                                    </td>
-                                    <td data-label="Created At">
-                                        <?php echo date('M d, Y h:i A', strtotime($booking['created_at'])); ?>
-
-                                    </td>
-                                    <td data-label="Invoice">
-                                        <?php if (in_array($status, $invoice_allowed_statuses)): ?>
-                                            <button class="invoice-btn" onclick="generateInvoice(this.closest('tr'))">
-                                                <i class="fas fa-file-invoice"></i>
-                                            </button>
-                                        <?php else: ?>
-                                            <i class="fas fa-ban text-gray-400" title="Invoice not available"></i>
-                                        <?php endif; ?>
-                                    </td>
-                                </tr>
-                            <?php endwhile; ?>
-                        </tbody>
-                    </table>
-                <?php else: ?>
-                    <div class="no-bookings">
-                        <p>No bookings history found.</p>
-                    </div>
-                <?php endif; ?>
-            </div>
-
         </div>
-
     </div>
+
+    <div class="booking-card">
+        <div class="booking-header">
+            <h1><i class="fas fa-calendar-alt"></i> Booking History</h1>
+        </div>
+        <div class="booking-content">
+            <div class="booking-section">
+                <div class="search-toggle-wrapper">
+                    <button id="toggle-history-btn" class="cta-btn">Show Booking History</button>
+
+                    <div class="search-container" style="display: none;">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="history-search" placeholder="Search bookings..." />
+                    </div>
+                </div>
+
+                <div id="booking-history-section" style="display: none;">
+                    <?php if ($history_result->num_rows > 0): ?>
+                        <table class="booking-table" id="booking-history">
+                            <thead>
+                                <tr>
+                                    <th>Reference No.</th>
+                                    <th>Room</th>
+                                    <th>Occupancy</th>
+                                    <th>Price</th>
+                                    <th>Check In</th>
+                                    <th>Check Out</th>
+                                    <th>Status</th>
+                                    <th>Created At</th>
+                                    <th>Invoice</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php while ($booking = $history_result->fetch_assoc()): ?>
+                                    <?php $status = strtolower($booking['status']); ?>
+                                    <tr>
+                                        <td data-label="Reference No."><?php echo htmlspecialchars($booking['reference_number']); ?></td>
+                                        <td data-label="Room">Room <?php echo htmlspecialchars($booking['room_number']); ?></td>
+                                        <td data-label="Occupancy"><?php echo htmlspecialchars($booking['occupancy']); ?> Person</td>
+                                        <td data-label="Price"><?php echo number_format($booking['price'], 2); ?></td>
+                                        <td data-label="Check In"><?php echo date('M d, Y', strtotime($booking['arrival_date'])) . ' ' . date('h:i A', strtotime($booking['arrival_time'])); ?></td>
+                                        <td data-label="Check Out"><?php echo date('M d, Y', strtotime($booking['departure_date'])) . ' ' . date('h:i A', strtotime($booking['departure_time'])); ?></td>
+                                        <td data-label="Status">
+                                            <span class="status-pill status-<?php echo $status; ?>">
+                                                <?php
+                                                echo isset($status_icons[$status]) ? $status_icons[$status] . ' ' : '';
+                                                echo ucfirst($status);
+                                                ?>
+                                            </span>
+                                        </td>
+                                        <td data-label="Created At">
+                                            <?php echo date('M d, Y h:i A', strtotime($booking['created_at'])); ?>
+
+                                        </td>
+                                        <td data-label="Invoice">
+                                            <?php if (in_array($status, $invoice_allowed_statuses)): ?>
+                                                <button class="invoice-btn" onclick="generateInvoice(this.closest('tr'))">
+                                                    <i class="fas fa-file-invoice"></i>
+                                                </button>
+                                            <?php else: ?>
+                                                <i class="fas fa-ban text-gray-400" title="Invoice not available"></i>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                <?php endwhile; ?>
+                            </tbody>
+                        </table>
+                    <?php else: ?>
+                        <div class="no-bookings">
+                            <p>No bookings history found.</p>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div id="cancelModal" class="cancel-modal">
@@ -681,6 +693,41 @@ $history_result = $history_stmt->get_result();
 
         });
     </script>
+
+
+    <!-- Search filter -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const toggleBtn = document.getElementById("toggle-history-btn");
+            const historySection = document.getElementById("booking-history-section");
+            const searchContainer = document.querySelector(".search-container");
+            const searchInput = document.getElementById("history-search");
+            const table = document.getElementById("booking-history");
+
+            // Toggle History Section & Search Bar
+            toggleBtn.addEventListener("click", () => {
+                const isVisible = historySection.style.display === "block";
+
+                historySection.style.display = isVisible ? "none" : "block";
+                searchContainer.style.display = isVisible ? "none" : "block";
+                toggleBtn.textContent = isVisible ? "Show Booking History" : "Hide Booking History";
+            });
+
+            // Search Filter
+            searchInput.addEventListener("input", function() {
+                const filter = this.value.toLowerCase();
+                const rows = table.querySelectorAll("tbody tr");
+
+                rows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    row.style.display = text.includes(filter) ? "" : "none";
+                });
+            });
+        });
+    </script>
+
+
+
 </body>
 
 </html>

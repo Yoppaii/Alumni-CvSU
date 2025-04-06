@@ -185,16 +185,20 @@ $result = $stmt->get_result();
         }
 
         .section-header {
-            text-align: left;
+            text-align: center;
             margin-bottom: 2rem;
         }
 
         .section-title {
             font-size: 2rem;
-            color: #006400;
+            color: #333;
             margin-bottom: 0.5rem;
         }
 
+        .section-subtitle {
+            color: #666;
+            font-size: 1.1rem;
+        }
 
         .view-all-btn {
             display: block;
@@ -239,6 +243,7 @@ $result = $stmt->get_result();
     <div class="news-container">
         <div class="section-header">
             <h2 class="section-title">Latest News & Features</h2>
+            <p class="section-subtitle">Stay updated with the latest happenings at CvSU</p>
         </div>
 
         <div class="news-grid">

@@ -765,6 +765,8 @@ $_SESSION['has_booking'] = $hasBooking;
             case 'Room-Reservation':
                 if (!$hasBooking) {
                     include 'user/booking.php';
+                } else {
+                    include 'user/booking_history.php';
                 }
                 break;
             case 'booking_history':

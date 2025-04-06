@@ -864,6 +864,9 @@ if (!isset($_SESSION['admin_id'])) {
                             <i class="fas fa-walking"></i> Walk-in Booking
                         </a>
                     </div>
+                    <a href="?section=view-all-bookings" class="nav-item <?php echo (isset($_GET['section']) && $_GET['section'] == 'view-all-bookings') ? 'active' : ''; ?>">
+                        <i class="fas fa-bed"></i>Bookings
+                    </a>
 
                 </div>
                 <div class="nav-section">

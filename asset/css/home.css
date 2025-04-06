@@ -616,7 +616,7 @@
 .analytics-dashboard {
     margin: 2rem 0;
 }
- 
+
 .analytics-summary {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -824,4 +824,50 @@
     .analytics-content {
         height: 250px;
     }
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.status-pending {
+    background-color: #FFC107;
+    color: #212121;
+}
+
+.status-confirmed {
+    background-color: #03A9F4;
+    color: white;
+}
+
+.status-checked_in {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.status-cancelled {
+    background-color: #F44336;
+    color: white;
+}
+
+.status-no_show {
+    background-color: #607D8B;
+    color: white;
+}
+
+.status-completed {
+    background-color: #2E7D32;
+    color: white;
+}
+
+.status-badge i {
+    margin-right: 4px;
 }
