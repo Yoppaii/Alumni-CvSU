@@ -351,14 +351,14 @@ function fetchCancellationRate(year, month, guestType, roomNumber) {
             }
 
             const cancelled = data.cancelled ? parseInt(data.cancelled) : 0;
-            const noShows = data.no_shows ? parseInt(data.no_shows) : 0;
+            const noShow = data.no_show ? parseInt(data.no_show) : 0;
             const successful = data.successful ? parseInt(data.successful) : 0;
 
-            const totalBookings = successful + cancelled + noShows;
+            const totalBookings = successful + cancelled + noShow;
 
             // Corrected rate calculation
             const rate = totalBookings > 0
-                ? (((cancelled + noShows) / totalBookings) * 100).toFixed(2)
+                ? (((cancelled + noShow) / totalBookings) * 100).toFixed(2)
                 : "0.00";
 
             const remaining = (100 - parseFloat(rate)).toFixed(2);

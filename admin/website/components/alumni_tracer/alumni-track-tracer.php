@@ -37,8 +37,9 @@
 
         .AT-page-header h1 {
             color: #006400;
-            font-size: 1.8em;
+            font-size: 2em;
             margin: 0;
+            margin-left: 130px;
         }
 
         .AT-date-time {
@@ -311,8 +312,20 @@
                 padding: 1rem;
                 height: 250px;
             }
+            .AT-page-header {
+                flex-direction: column; /* Stack items vertically */
+                align-items: flex-start; /* Align items to the start */
+                padding: 15px; /* Adjust padding */
+            }
 
+            .AT-page-header h1 {
+                font-size: 1.5em; /* Smaller font size on smaller screens */
+                margin-left: 0; /* Remove left margin */
+                margin-bottom: 10px; /* Add bottom margin */
+            }
         }
+
+        
     </style>
 
 </head>

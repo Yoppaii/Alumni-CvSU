@@ -47,7 +47,7 @@ $result = $mysqli->query($query);
             ?>
         </div>
         <a href="all_announcements.php" class="announcement-view-all">
-            See all announcements
+            View All Announcements
             <i class="fas fa-chevron-right"></i>
         </a>
     </div>
@@ -70,6 +70,7 @@ $result = $mysqli->query($query);
 
 .announcement-container {
     background-color: white;
+    height: 800px;
     border-radius: 8px;
     box-shadow: var(--cvsu-shadow-sm);
     padding: 1.25rem;
@@ -77,7 +78,7 @@ $result = $mysqli->query($query);
 
 .announcement-heading {
     color: var(--cvsu-primary-green);
-    font-size: 1.5rem;
+    font-size: 2rem;
     margin-bottom: 1rem;
     display: flex;
     align-items: center;
@@ -103,7 +104,7 @@ $result = $mysqli->query($query);
     display: flex;
     flex-direction: column;
     min-width: 250px;
-    height: 300px;
+    height: 500px;
     position: relative;
 }
 
@@ -132,7 +133,7 @@ $result = $mysqli->query($query);
 
 .announcement-title {
     color: var(--cvsu-primary-green);
-    font-size: 1rem;
+    font-size: 1.5rem;
     margin: 0;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -193,21 +194,24 @@ $result = $mysqli->query($query);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
-    color: var(--cvsu-primary-green);
+    gap: 1rem;
+    color:rgb(22, 22, 22)0; 
+    background-color: #00ca00; 
     text-decoration: none;
-    font-weight: 500;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: bold;
     padding: 0.5rem 1rem;
     border: 2px solid var(--cvsu-light-green);
     border-radius: 8px;
     transition: all 0.3s ease;
-    margin: 0 auto;
+    margin: 80px auto 0;
     width: fit-content;
-    font-size: 0.9rem;
+    font-size: 1.3rem;
+    letter-spacing: 0.1rem; /* Adjust the spacing between letters */
 }
 
 .announcement-view-all:hover {
-    background-color: var(--cvsu-light-green);
+    background-color:rgb(3, 150, 3);
     transform: translateY(-2px);
 }
 

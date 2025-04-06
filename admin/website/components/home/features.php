@@ -70,7 +70,7 @@
 <style>
 .cvsu-features {
     padding: 4rem 0;
-    background-color: #f8f9fa;
+    background-color:rgb(53, 53, 53);
 }
 
 .cvsu-container {
@@ -81,7 +81,7 @@
 
 .cvsu-features-title {
     text-align: center;
-    color: #006400;
+    color:#00ca00;
     font-size: 2.5rem;
     margin-bottom: 3rem;
     position: relative;
@@ -96,7 +96,7 @@
     transform: translateX(-50%);
     width: 100px;
     height: 3px;
-    background-color: #006400;
+    background-color: #00ca00;
 }
 
 .cvsu-slider-container {
@@ -218,7 +218,7 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: #006400;
+    background: #00ca00;
     color: white;
     border: none;
     cursor: pointer;

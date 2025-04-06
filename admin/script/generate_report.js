@@ -9,8 +9,8 @@ document.getElementById("printReport").addEventListener("click", async function 
     function hasCancellationData(data) {
         if (!data || typeof data !== 'object') return false;
         const cancelled = parseInt(data.cancelled || 0);
-        const noShows = parseInt(data.no_shows || 0);
-        return cancelled > 0 || noShows > 0;
+        const noShow = parseInt(data.no_show || 0);
+        return cancelled > 0 || noShow > 0;
     }
 
     function getMonthName(monthNum) {
@@ -224,23 +224,23 @@ document.getElementById("printReport").addEventListener("click", async function 
             // Cancellations & No-Shows
             if (selectedCharts.includes('cancellationData') && data.cancellationData) {
                 const cancelled = data.cancellationData.cancelled ? parseInt(data.cancellationData.cancelled) : 0;
-                const noShows = data.cancellationData.no_shows ? parseInt(data.cancellationData.no_shows) : 0;
+                const noShow = data.cancellationData.no_show ? parseInt(data.cancellationData.no_show) : 0;
                 const successful = data.cancellationData.successful ? parseInt(data.cancellationData.successful) : 0;
 
 
                 // Manually calculate the total instead of using the API's total
-                const totalBookings = successful + cancelled + noShows;
+                const totalBookings = successful + cancelled + noShow;
 
                 // Recalculate the rate
                 const rate = successful > 0
-                    ? (((cancelled + noShows) / totalBookings) * 100).toFixed(2)
+                    ? (((cancelled + noShow) / totalBookings) * 100).toFixed(2)
                     : "0.00";
                 summaryItems.push({
                     label: "Total Bookings:",
                     value: totalBookings.toLocaleString()
                 });
                 summaryItems.push({
-                    label: "Cancellations:",
+                    label: "Cancellations / No Shows:",
                     value: cancelled.toLocaleString()
                 });
                 summaryItems.push({
@@ -248,7 +248,7 @@ document.getElementById("printReport").addEventListener("click", async function 
                     value: successful.toLocaleString()
                 });
                 summaryItems.push({
-                    label: "Cancellation Rate:",
+                    label: "Combined Rate:",
                     value: `${rate}%`
                 });
             }
@@ -432,15 +432,15 @@ document.getElementById("printReport").addEventListener("click", async function 
             y = drawSectionHeader("CANCELLATIONS & NO-SHOWS", y);
 
             const cancelled = data.cancellationData.cancelled ? parseInt(data.cancellationData.cancelled) : 0;
-            const noShows = data.cancellationData.no_shows ? parseInt(data.cancellationData.no_shows) : 0;
+            const noShow = data.cancellationData.no_show ? parseInt(data.cancellationData.no_show) : 0;
             const successful = data.cancellationData.successful ? parseInt(data.cancellationData.successful) : 0;
 
             // Manually calculate the total instead of using the API's total
-            const totalBookings = successful + cancelled + noShows;
+            const totalBookings = successful + cancelled + noShow;
 
             // Recalculate the rate
             const rate = successful > 0
-                ? (((cancelled + noShows) / totalBookings) * 100).toFixed(2)
+                ? (((cancelled + noShow) / totalBookings) * 100).toFixed(2)
                 : "0.00";
 
             // Table style presentation
@@ -452,7 +452,7 @@ document.getElementById("printReport").addEventListener("click", async function 
                 // { label: "Total Bookings", value: totalBookings },
                 { label: "Successful Bookings", value: successful },
                 { label: "Cancellations", value: cancelled },
-                { label: "No-Shows", value: noShows },
+                { label: "No-Shows", value: noShow },
                 { label: "Combined Rate", value: `${rate}%` },
             ];
 

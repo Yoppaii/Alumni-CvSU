@@ -330,7 +330,6 @@ body {
 
 .alm-status-early_checkout {
     background-color: #fb923c;
-    /* Orange color for early checkout */
     color: white;
 }
 
@@ -713,7 +712,7 @@ body {
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
-
+ 
 .alm-status-badge {
     position: relative;
     overflow: hidden;

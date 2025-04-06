@@ -17,6 +17,7 @@ if (session_status() === PHP_SESSION_NONE) {
     <link rel="icon" href="asset/images/res1.png" type="image/x-icon">
     <link rel="stylesheet" href="asset/css/button-up-css/up_buttonss.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 </head>
     <style>
         :root {
@@ -51,7 +52,8 @@ if (session_status() === PHP_SESSION_NONE) {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: Arial, sans-serif;
+            font-family: 'Montserrat', sans-serif;
+            
         }
 
         body {
