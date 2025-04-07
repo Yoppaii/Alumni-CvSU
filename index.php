@@ -98,7 +98,7 @@ if (session_status() === PHP_SESSION_NONE) {
         }
 
         .cvsu-logo img {
-            height: 40px;
+            height: 50px;
             width: auto;
             object-fit: contain;
         }
@@ -438,7 +438,8 @@ if (session_status() === PHP_SESSION_NONE) {
     <header class="cvsu-header">
         <div class="cvsu-container cvsu-header-content">
             <a href="index" class="cvsu-logo">
-                <img src="asset/images/res1.png" alt="CSU Logo">
+                <img src="asset/images/1.png" alt="CSU Logo">
+                <img src="asset/images/2.png" alt="CSU Logo">
                 <span>Cavite State University<br>Office of Alumni Affairs</span>
             </a>
 

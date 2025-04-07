@@ -14,12 +14,38 @@ $tabs = [
     'completed' => 'Completed',
 ];
 
-$baseQuery = "SELECT b.*, u.id as user_id FROM bookings b LEFT JOIN users u ON b.user_id = u.id";
+// $baseQuery = "SELECT b.*, u.id as user_id FROM bookings b LEFT JOIN users u ON b.user_id = u.id";
+// if ($current_tab !== 'all') {
+//     $baseQuery .= " WHERE b.status = '$current_tab'";
+// }
+// $baseQuery .= " ORDER BY b.created_at DESC LIMIT 20";
+// $bookingsResult = $mysqli->query($baseQuery);
+
+
+$booking_type = isset($_GET['booking_type']) ? $_GET['booking_type'] : 'all';
+
+$limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 25;
+$limit = in_array($limit, [5, 25, 50, 100, 500]) ? $limit : 25;
+
+$bookingsQuery = "SELECT * FROM bookings";
+$conditions = [];
+
 if ($current_tab !== 'all') {
-    $baseQuery .= " WHERE b.status = '$current_tab'";
+    $conditions[] = "status = '" . $mysqli->real_escape_string($current_tab) . "'";
 }
-$baseQuery .= " ORDER BY b.created_at DESC LIMIT 20";
-$bookingsResult = $mysqli->query($baseQuery);
+
+if ($booking_type !== 'all') {
+    $conditions[] = "is_walkin = '" . $mysqli->real_escape_string($booking_type) . "'";
+}
+
+if (!empty($conditions)) {
+    $bookingsQuery .= " WHERE " . implode(" AND ", $conditions);
+}
+
+$bookingsQuery .= " ORDER BY created_at DESC LIMIT $limit";
+$bookingsResult = $mysqli->query($bookingsQuery);
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -51,37 +77,66 @@ $bookingsResult = $mysqli->query($baseQuery);
     <div class="alm-bookings-container">
         <div class="alm-header-content">
             <h2><i class="fas fa-calendar-check"></i> View Bookings</h2>
+            <form method="get" class="alm-filter-form">
+                <input type="hidden" name="section" value="view-all-bookings">
+                <input type="hidden" name="tab" value="<?php echo htmlspecialchars($current_tab); ?>">
+                <div class="booking-filters">
+                    <div class="booking-type-filter">
+                        <label for="limit">Entries:</label>
+                        <select name="limit" id="limit" class="booking-type-select" onchange="this.form.submit()">
+                            <?php foreach ([5, 25, 50, 100, 500] as $val): ?>
+                                <option value="<?php echo $val; ?>" <?php echo ($limit === $val) ? 'selected' : ''; ?>>
+                                    <?php echo $val; ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="booking-type-filter">
+                        <label for="booking_type">Booking Type:</label>
+                        <select name="booking_type" id="booking_type" class="booking-type-select" onchange="this.form.submit()">
+                            <option value="all" <?php echo ($booking_type === 'all') ? 'selected' : ''; ?>>All</option>
+                            <option value="yes" <?php echo ($booking_type === 'yes') ? 'selected' : ''; ?>>Walk-in</option>
+                            <option value="no" <?php echo ($booking_type === 'no') ? 'selected' : ''; ?>>Online</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
         </div>
 
         <div class="alm-booking-tabs">
             <?php foreach ($tabs as $tab_id => $tab_name): ?>
-                <a href="?section=view-all-bookings&tab=<?php echo $tab_id; ?>"
-                    class="alm-booking-tab <?php echo ($current_tab === $tab_id) ? 'active' : ''; ?>">
-                    <?php
-                    $icon = match ($tab_id) {
-                        'all' => 'fas fa-list',
-                        'pending' => 'fas fa-clock',
-                        'confirmed' => 'fas fa-check',
-                        'checked_in' => 'fas fa-door-open',
-                        'cancelled' => 'fas fa-times-circle',
-                        'no_show' => 'fas fa-user-slash',
-                        'completed' => 'fas fa-check-double',
-                        default => 'fas fa-bookmark'
-                    };
-                    ?>
-                    <i class="<?php echo $icon; ?>"></i>
+                <?php
+                $countQuery = "SELECT COUNT(*) as count FROM bookings";
+                $countConditions = [];
+
+                if ($tab_id !== 'all') {
+                    $countConditions[] = "status = '" . $mysqli->real_escape_string($tab_id) . "'";
+                }
+
+                if ($booking_type !== 'all') {
+                    $countConditions[] = "is_walkin = '" . $mysqli->real_escape_string($booking_type) . "'";
+                }
+
+                if (!empty($countConditions)) {
+                    $countQuery .= " WHERE " . implode(" AND ", $countConditions);
+                }
+
+                $countResult = $mysqli->query($countQuery);
+                $count = $countResult->fetch_assoc()['count'];
+                ?>
+                <a href="?section=view-all-bookings&tab=<?php echo $tab_id; ?>" class="alm-booking-tab <?php echo ($current_tab === $tab_id) ? 'active' : ''; ?>">
+                    <i class="<?php echo match ($tab_id) {
+                                    'all' => 'fas fa-list',
+                                    'pending' => 'fas fa-clock',
+                                    'confirmed' => 'fas fa-check',
+                                    'checked_in' => 'fas fa-door-open',
+                                    'cancelled' => 'fas fa-times-circle',
+                                    'no_show' => 'fas fa-user-slash',
+                                    'completed' => 'fas fa-check-double',
+                                    default => 'fas fa-bookmark'
+                                }; ?>"></i>
                     <?php echo $tab_name; ?>
-                    <span class="alm-booking-count">
-                        <?php
-                        $countQuery = "SELECT COUNT(*) as count FROM bookings";
-                        if ($tab_id !== 'all') {
-                            $countQuery .= " WHERE status = '$tab_id'";
-                        }
-                        $countResult = $mysqli->query($countQuery);
-                        $count = $countResult->fetch_assoc()['count'];
-                        echo $count;
-                        ?>
-                    </span>
+                    <span class="alm-booking-count"><?php echo $count; ?></span>
                 </a>
             <?php endforeach; ?>
         </div>
@@ -144,34 +199,20 @@ $bookingsResult = $mysqli->query($baseQuery);
                                 <?php if ($current_tab !== 'all'): ?>
                                     <td class="alm-hide-mobile alm-actions-cell">
                                         <div class="alm-action-buttons">
-                                            <?php if ($booking['status'] !== 'cancelled' && $booking['status'] !== 'completed'): ?>
+                                            <?php if (!in_array($booking['status'], ['cancelled', 'completed'])): ?>
                                                 <select class="alm-status-select" data-booking-id="<?php echo $booking['id']; ?>">
                                                     <option value="<?php echo $booking['status']; ?>" selected>
                                                         Change Status
                                                     </option>
                                                     <?php
-                                                    $statuses = [];
+                                                    $statuses = match ($booking['status']) {
+                                                        'pending' => ['confirmed', 'cancelled'],
+                                                        'confirmed' => ['checked_in', 'cancelled', 'no_show'],
+                                                        'checked_in' => ['completed', 'early_checkout'],
+                                                        'no_show' => ['cancelled', 'confirmed'],
+                                                        default => []
+                                                    };
 
-                                                    switch ($booking['status']) {
-                                                        case 'pending':
-                                                            $statuses = ['confirmed', 'cancelled'];
-                                                            break;
-                                                        case 'confirmed':
-                                                            $statuses = ['checked_in', 'cancelled', 'no_show'];
-                                                            break;
-                                                        case 'checked_in':
-                                                            $statuses = ['completed', 'early_checkout'];
-                                                            break;
-                                                        case 'cancelled':
-                                                            $statuses = [];
-                                                            break;
-                                                        case 'no_show':
-                                                            $statuses = ['cancelled', 'confirmed'];
-                                                            break;
-                                                        case 'completed':
-                                                            $statuses = [];
-                                                            break;
-                                                    }
                                                     foreach ($statuses as $newStatus):
                                                     ?>
                                                         <option value="<?php echo $newStatus; ?>">
@@ -396,7 +437,7 @@ $bookingsResult = $mysqli->query($baseQuery);
                     toast.style.display = 'none';
                 };
             };
- 
+
             const showErrorMessage = (modalBody, error) => {
                 const existingError = modalBody.querySelector('.alm-error-message');
                 if (existingError) {

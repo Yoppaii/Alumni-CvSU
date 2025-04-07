@@ -853,18 +853,10 @@ if (!isset($_SESSION['admin_id'])) {
                     <a href="?section=Dashboard" class="nav-item <?php echo (!isset($_GET['section']) || $_GET['section'] == 'Dashboard') ? 'active' : ''; ?>">
                         <i class="fas fa-chart-line"></i>Dashboard
                     </a>
-                    <a href="#" class="nav-item has-dropdown">
-                        <i class="fas fa-bolt"></i> Quick Booking
+                    <a href="?section=Room-Reservation" class="nav-item <?php echo (!isset($_GET['section']) || $_GET['section'] == 'Room-Reservation') ? 'active' : ''; ?>">
+                        <i class="fas fa-bolt"></i>Quick Booking
                     </a>
 
-                    <div class="dropdown">
-                        <a href="?section=Room-Reservation" class="dropdown-item">
-                            <i class="fas fa-bed"></i> Check Available Rooms
-                        </a>
-                        <a href="?section=Walk-in-Booking" class="dropdown-item">
-                            <i class="fas fa-walking"></i> Walk-in Booking
-                        </a>
-                    </div>
                     <a href="?section=view-all-bookings" class="nav-item <?php echo (isset($_GET['section']) && $_GET['section'] == 'view-all-bookings') ? 'active' : ''; ?>">
                         <i class="fas fa-bed"></i>Bookings
                     </a>

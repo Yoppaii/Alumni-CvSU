@@ -111,7 +111,6 @@
             font-size: 24px;
         }
 
-<<<<<<< HEAD
         .herodaw::after {
             content: '';
             position: absolute;
@@ -127,11 +126,9 @@
             filter: brightness(0.4); 
             z-index: 1;
             
-=======
         .herodaw p {
             font-size: 14px;
             line-height: 1.5;
->>>>>>> upstream/main
         }
 
         .herodaw .cta-btn {
