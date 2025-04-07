@@ -1,13 +1,13 @@
-<!-- Room Slider Section -->
-<section class="cvsu-features">
-    <div class="cvsu-container">
-        <h2 class="cvsu-features-title">Available Rooms</h2>
 
-        <div class="cvsu-slider-container">
-            <div class="cvsu-slider-wrapper">
-                <div class="cvsu-slider">
+<section class="features">
+    <div class="container">
+        <h2 class="features-title">Available Rooms</h2>
+
+        <div class="slider-wrapper">
+            <div class="swiper slider">
+                <div class="swiper-wrapper">
                     <?php
-                    require_once 'main_db.php'; // Include the database connection file
+                    require_once 'main_db.php';
 
                     $rooms = [
                         'Room 1',
@@ -23,7 +23,7 @@
                         'Lobby'
                     ];
 
-                    $room_descriptions = [
+                    $descriptions = [
                         'Spacious room perfect for small gatherings and meetings. Equipped with modern amenities and comfortable seating arrangements.',
                         'Versatile space ideal for workshops and training sessions. Features state-of-the-art presentation equipment.',
                         'Cozy meeting space with natural lighting. Perfect for team discussions and small group activities.',
@@ -46,255 +46,35 @@
                         $image = $result->fetch_assoc();
                         $image_path = $image ? "asset/uploads/" . $image['image_path'] : "user/bg/default-room.jpg";
                     ?>
-                        <div class="cvsu-slide">
-                            <div class="cvsu-feature-card">
-                                <div class="cvsu-feature-image-wrapper">
-                                    <img src="<?php echo $image_path; ?>" alt="<?php echo $room; ?>" class="cvsu-feature-image">
-                                    <div class="cvsu-feature-overlay">
+                        <div class="swiper-slide">
+                            <div class="feature-card">
+                                <div class="image-wrapper">
+                                    <img src="<?php echo $image_path; ?>" alt="<?php echo $room; ?>" class="feature-image">
+                                    <div class="overlay">
                                         <i class="fas fa-expand-arrows-alt"></i>
                                     </div>
                                 </div>
-                                <div class="cvsu-feature-content">
+                                <div class="feature-content">
                                     <h3><?php echo $room; ?></h3>
-                                    <p><?php echo $room_descriptions[$index]; ?></p>
-                                    <a href="#" class="cvsu-feature-link">Learn More <i class="fas fa-arrow-right"></i></a>
+                                    <p><?php echo $descriptions[$index]; ?></p>
+                                    <a href="#" class="feature-link">Learn More <i class="fas fa-arrow-right"></i></a>
                                 </div>
                             </div>
                         </div>
                     <?php } ?>
                 </div>
-            </div>
 
-            <button class="cvsu-slider-arrow cvsu-prev">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            <button class="cvsu-slider-arrow cvsu-next">
-                <i class="fas fa-chevron-right"></i>
-            </button>
+                <div class="swiper-button-prev"><i class="fas fa-chevron-left"></i></div>
+                <div class="swiper-button-next"><i class="fas fa-chevron-right"></i></div>
+            </div>
         </div>
     </div>
 </section>
 
-<style>
-    .cvsu-features {
-        padding: 4rem 0;
-        background-color: #f8f9fa;
-    }
-
-    .cvsu-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 1rem;
-    }
-
-    .cvsu-features-title {
-        text-align: center;
-        color: #006400;
-        font-size: 2.5rem;
-        margin-bottom: 3rem;
-        position: relative;
-        padding-bottom: 1rem;
-    }
-
-    .cvsu-features-title::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 100px;
-        height: 3px;
-        background-color: #006400;
-    }
-
-    .cvsu-slider-container {
-        position: relative;
-        padding: 0 60px;
-    }
-
-    .cvsu-slider-wrapper {
-        overflow: hidden;
-    }
-
-    .cvsu-slider {
-        display: flex;
-        transition: transform 0.5s ease;
-    }
-
-    .cvsu-slide {
-        min-width: calc(33.333% - 30px);
-        /* Show 3 slides in desktop */
-        padding: 0 15px;
-        transition: min-width 0.3s ease;
-    }
-
-    .cvsu-feature-card {
-        background: white;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .cvsu-feature-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    }
-
-    .cvsu-feature-image-wrapper {
-        position: relative;
-        overflow: hidden;
-        padding-top: 66.67%;
-        /* 3:2 Aspect Ratio */
-    }
-
-    .cvsu-feature-image {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.3s ease;
-    }
-
-    .cvsu-feature-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 100, 0, 0.2);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-
-    .cvsu-feature-overlay i {
-        color: white;
-        font-size: 2rem;
-        transform: scale(0.8);
-        transition: transform 0.3s ease;
-    }
-
-    .cvsu-feature-card:hover .cvsu-feature-overlay {
-        opacity: 1;
-    }
-
-    .cvsu-feature-card:hover .cvsu-feature-overlay i {
-        transform: scale(1);
-    }
-
-    .cvsu-feature-card:hover .cvsu-feature-image {
-        transform: scale(1.05);
-    }
-
-    .cvsu-feature-content {
-        padding: 1.5rem;
-    }
-
-    .cvsu-feature-content h3 {
-        color: #006400;
-        font-size: 1.5rem;
-        margin-bottom: 1rem;
-    }
-
-    .cvsu-feature-content p {
-        color: #333;
-        margin-bottom: 1.5rem;
-        line-height: 1.6;
-    }
-
-    .cvsu-feature-link {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        color: #006400;
-        text-decoration: none;
-        font-weight: 500;
-        transition: gap 0.3s ease;
-    }
-
-    .cvsu-feature-link:hover {
-        gap: 0.8rem;
-    }
-
-    .cvsu-slider-arrow {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: #006400;
-        color: white;
-        border: none;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: background-color 0.3s ease;
-        z-index: 10;
-    }
-
-    .cvsu-slider-arrow:hover {
-        background: #004d00;
-    }
-
-    .cvsu-prev {
-        left: 0;
-    }
-
-    .cvsu-next {
-        right: 0;
-    }
-
-    /* Responsive styles */
-    @media (max-width: 1024px) {
-        .cvsu-slide {
-            min-width: calc(50% - 30px);
-            /* Show 2 slides in tablet */
-        }
-    }
-
-    @media (max-width: 768px) {
-        .cvsu-slide {
-            min-width: calc(100% - 30px);
-            /* Show 1 slide in mobile */
-        }
-
-        .cvsu-features-title {
-            font-size: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .cvsu-slider-container {
-            padding: 0 40px;
-        }
-
-        .cvsu-feature-content h3 {
-            font-size: 1.25rem;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .cvsu-features-title {
-            font-size: 1.75rem;
-        }
-
-        .cvsu-slider-container {
-            padding: 0 30px;
-        }
-    }
-</style>
-
 <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
-
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        new Swiper('.cvsu-slider-container', {
+        new Swiper('.slider', {
             slidesPerView: 3,
             spaceBetween: 30,
             loop: true,

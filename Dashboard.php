@@ -854,49 +854,31 @@ if (!isset($_SESSION['admin_id'])) {
                         <i class="fas fa-chart-line"></i>Dashboard
                     </a>
                     <a href="?section=Room-Reservation" class="nav-item <?php echo (!isset($_GET['section']) || $_GET['section'] == 'Room-Reservation') ? 'active' : ''; ?>">
-                        <i class="fas fa-bolt"></i>Quick Booking
-                    </a>
-
-                    <a href="?section=view-all-bookings" class="nav-item <?php echo (isset($_GET['section']) && $_GET['section'] == 'view-all-bookings') ? 'active' : ''; ?>">
-                        <i class="fas fa-bed"></i>Bookings
+                        <i class="fas fa-bolt"></i> Walk-in Booking
                     </a>
 
                 </div>
                 <div class="nav-section">
-                    <a href="#" class="nav-item has-dropdown">
-                        <i class="fas fa-globe"></i>Website Managements
-                    </a>
-                    <div class="dropdown">
-                        <a href="?section=Latest-Announcements" class="dropdown-item">
-                            <i class="fas fa-bullhorn"></i>Announcement
-                        </a>
-                        <a href="?section=Latest-News-and-Features" class="dropdown-item">
-                            <i class="fas fa-newspaper"></i>News / Features
-                        </a>
-                        <a href="?section=CvSU-Events" class="dropdown-item">
-                            <i class="fas fa-calendar-day"></i>Events
-                        </a>
-                    </div>
-                    <a href="?section=user-live-chat" class="nav-item <?php echo (isset($_GET['section']) && $_GET['section'] == 'user-live-chat') ? 'active' : ''; ?>">
+                    <!-- <a href="?section=user-live-chat" class="nav-item <?php echo (isset($_GET['section']) && $_GET['section'] == 'user-live-chat') ? 'active' : ''; ?>">
                         <i class="fas fa-comment"></i>Live Chat
+                    </a> -->
+                    <a href="?section=Alumni-analytics" class="nav-item <?php echo (isset($_GET['section']) && $_GET['section'] == 'Alumni-analytics') ? 'active' : ''; ?>">
+                        <i class="fas fa-user"></i>Alumni Tracer
                     </a>
-                    <a href="#" class="nav-item has-dropdown">
-                        <i class="fas fa-user"></i>Alumni Tracker
-                    </a>
-                    <div class="dropdown">
+                    <!-- <div class="dropdown">
                         <a href="?section=Alumni-analytics" class="dropdown-item">
-                            <i class="fas fa-user"></i>Alumni Tracer Analytics
-                        </a>
-                        <a href="?section=Alumni-tracker" class="dropdown-item">
-                            <i class="fas fa-user"></i>Alumni Total Response
-                        </a>
-                        <a href="?section=charts" class="dropdown-item">
+                            <i class="fas fa-user"></i>Tracer Analytics
+                        </a> -->
+                    <!-- <a href="?section=Alumni-tracker" class="dropdown-item">
+                            <i class="fas fa-user"></i>Total Response
+                        </a> -->
+                    <!-- <a href="?section=charts" class="dropdown-item">
                             <i class="fas fa-newspaper"></i>Chart
                         </a>
                         <a href="?section=questions" class="dropdown-item">
                             <i class="fas fa-calendar-day"></i>Question Ratings
-                        </a>
-                    </div>
+                        </a> -->
+                    <!-- </div> -->
                     <a href="#" class="nav-item has-dropdown">
                         <i class="fas fa-id-card"></i>Alumni ID
                     </a>
@@ -915,7 +897,10 @@ if (!isset($_SESSION['admin_id'])) {
                         </a>
                     </div>
                     <div class="nav-section-title">Management</div>
-                    <a href="#" class="nav-item has-dropdown">
+                    <a href="?section=view-all-bookings" class="nav-item <?php echo (isset($_GET['section']) && $_GET['section'] == 'view-all-bookings') ? 'active' : ''; ?>">
+                        <i class="fas fa-bed"></i>All Bookings
+                    </a>
+                    <!-- <a href="#" class="nav-item has-dropdown">
                         <i class="fas fa-graduation-cap"></i>Alumni Records
                     </a>
                     <div class="dropdown">
@@ -925,9 +910,9 @@ if (!isset($_SESSION['admin_id'])) {
                         <a href="?section=alumni-status" class="dropdown-item">
                             <i class="fas fa-chart-pie"></i>Status Report
                         </a>
-                    </div>
+                    </div> -->
 
-                    <a href="#" class="nav-item has-dropdown">
+                    <!-- <a href="#" class="nav-item has-dropdown">
                         <i class="fas fa-users"></i>Guest Records
                     </a>
                     <div class="dropdown">
@@ -940,33 +925,47 @@ if (!isset($_SESSION['admin_id'])) {
                         <a href="?section=guest-status" class="dropdown-item">
                             <i class="fas fa-chart-bar"></i>Guest Analytics
                         </a>
-                    </div>
+                    </div> -->
 
                     <a href="#" class="nav-item has-dropdown">
                         <i class="fas fa-calendar-alt"></i>Bookings Managements
                     </a>
                     <div class="dropdown">
-                        <a href="?section=all-bookings" class="dropdown-item">
+                        <!-- <a href="?section=all-bookings" class="dropdown-item">
                             <i class="fas fa-calendar-check"></i>All Bookings
-                        </a>
+                        </a> -->
                         <a href="?section=booking-room" class="dropdown-item">
                             <i class="fas fa-bed"></i>Price Room
                         </a>
                         <a href="?section=room-images" class="dropdown-item">
                             <i class="fas fa-camera"></i> Room Images
                         </a>
-                        <a href="?section=new-booking" class="dropdown-item">
+                        <!-- <a href="?section=new-booking" class="dropdown-item">
                             <i class="fas fa-plus-circle"></i>New Booking
                         </a>
                         <a href="?section=booking-calendar" class="dropdown-item">
-                            <i class="fas fa-calendar-week"></i>Calendar View
+                            <i class="fas fa-calendar-week"></i>Calendar View -->
+                        <!-- </a> -->
+                    </div>
+                    <a href="#" class="nav-item has-dropdown">
+                        <i class="fas fa-globe"></i>Website Managements
+                    </a>
+                    <div class="dropdown">
+                        <a href="?section=Latest-Announcements" class="dropdown-item">
+                            <i class="fas fa-bullhorn"></i>Announcement
+                        </a>
+                        <a href="?section=Latest-News-and-Features" class="dropdown-item">
+                            <i class="fas fa-newspaper"></i>News / Features
+                        </a>
+                        <a href="?section=CvSU-Events" class="dropdown-item">
+                            <i class="fas fa-calendar-day"></i>Events
                         </a>
                     </div>
                 </div>
 
                 <div class="nav-section">
                     <div class="nav-section-title">System</div>
-                    <a href="#" class="nav-item has-dropdown">
+                    <!-- <a href="#" class="nav-item has-dropdown">
                         <i class="fas fa-user-shield"></i>System User Management
                     </a>
                     <div class="dropdown">
@@ -976,17 +975,20 @@ if (!isset($_SESSION['admin_id'])) {
                         <a href="?section=user-roles" class="dropdown-item">
                             <i class="fas fa-user-tag"></i>Roles & Permissions
                         </a>
-                    </div>
-                    <a href="#" class="nav-item has-dropdown">
-                        <i class="fas fa-user-shield"></i>User Management Booking
+                    </div> -->
+                    <a href="?section=all-users-bookings" class="dropdown-item">
+                        <i class="fas fa-users-cog"></i>All Users
+                    </a>
+                    <!-- <a href="#" class="nav-item has-dropdown">
+                        <i class="fas fa-user-shield"></i>User Management
                     </a>
                     <div class="dropdown">
                         <a href="?section=all-users-bookings" class="dropdown-item">
                             <i class="fas fa-users-cog"></i>All Users
                         </a>
-                    </div>
+                    </div> -->
 
-                    <a href="#" class="nav-item has-dropdown">
+                    <!-- <a href="#" class="nav-item has-dropdown">
                         <i class="fas fa-cog"></i>Settings
                     </a>
                     <div class="dropdown">
@@ -999,7 +1001,7 @@ if (!isset($_SESSION['admin_id'])) {
                         <a href="?section=backup" class="dropdown-item">
                             <i class="fas fa-database"></i>Backup & Restore
                         </a>
-                    </div>
+                    </div> -->
                 </div>
             </nav>
         </aside>
