@@ -25,7 +25,7 @@ if ($booking_id <= 0) {
     exit;
 }
 
-$valid_statuses = ['pending', 'confirmed', 'checked_in', 'checked_out', 'cancelled', 'no_show', 'completed', 'cancelled', 'early_checkout'];
+$valid_statuses = ['pending', 'confirmed', 'checked_in', 'checked_out', 'cancelled', 'no_show', 'completed', 'cancelled', 'extend_stay', 'early_checkout'];
 if (!in_array(strtolower($status), $valid_statuses)) {
     echo json_encode(['success' => false, 'message' => 'Invalid status']);
     exit;
@@ -56,7 +56,8 @@ try {
         ($booking['middle_name'] ? $booking['middle_name'] . ' ' : '') .
         $booking['last_name']);
 
-    // Handle both early_checkout and checked_out differently
+
+
     if ($status === 'early_checkout') {
         $current_date = date('Y-m-d');
         $current_time = date('H:i:s');
@@ -77,6 +78,20 @@ try {
         $update_query = "UPDATE bookings SET status = ? WHERE id = ?";
         $update_stmt = $mysqli->prepare($update_query);
         $update_stmt->bind_param('si', $status, $booking_id);
+    } else if ($status === 'extend_stay') {
+        // Extend stay by 1 day
+        $new_departure_date = date('Y-m-d', strtotime($booking['departure_date'] . ' +1 day'));
+
+        // Maintain status as 'checked_in'
+        $new_status = 'checked_in';
+
+        $update_query = "UPDATE bookings SET status = ?, departure_date = ? WHERE id = ?";
+        $update_stmt = $mysqli->prepare($update_query);
+        $update_stmt->bind_param('ssi', $new_status, $new_departure_date, $booking_id);
+
+        // Also update the value in booking array for email
+        $booking['departure_date'] = $new_departure_date;
+        $status = $new_status; // for email + response
     } else {
         $update_query = "UPDATE bookings SET status = ? WHERE id = ?";
         $update_stmt = $mysqli->prepare($update_query);

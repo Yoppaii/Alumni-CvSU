@@ -35,12 +35,12 @@ $bookingTimes = [];
 while ($row = $result->fetch_assoc()) {
     $current = strtotime($row['arrival_date']);
     $end = strtotime($row['departure_date']);
-    
+
     while ($current < $end) {
         $bookedDates[] = date('Y-m-d', $current);
         $current = strtotime('+1 day', $current);
     }
-    
+
     $bookingTimes[] = [
         'date' => $row['departure_date'],
         'departure_time' => $row['departure_datetime']
@@ -54,4 +54,3 @@ echo json_encode([
 
 $stmt->close();
 $mysqli->close();
-?>
