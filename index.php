@@ -361,6 +361,7 @@ if (session_status() === PHP_SESSION_NONE) {
             .cvsu-secondary-nav.cvsu-active {
                 display: block;
             }
+            
 
             .cvsu-nav-list {
                 display: flex;
@@ -412,7 +413,13 @@ if (session_status() === PHP_SESSION_NONE) {
                 border-color: var(--cvsu-primary-green);
                 color: var(--cvsu-text-light);
             }
+
+            .cvsu-secondary-nav {
+                padding: 0.25rem 0; /* Reduce padding on smaller screens */
+                top: calc(30px + 1rem); /* Adjust top position if needed */
+            }
         }
+        
 
         @media (max-width: 480px) {
             .cvsu-logo span {
@@ -421,6 +428,11 @@ if (session_status() === PHP_SESSION_NONE) {
 
             .cvsu-logo img {
                 height: 30px;
+            }
+
+            .cvsu-secondary-nav {
+                padding: 0.5rem 0; /* Maintain padding for very small screens */
+                top: calc(20px + 0.5rem); /* Further adjust top position */
             }
         }
     </style>
