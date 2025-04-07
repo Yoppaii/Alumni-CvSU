@@ -856,8 +856,9 @@ if (!isset($_SESSION['admin_id'])) {
                     <a href="#" class="nav-item has-dropdown">
                         <i class="fas fa-bolt"></i> Quick Booking
                     </a>
+
                     <div class="dropdown">
-                        <a href="?section=Check-Available-Rooms" class="dropdown-item">
+                        <a href="?section=Room-Reservation" class="dropdown-item">
                             <i class="fas fa-bed"></i> Check Available Rooms
                         </a>
                         <a href="?section=Walk-in-Booking" class="dropdown-item">
@@ -1063,8 +1064,11 @@ if (!isset($_SESSION['admin_id'])) {
                 case 'Check-Available-Rooms':
                     include 'admin/check-available-rooms.php';
                     break;
-                case 'Walk-in-Booking':
+                case 'Room-Reservation':
                     include 'admin/walk-in-booking.php';
+                    break;
+                case 'room-details':
+                    include 'admin/walk-in-room-details.php';
                     break;
                 case 'Alumni-analytics':
                     include 'admin/alumni-tracer/alumni-analytics.php';
