@@ -18,12 +18,14 @@
 }
 
 .section-titles h2 {
-    color: var(--primary-green);
-    font-size: 1.2rem;
-    position: relative;
-    padding-bottom: 0.3rem;
-    flex-basis: 50%;
-    margin: 0;
+    color: var(--cvsu-primary-green);
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 3px solid var(--cvsu-primary-green);
+    display: block; 
+    width: 100%;
 }
 
 .section-titles h2::after {
@@ -33,7 +35,7 @@
     left: 0;
     width: 50px;
     height: 2px;
-    background: var(--primary-green);
+
     border-radius: 2px;
 }
 
@@ -46,11 +48,12 @@
 }
 
 .organization-container {
+    display: block;
     flex: 1;
     background: white;
     border-radius: 10px;
     box-shadow: var(--shadow-md);
-    padding: 1.5rem;
+    padding: 5rem;
     animation: fadeIn 0.6s ease-out;
 }
 
@@ -79,10 +82,10 @@
 
 .text ul li {
     color: var(--text-dark);
-    font-size: 0.85rem;
+    font-size: 1.5rem;
     line-height: 1.5;
     margin-bottom: 0.6rem;
-    padding-left: 1rem;
+    padding-left: 2rem;
     position: relative;
 }
 
@@ -91,21 +94,6 @@
     color: var(--primary-green);
     position: absolute;
     left: 0;
-}
-
-.image {
-    flex: 0 0 300px;
-    background: var(--gray-light);
-    border-radius: 8px;
-    overflow: hidden;
-    padding: 0.5rem;
-}
-
-.image img {
-    width: 100%;
-    height: auto;
-    display: block;
-    object-fit: contain;
 }
 
 @media (max-width: 768px) {
@@ -126,32 +114,15 @@
         flex-direction: column;
     }
 
-    .image {
-        flex: 0 0 auto;
-        width: 100%;
-        max-width: 300px;
-        margin: 1rem auto 0;
-    }
 }
 </style>
 
 <!-- Updated HTML Structure -->
 <div class="section-titles">
-    <h2>Organizational Chart</h2>
     <h2>Our Objectives</h2>
 </div>
 
-<div class="organization-wrapper">
-    <div class="organization-container">
-        <div class="content-wrapper">
-            <div class="text">
-                <p>Our organizational chart provides a visual representation of the key departments and leadership hierarchy within our company. It helps clarify reporting lines and responsibilities, ensuring effective communication and collaboration across teams.</p>
-            </div>
-            <div class="image">
-                <img src="asset/images/organization_chart/Association.jpg" alt="Organizational Chart">
-            </div>
-        </div>
-    </div>
+
 
     <div class="organization-container">
         <div class="content-wrapper">
@@ -162,9 +133,6 @@
                     <li>To promote high moral standards among members.</li>
                     <li>To partake in the social issues and concerns in the community, especially those affecting the organization and its members.</li>
                 </ul>
-            </div>
-            <div class="image">
-                <img src="asset/images/organization_chart/Organization.jpg" alt="Organization Chart">
             </div>
         </div>
     </div>

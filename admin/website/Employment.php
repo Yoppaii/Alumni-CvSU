@@ -66,11 +66,12 @@
             right: 0;
             bottom: 0;
             height: 500px;
-            background-image: url('asset/images/bg.jpg');
+            background-image: url('asset/images/bground.jpg');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            filter: blur(4px) brightness(0.5); 
+            background-attachment: fixed;
+            filter: brightness(0.4);
             z-index: 1;
         }
 

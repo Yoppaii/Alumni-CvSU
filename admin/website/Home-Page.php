@@ -73,6 +73,7 @@
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
+        background-attachment: fixed;
         filter: brightness(0.4);
         z-index: 1;
 
@@ -125,6 +126,7 @@
             background-repeat: no-repeat;
             filter: brightness(0.4); 
             z-index: 1;
+        }
             
         .herodaw p {
             font-size: 14px;
@@ -136,7 +138,7 @@
             font-size: 14px;
         }
     }
-}
+
 </style>
 
 <body>
@@ -145,6 +147,7 @@
         <p>Your easy solution for booking meeting rooms, events, and conferences at Cavite State University.</p>
         <a href="#services" class="cta-btn">Explore Our Services</a>
     </section>
+    
 
     <?php include('components/home/announcement.php'); ?>
     <?php include('components/home/features.php'); ?>
