@@ -1316,6 +1316,31 @@ $bookingsResult = $mysqli->query($bookingsQuery);
                             return;
                         }
 
+                        // Add this code to handle other status changes
+                        showLoading('Updating booking status...');
+
+                        const formData = new FormData();
+                        formData.append('booking_id', bookingId);
+                        formData.append('status', newStatus);
+
+                        const response = await fetch('/Alumni-CvSU/admin/update_booking_status.php', {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        const data = await response.json();
+
+                        hideLoading();
+
+                        if (data.success) {
+                            showToast('Booking status updated successfully', true);
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 2000);
+                        } else {
+                            throw new Error(data.message || 'Failed to update booking status');
+                        }
+
                         // Rest of the code for other statuses...
                     } catch (error) {
                         console.error('Error updating booking status:', error);
