@@ -139,6 +139,7 @@
             font-size: 14px;
         }
     }
+}
 </style>
 
 <body>
