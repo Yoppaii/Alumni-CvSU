@@ -11,6 +11,8 @@ try {
         throw new Exception('Invalid request data');
     }
 
+    $isWalkin = 'yes';
+
     $userId = 73; // Hardcoded user ID for keithjoshuabungalso123@gmail.com
 
     $userStmt = $mysqli->prepare("
@@ -49,16 +51,12 @@ try {
     }
 
     $bookingStmt = $mysqli->prepare("INSERT INTO bookings 
-        (reference_number, user_id, room_number, occupancy, price, price_per_day,
-         arrival_date, arrival_time, departure_date, departure_time, status) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')");
-
-    if (!$bookingStmt) {
-        throw new Exception($mysqli->error);
-    }
+    (reference_number, user_id, room_number, occupancy, price, price_per_day,
+     arrival_date, arrival_time, departure_date, departure_time, status, is_walkin) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)");
 
     $bookingStmt->bind_param(
-        "siiiidssss",
+        "siiiidsssss",
         $data['reference_number'],
         $userId,
         $data['room_number'],
@@ -68,8 +66,10 @@ try {
         $data['arrival_date'],
         $data['arrival_time'],
         $data['departure_date'],
-        $data['departure_time']
+        $data['departure_time'],
+        $isWalkin
     );
+
 
     if (!$bookingStmt->execute()) {
         throw new Exception($bookingStmt->error);
