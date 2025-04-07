@@ -350,7 +350,7 @@ if (isset($_SESSION['user_id'])) {
     <section class="profile-guest">
         <div class="header-container-guest">
             <div class="logo-container-guest">
-                <img src="user/bg/res1.png" alt="Cavite State University Logo" class="logo-guest">
+                <img src="asset/images/1.png" alt="Cavite State University Logo" class="logo-guest">
             </div>
 
             <div class="text-container-guest">

@@ -98,7 +98,7 @@ if (session_status() === PHP_SESSION_NONE) {
         }
 
         .cvsu-logo img {
-            height: 40px;
+            height: 50px;
             width: auto;
             object-fit: contain;
         }
@@ -359,6 +359,7 @@ if (session_status() === PHP_SESSION_NONE) {
             .cvsu-secondary-nav.cvsu-active {
                 display: block;
             }
+            
 
             .cvsu-nav-list {
                 display: flex;
@@ -410,7 +411,13 @@ if (session_status() === PHP_SESSION_NONE) {
                 border-color: var(--cvsu-primary-green);
                 color: var(--cvsu-text-light);
             }
+
+            .cvsu-secondary-nav {
+                padding: 0.25rem 0; /* Reduce padding on smaller screens */
+                top: calc(30px + 1rem); /* Adjust top position if needed */
+            }
         }
+        
 
         @media (max-width: 480px) {
             .cvsu-logo span {
@@ -420,13 +427,19 @@ if (session_status() === PHP_SESSION_NONE) {
             .cvsu-logo img {
                 height: 30px;
             }
+
+            .cvsu-secondary-nav {
+                padding: 0.5rem 0; /* Maintain padding for very small screens */
+                top: calc(20px + 0.5rem); /* Further adjust top position */
+            }
         }
     </style>
 <body>
     <header class="cvsu-header">
         <div class="cvsu-container cvsu-header-content">
             <a href="index" class="cvsu-logo">
-                <img src="asset/images/res1.png" alt="CSU Logo">
+                <img src="asset/images/1.png" alt="CSU Logo">
+                <img src="asset/images/2.png" alt="CSU Logo">
                 <span>Cavite State University<br>Office of Alumni Affairs</span>
             </a>
 

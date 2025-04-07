@@ -69,11 +69,11 @@
         right: 0;
         bottom: 0;
         height: 500px;
-        background-image: url('asset/images/bg.jpg');
+        background-image: url('asset/images/bground.jpg');
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
-        filter: blur(4px) brightness(0.5);
+        filter: brightness(0.4);
         z-index: 1;
 
     }
@@ -111,6 +111,21 @@
             font-size: 24px;
         }
 
+        .herodaw::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 700px;
+            background-image: url('asset/images/bground.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            filter: brightness(0.4); 
+            z-index: 1;
+            
         .herodaw p {
             font-size: 14px;
             line-height: 1.5;
@@ -121,6 +136,7 @@
             font-size: 14px;
         }
     }
+}
 </style>
 
 <body>

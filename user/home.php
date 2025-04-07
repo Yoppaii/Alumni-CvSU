@@ -490,35 +490,35 @@ if ($userId) {
             <div class="home-slider">
                 <div class="home-slides">
                     <div class="home-slide">
-                        <img src="user/bg/bg1.jpg" alt="Room 1">
+                        <img src="asset/Room1/1.jpg" alt="Room 1">
                         <div class="home-room-number">Room 1</div>
                     </div>
                     <div class="home-slide">
-                        <img src="user/bg/bg2.jpg" alt="Room 2">
+                        <img src="asset/Room2/6314362091837965302.jpg" alt="Room 2">
                         <div class="home-room-number">Room 2</div>
                     </div>
                     <div class="home-slide">
-                        <img src="user/bg/bg3.jpg" alt="Room 3">
+                        <img src="asset/Room3/6314362091837965305.jpg" alt="Room 3">
                         <div class="home-room-number">Room 3</div>
                     </div>
                     <div class="home-slide">
-                        <img src="user/bg/bg4.jpg" alt="Room 4">
+                        <img src="asset/Room4/6314362091837965308.jpg" alt="Room 4">
                         <div class="home-room-number">Room 4</div>
                     </div>
                     <div class="home-slide">
-                        <img src="user/bg/bg5.jpg" alt="Room 5">
+                        <img src="asset/Room5/6314362091837965311.jpg" alt="Room 5">
                         <div class="home-room-number">Room 5</div>
                     </div>
                     <div class="home-slide">
-                        <img src="user/bg/bg6.jpg" alt="Room 6">
+                        <img src="asset/Room6/6314362091837965314.jpg" alt="Room 6">
                         <div class="home-room-number">Room 6</div>
                     </div>
                     <div class="home-slide">
-                        <img src="user/bg/bg7.jpg" alt="Room 7">
+                        <img src="asset/Room7/6314362091837965317.jpg" alt="Room 7">
                         <div class="home-room-number">Room 7</div>
                     </div>
                     <div class="home-slide">
-                        <img src="user/bg/bg8.jpg" alt="Room 8">
+                        <img src="asset/Room8/6314362091837965322.jpg" alt="Room 8">
                         <div class="home-room-number">Room 8</div>
                     </div>
                 </div>
