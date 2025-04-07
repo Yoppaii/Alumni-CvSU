@@ -6,11 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alumni Cavite State University</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="admin/website/components/home/home-styles.css">
 
 </head>
 <style>
     .herodaw {
         color: white;
+        background-color: var(--cvsu-primary-green);
+        /* ensures background consistency */
         padding: 80px 20px;
         text-align: center;
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
@@ -26,6 +29,8 @@
         font-weight: 700;
         position: relative;
         z-index: 2;
+        color: white;
+        /* explicitly set to match Hero theme */
     }
 
     .herodaw p {
@@ -36,11 +41,12 @@
         line-height: 1.6;
         position: relative;
         z-index: 2;
+        color: white;
     }
 
     .herodaw .cta-btn {
         padding: 12px 25px;
-        background: #006400;
+        background: var(--cvsu-primary-green);
         color: white;
         border-radius: 25px;
         font-size: 16px;
@@ -57,7 +63,7 @@
     }
 
     .herodaw .cta-btn:hover {
-        background: #004d00;
+        background: var(--cvsu-hover-green);
         transform: translateX(-50%) translateY(-2px);
     }
 
@@ -76,8 +82,10 @@
         background-attachment: fixed;
         filter: brightness(0.4);
         z-index: 1;
-
     }
+
+
+
 
     @media (max-width: 768px) {
         .herodaw {

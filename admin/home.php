@@ -325,7 +325,7 @@ $today = date('Y-m-d');
     </div>
 
 
-    <div class="bookings-table-container">
+    <!-- <div class="bookings-table-container">
         <div class="header-content">
             <h2>Recent Bookings</h2>
             <a href="?section=view-all-bookings" class="view-all-link">
@@ -426,7 +426,7 @@ $today = date('Y-m-d');
                 </tbody>
             </table>
         </div>
-    </div>
+    </div> -->
 
     <!-- User Details Modal -->
     <div id="bookingUserModal" class="booking-user-modal">

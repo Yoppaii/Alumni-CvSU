@@ -9,6 +9,8 @@
 <style>
     .ra-hero {
         color: white;
+        background-color: var(--cvsu-primary-green);
+        /* fallback if background image fails */
         padding: 80px 20px;
         text-align: center;
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
@@ -24,6 +26,7 @@
         font-weight: 700;
         position: relative;
         z-index: 2;
+        color: white;
     }
 
     .ra-hero p {
@@ -34,11 +37,12 @@
         line-height: 1.6;
         position: relative;
         z-index: 2;
+        color: white;
     }
 
     .ra-hero .cta-btn {
         padding: 12px 25px;
-        background: #006400;
+        background: var(--cvsu-primary-green);
         color: white;
         border-radius: 25px;
         font-size: 16px;
@@ -55,7 +59,7 @@
     }
 
     .ra-hero .cta-btn:hover {
-        background: #004d00;
+        background: var(--cvsu-hover-green);
         transform: translateX(-50%) translateY(-2px);
     }
 
@@ -121,6 +125,7 @@
     }
 </style>
 
+
 <body>
     <section class="ra-hero">
         <h2>Room Accommodation Services</h2>
@@ -130,11 +135,11 @@
     <?php include('components/online_services/alumni.php'); ?>
 
 
-    <?php include('components/online_services/booked-today.php'); ?>
+    <!-- <?php include('components/online_services/booked-today.php'); ?>
 
     <?php include('components/online_services/alumni-form.php'); ?>
 
-    <?php include('components/online_services/alumni-id-form.php'); ?>
+    <?php include('components/online_services/alumni-id-form.php'); ?> -->
 
 </body>
 

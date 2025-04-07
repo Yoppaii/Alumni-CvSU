@@ -53,20 +53,14 @@ $mysqli->close();
 </head>
 <style>
     :root {
-        --primary-color: #2d6936;
-        --secondary-color: #1e40af;
+        --primary-color: #10b981;
+        --secondary-color: #64748b;
         --background-color: #f4f6f8;
         --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
         --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 
-    body {
-        background: var(--background-color);
-        min-height: 100vh;
-        padding: 10px;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        margin: 0;
-    }
+
 
     .notification-container {
         position: fixed;
@@ -1073,7 +1067,7 @@ $mysqli->close();
                         if (data.success) {
                             NotificationSystem.show(`Booking confirmed! Reference: ${data.reference_number}`, 'success');
                             setTimeout(() => {
-                                window.location.href = '?section=booking_history';
+                                window.location.href = '?section=view-all-bookings&tab=pending';
                             }, 1500);
                         } else {
                             hideLoading();
