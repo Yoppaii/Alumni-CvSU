@@ -120,7 +120,7 @@
 }
 
 .info-portrait-text {
-    color:#161616;
+    color: var(--cvsu-text-dark);
     line-height: 1.6;
     margin-bottom: 1rem;
     flex-grow: 1;
@@ -154,7 +154,7 @@
     background-color: rgba(0, 100, 0, 0.05);
     border-left: 4px solid var(--cvsu-primary-green);
     font-style: italic;
-    color: #161616;
+    color: var(--cvsu-text-dark);
     font-size: 0.95rem;
 }
 

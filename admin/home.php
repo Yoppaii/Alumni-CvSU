@@ -212,7 +212,7 @@ $today = date('Y-m-d');
 
 <body>
     <!-- NEW DASHBOARD -->
- 
+
     <!-- Filters -->
 
     <div class="dashboard-container">
@@ -357,20 +357,35 @@ $today = date('Y-m-d');
                     if ($result && $result->num_rows > 0) {
                         while ($booking = $result->fetch_assoc()) {
                             $statusClass = '';
+                            $statusIcon = '';
+
                             switch ($booking['status']) {
                                 case 'pending':
                                     $statusClass = 'status-pending';
+                                    $statusIcon = '<i class="fas fa-clock"></i>';
                                     break;
-                                case 'approved':
-                                    $statusClass = 'status-approved';
+                                case 'confirmed':
+                                    $statusClass = 'status-confirmed';
+                                    $statusIcon = '<i class="fas fa-check"></i>';
                                     break;
-                                case 'completed':
-                                    $statusClass = 'status-completed';
+                                case 'checked_in':
+                                    $statusClass = 'status-checked_in';
+                                    $statusIcon = '<i class="fas fa-door-open"></i>';
                                     break;
                                 case 'cancelled':
                                     $statusClass = 'status-cancelled';
+                                    $statusIcon = '<i class="fas fa-times-circle"></i>';
+                                    break;
+                                case 'no_show':
+                                    $statusClass = 'status-no_show';
+                                    $statusIcon = '<i class="fas fa-user-slash"></i>';
+                                    break;
+                                case 'completed':
+                                    $statusClass = 'status-completed';
+                                    $statusIcon = '<i class="fas fa-check-double"></i>';
                                     break;
                             }
+
                     ?>
                             <tr data-user-id="<?php echo htmlspecialchars($booking['user_id']); ?>">
                                 <td><?php echo htmlspecialchars($booking['reference_number']); ?></td>
@@ -393,8 +408,9 @@ $today = date('Y-m-d');
                                 <td class="hide-mobile">₱<?php echo number_format($booking['price'], 2); ?></td>
                                 <td>
                                     <span class="status-badge <?php echo $statusClass; ?>">
-                                        <?php echo ucfirst($booking['status']); ?>
+                                        <?php echo $statusIcon . ' ' . ucfirst(str_replace('_', ' ', $booking['status'])); ?>
                                     </span>
+
                                 </td>
                             </tr>
                         <?php

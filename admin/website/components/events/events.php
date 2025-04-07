@@ -106,7 +106,8 @@
 
 .ev-page-title {
     color: #006400;
-    font-size: 2em;
+    text-align: center;
+    font-size: 2.5em;
     margin-bottom: 40px;
 }
 

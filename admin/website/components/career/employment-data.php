@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <title>Job Opportunities</title>
     <style>
         .cr-container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
-            font-family: 'Montserrat', sans-serif;
+            font-family: Arial, sans-serif;
         }
 
         .cr-search-header {
@@ -19,7 +18,7 @@
 
         .cr-search-header h1 {
             color: #006400;
-            font-size: 2em;
+            font-size: 24px;
             margin: 0 0 10px 0;
         }
 
@@ -169,20 +168,6 @@
 
             .cr-filter-bar {
                 justify-content: center;
-            }
-
-            @media (max-width: 768px) {
-            .cr-search-header h1 {
-                font-size: 1.5em; /* Smaller font size on smaller screens */
-                margin: 0 0 8px 0; /* Adjust bottom margin */
-                }
-            }
-
-            @media (max-width: 480px) {
-                .cr-search-header h1 {
-                    font-size: 1.2em; /* Further reduce font size for very small screens */
-                    margin: 0 0 5px 0; /* Adjust bottom margin */
-                }
             }
         }
     </style>

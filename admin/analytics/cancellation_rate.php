@@ -14,10 +14,10 @@ $monthCondition = ($month === null) ? "" : "AND MONTH(b.arrival_date) = $month";
 
 $query = "SELECT 
             COUNT(*) AS total_bookings,
-            SUM(CASE WHEN b.reference_number IN (SELECT reference_number FROM cancelled_bookings) THEN 1 ELSE 0 END) AS cancelled,
+            SUM(CASE WHEN b.status IN ('cancelled') THEN 1 ELSE 0 END) AS cancelled,
             SUM(CASE WHEN b.status IN ('no_show') THEN 1 ELSE 0 END) AS no_show,
             SUM(CASE WHEN b.status = 'completed' THEN 1 ELSE 0 END) AS successful,
-            (SUM(CASE WHEN b.status IN ('no_show') OR b.reference_number IN (SELECT reference_number FROM cancelled_bookings) THEN 1 ELSE 0 END) * 100 / COUNT(*)) AS rate
+            (SUM(CASE WHEN b.status IN ('cancelled', 'no_show') THEN 1 ELSE 0 END) * 100 / COUNT(*)) AS rate
           FROM bookings b
           LEFT JOIN user u ON b.user_id = u.user_id
           WHERE 1=1 
@@ -25,7 +25,6 @@ $query = "SELECT
           $monthCondition
           $guestTypeCondition
           $roomNumberCondition";
-
 
 $result = $mysqli->query($query);
 

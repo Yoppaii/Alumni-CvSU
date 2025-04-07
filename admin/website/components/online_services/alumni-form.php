@@ -9,7 +9,7 @@
     <style>
         .guest-profile-container {
             max-width: 97%;
-            margin: 50px auto;
+            margin: 30px auto;
             background-color: #fff;
             padding: 25px;
             border-radius: 8px;
@@ -25,19 +25,14 @@
         }
 
         .logo-container {
+            flex: 1;
             display: flex;
-            justify-content: flex-start;
-            flex: 0 0 120px; 
-            margin-left: 20px; 
+            justify-content: center;
         }
 
         .logo-image {
-            width: 120px;  
-            height: 120px;
-            border-radius: 50%;
-            margin: 0;
-            margin-right: 0;
-            margin-left: 0;
+            max-width: 100px;
+            height: auto;
         }
 
         .text-container {
@@ -54,21 +49,18 @@
             font-size: 22px;
             font-weight: 700;
             color: #4CAF50;
-            text-align: center;
         }
 
         .campus-name {
             font-size: 16px;
             font-weight: 500;
             color: #333;
-            text-align: center;
         }
 
         .alumni-association {
             font-size: 14px;
             font-weight: 500;
             color: #333;
-            text-align: center;
         }
 
         .form-heading {
@@ -126,7 +118,7 @@
         }
 
         .submit-button {
-            width: 200px;
+            width: 100%;
             padding: 12px;
             background-color: #3C8D40;
             color: white;
@@ -135,8 +127,7 @@
             border-radius: 6px;
             cursor: pointer;
             transition: background-color 0.3s ease;
-            margin: 20px auto;
-            display: block;
+            margin-top: 20px;
         }
 
         .submit-button:hover {

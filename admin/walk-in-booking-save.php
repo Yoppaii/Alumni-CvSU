@@ -1,20 +1,17 @@
 <?php
 define('BASE_PATH', dirname(__DIR__));
 require_once BASE_PATH . '/main_db.php';
-require_once 'email-notif.php';
+require_once 'walk-in-email-notif.php';
 
 header('Content-Type: application/json');
-session_start();
 
 try {
-    if (!isset($_SESSION['user_id'])) {
-        throw new Exception('User not logged in');
-    }
-
     $data = json_decode(file_get_contents('php://input'), true);
     if (!$data) {
         throw new Exception('Invalid request data');
     }
+
+    $userId = 73; // Hardcoded user ID for keithjoshuabungalso123@gmail.com
 
     $userStmt = $mysqli->prepare("
         SELECT u.email, 
@@ -28,7 +25,7 @@ try {
         throw new Exception($mysqli->error);
     }
 
-    $userStmt->bind_param("i", $_SESSION['user_id']);
+    $userStmt->bind_param("i", $userId);
     if (!$userStmt->execute()) {
         throw new Exception($userStmt->error);
     }
@@ -63,7 +60,7 @@ try {
     $bookingStmt->bind_param(
         "siiiidssss",
         $data['reference_number'],
-        $_SESSION['user_id'],
+        $userId,
         $data['room_number'],
         $data['occupancy'],
         $data['price'],
