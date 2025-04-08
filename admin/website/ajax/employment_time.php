@@ -11,39 +11,35 @@ $employmentStatus = isset($_GET['employmentStatus']) ? $mysqli->real_escape_stri
 $fromYear = isset($_GET['fromYear']) && $_GET['fromYear'] !== '' ? $mysqli->real_escape_string($_GET['fromYear']) : '';
 $toYear = isset($_GET['toYear']) && $_GET['toYear'] !== '' ? $mysqli->real_escape_string($_GET['toYear']) : '';
 
-// Log received parameters for debugging
+// Debug: Log received parameters
 error_log("Received params - campus: $campus, course: $course, status: $employmentStatus, fromYear: $fromYear, toYear: $toYear");
 
-// Build SQL conditions
-$campusCondition = ($campus === '') ? "" : "AND eb.college_university = '$campus'";
-$courseCondition = ($course === '') ? "" : "AND eb.degree_specialization = '$course'";
+// Filters (campus & course now from personal_info)
+$campusCondition = ($campus === '') ? "" : "AND pi.campus = '$campus'";
+$courseCondition = ($course === '') ? "" : "AND pi.course = '$course'";
 $employmentStatusCondition = ($employmentStatus === '') ? "" : "AND ed.present_employment_status = '$employmentStatus'";
 
-// Updated year condition logic:
-// When fromYear is blank and toYear is filled, include that year and all previous years
+// Year filtering from educational_background
 $yearCondition = "";
 if (!empty($fromYear) && !empty($toYear)) {
-    // Both years provided - use range
     $yearCondition = "AND eb.year_graduated BETWEEN '$fromYear' AND '$toYear'";
 } elseif (!empty($fromYear)) {
-    // Only fromYear provided - from that year to present
     $yearCondition = "AND eb.year_graduated >= '$fromYear'";
 } elseif (!empty($toYear)) {
-    // Only toYear provided - that year and all previous years
     $yearCondition = "AND eb.year_graduated <= '$toYear'";
 }
 
-// Log the constructed year condition
+// Debug: Log year condition
 error_log("Year condition: $yearCondition");
 
+// Query with LEFT JOIN on personal_info
 $query = "SELECT 
         jd.time_to_land,
         COUNT(*) AS alumni_count
     FROM job_duration jd
-    LEFT JOIN educational_background eb 
-        ON jd.user_id = eb.user_id
-    LEFT JOIN employment_data ed 
-        ON ed.user_id = eb.user_id
+    LEFT JOIN educational_background eb ON jd.user_id = eb.user_id
+    LEFT JOIN employment_data ed ON ed.user_id = jd.user_id
+    LEFT JOIN personal_info pi ON jd.user_id = pi.user_id
     WHERE jd.time_to_land IS NOT NULL
     $campusCondition
     $courseCondition
@@ -52,7 +48,7 @@ $query = "SELECT
     GROUP BY jd.time_to_land
     ORDER BY FIELD(jd.time_to_land, 'less_than_1month', '1_6months', '7_11months', '1year_more')";
 
-// Log the final query for debugging
+// Debug: Log final query
 error_log("Final query: $query");
 
 $result = $mysqli->query($query);
@@ -61,16 +57,18 @@ if (!$result) {
     die(json_encode(["error" => "SQL Error: " . $mysqli->error]));
 }
 
+// Initialize expected categories
 $categories = ['less_than_1month', '1_6months', '7_11months', '1year_more'];
 $dataMap = array_fill_keys($categories, 0);
 $totalAlumni = 0;
 
+// Collect data
 while ($row = $result->fetch_assoc()) {
     $dataMap[$row['time_to_land']] = (int)$row['alumni_count'];
     $totalAlumni += (int)$row['alumni_count'];
 }
 
-// Calculate percentages
+// Format response
 $formattedData = [];
 foreach ($dataMap as $timeCategory => $count) {
     $percentage = $totalAlumni > 0 ? round(($count / $totalAlumni) * 100, 1) : 0;
@@ -82,4 +80,3 @@ foreach ($dataMap as $timeCategory => $count) {
 }
 
 echo json_encode($formattedData);
-?>

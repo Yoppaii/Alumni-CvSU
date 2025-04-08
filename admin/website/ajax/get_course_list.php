@@ -4,16 +4,16 @@ header('Content-Type: application/json');
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-$query = "SELECT DISTINCT degree_specialization FROM educational_background ORDER BY degree_specialization ASC";
+$query = "SELECT DISTINCT course FROM personal_info ORDER BY course ASC";
 $result = $mysqli->query($query);
 
 if (!$result) {
     die(json_encode(["error" => "SQL Error: " . $mysqli->error]));
 }
 
-$campuses = [];
+$course = [];
 while ($row = $result->fetch_assoc()) {
-    $campuses[] = $row['degree_specialization'];
+    $course[] = $row['course'];
 }
 
-echo json_encode($campuses);
+echo json_encode($course);

@@ -12,43 +12,42 @@ $fromYear = isset($_GET['fromYear']) && $_GET['fromYear'] !== '' ? $mysqli->real
 $toYear = isset($_GET['toYear']) && $_GET['toYear'] !== '' ? $mysqli->real_escape_string($_GET['toYear']) : '';
 
 // Build filter conditions
-$campusCondition = ($campus === '') ? "" : "AND eb.college_university = '$campus'";
-$courseCondition = ($course === '') ? "" : "AND eb.degree_specialization = '$course'";
+$campusCondition = ($campus === '') ? "" : "AND pi.campus = '$campus'";
+$courseCondition = ($course === '') ? "" : "AND pi.course = '$course'";
 $employmentStatusCondition = ($employmentStatus === '') ? "" : "AND ed.present_employment_status = '$employmentStatus'";
 
 $yearCondition = "";
 if (!empty($fromYear) && !empty($toYear)) {
-    // Both fromYear and toYear are provided - filter within range
     $yearCondition = "AND eb.year_graduated BETWEEN '$fromYear' AND '$toYear'";
 } elseif (!empty($fromYear)) {
-    // Only fromYear is provided - filter from that year onward
     $yearCondition = "AND eb.year_graduated >= '$fromYear'";
 } elseif (!empty($toYear)) {
-    // Only toYear is provided - filter up to that year
     $yearCondition = "AND eb.year_graduated <= '$toYear'";
 }
 
 // If no campus is specified, get total per campus
 if ($campus === '') {
-    $query = "SELECT eb.college_university AS campus, COUNT(DISTINCT eb.user_id) AS total_graduates
-              FROM educational_background eb
-              LEFT JOIN employment_data ed ON ed.user_id = eb.user_id
-              WHERE eb.college_university != ''
+    $query = "SELECT pi.campus, COUNT(DISTINCT eb.user_id) AS total_graduates
+              FROM personal_info pi
+              LEFT JOIN educational_background eb ON eb.user_id = pi.user_id
+              LEFT JOIN employment_data ed ON ed.user_id = pi.user_id
+              WHERE pi.campus != ''
               $courseCondition
               $employmentStatusCondition
               $yearCondition
-              GROUP BY eb.college_university
+              GROUP BY pi.campus
               ORDER BY total_graduates DESC";
 } else {
     // If campus is specified, return only that campus total
-    $query = "SELECT eb.college_university AS campus, COUNT(DISTINCT eb.user_id) AS total_graduates
-              FROM educational_background eb
-              LEFT JOIN employment_data ed ON ed.user_id = eb.user_id
-              WHERE eb.college_university = '$campus'
+    $query = "SELECT pi.campus, COUNT(DISTINCT eb.user_id) AS total_graduates
+              FROM personal_info pi
+              LEFT JOIN educational_background eb ON eb.user_id = pi.user_id
+              LEFT JOIN employment_data ed ON ed.user_id = pi.user_id
+              WHERE pi.campus = '$campus'
               $courseCondition
               $employmentStatusCondition
               $yearCondition
-              GROUP BY eb.college_university";
+              GROUP BY pi.campus";
 }
 
 $result = $mysqli->query($query);

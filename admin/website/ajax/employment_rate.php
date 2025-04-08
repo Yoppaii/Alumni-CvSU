@@ -14,21 +14,18 @@ $toYear = isset($_GET['toYear']) && $_GET['toYear'] !== '' ? $mysqli->real_escap
 // Debugging: Log received parameters
 error_log("Received params - campus: $campus, course: $course, status: $employmentStatus, fromYear: $fromYear, toYear: $toYear");
 
-// Build SQL conditions
-$campusCondition = ($campus === '') ? "" : "AND eb.college_university = '$campus'";
-$courseCondition = ($course === '') ? "" : "AND eb.degree_specialization = '$course'";
+// Update filters using personal_info
+$campusCondition = ($campus === '') ? "" : "AND pi.campus = '$campus'";
+$courseCondition = ($course === '') ? "" : "AND pi.course = '$course'";
 $employmentStatusCondition = ($employmentStatus === '') ? "" : "AND ed.present_employment_status = '$employmentStatus'";
 
 // Year Condition Logic
 $yearCondition = "";
 if (!empty($fromYear) && !empty($toYear)) {
-    // Both fromYear and toYear are provided - filter within range
     $yearCondition = "AND eb.year_graduated BETWEEN '$fromYear' AND '$toYear'";
 } elseif (!empty($fromYear)) {
-    // Only fromYear is provided - filter from that year onward
     $yearCondition = "AND eb.year_graduated >= '$fromYear'";
 } elseif (!empty($toYear)) {
-    // Only toYear is provided - filter up to that year
     $yearCondition = "AND eb.year_graduated <= '$toYear'";
 }
 
@@ -38,8 +35,8 @@ error_log("Year condition: $yearCondition");
 // Build final query
 $query = "SELECT ed.employment_status, COUNT(ed.user_id) AS total 
           FROM employment_data ed 
-          LEFT JOIN educational_background eb 
-              ON ed.user_id = eb.user_id
+          LEFT JOIN educational_background eb ON ed.user_id = eb.user_id
+          LEFT JOIN personal_info pi ON ed.user_id = pi.user_id
           WHERE 1=1
           $campusCondition
           $courseCondition
@@ -73,4 +70,3 @@ while ($row = $result->fetch_assoc()) {
 
 // Output JSON response
 echo json_encode($employmentData);
-?>

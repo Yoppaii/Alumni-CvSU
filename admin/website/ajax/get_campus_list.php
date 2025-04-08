@@ -4,7 +4,7 @@ header('Content-Type: application/json');
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-$query = "SELECT DISTINCT college_university FROM educational_background ORDER BY college_university ASC";
+$query = "SELECT DISTINCT campus FROM personal_info ORDER BY campus ASC";
 $result = $mysqli->query($query);
 
 if (!$result) {
@@ -13,7 +13,7 @@ if (!$result) {
 
 $campuses = [];
 while ($row = $result->fetch_assoc()) {
-    $campuses[] = $row['college_university'];
+    $campuses[] = $row['campus'];
 }
 
 echo json_encode($campuses);

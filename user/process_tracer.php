@@ -13,9 +13,10 @@ require __DIR__ . '/../vendor/autoload.php';
 ini_set('display_errors', 0);
 error_reporting(E_ALL);
 
-function sendTracerSubmissionEmail($email, $fullName) {
+function sendTracerSubmissionEmail($email, $fullName)
+{
     $mail = new PHPMailer(true);
-    
+
     $message = '<!DOCTYPE html>
     <html>
     <head>
@@ -96,7 +97,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $check_stmt->bind_param("i", $logged_user_id);
         $check_stmt->execute();
         $check_result = $check_stmt->get_result();
-        
+
         if ($check_result->num_rows > 0) {
             throw new Exception("You have already submitted a tracer form.");
         }
@@ -105,8 +106,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Step 1: Personal Information
         $stmt = $mysqli->prepare("INSERT INTO personal_info (user_id, civil_status, sex, birthday, course, campus, residence) 
                                VALUES (?, ?, ?, ?, ?, ?, ?)");
-        
-        $stmt->bind_param("issssss", 
+
+        $stmt->bind_param(
+            "issssss",
             $logged_user_id,
             $_POST['civilStatus'],
             $_POST['sex'],
@@ -131,8 +133,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             highest_education, 
             reason_for_taking
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        
-        $stmt->bind_param("iisssisss",
+
+        $stmt->bind_param(
+            "iisssisss",
             $logged_user_id,
             $form_id,
             $_POST['degree_specialization'],
@@ -149,8 +152,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Step 3: Training/Advance Studies
         $stmt = $mysqli->prepare("INSERT INTO training_studies (user_id, personal_info_id, training_title, duration_credits, institution, advance_reason) 
                                VALUES (?, ?, ?, ?, ?, ?)");
-        
-        $stmt->bind_param("iissss",
+
+        $stmt->bind_param(
+            "iissss",
             $logged_user_id,
             $form_id,
             $_POST['trainingTitle'],
@@ -166,8 +170,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             user_id, personal_info_id, employment_status, present_employment_status, 
             self_employed_skills, present_occupation, business_line, work_place
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-        
-        $stmt->bind_param("iissssss",
+
+        $stmt->bind_param(
+            "iissssss",
             $logged_user_id,
             $form_id,
             $_POST['employmentStatus'],
@@ -193,8 +198,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt = $mysqli->prepare("INSERT INTO job_experience (
             user_id, personal_info_id, first_job, course_related
         ) VALUES (?, ?, ?, ?)");
-        
-        $stmt->bind_param("iiss",
+
+        $stmt->bind_param(
+            "iiss",
             $logged_user_id,
             $form_id,
             $_POST['firstJob'],
@@ -226,8 +232,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             user_id, personal_info_id, first_job_duration, job_finding_method, time_to_land,
             job_level, current_job, initial_earning, curriculum_relevant, suggestions
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        
-        $stmt->bind_param("iissssssss",
+
+        $stmt->bind_param(
+            "iissssssss",
             $logged_user_id,
             $form_id,
             $_POST['firstJobDuration'],
@@ -256,10 +263,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt = $mysqli->prepare("INSERT INTO other_alumni (
                 user_id, personal_info_id, name, email, contact_number
             ) VALUES (?, ?, ?, ?, ?)");
-            
+
             for ($i = 0; $i < count($_POST['graduate_name']); $i++) {
                 if (!empty($_POST['graduate_name'][$i])) {
-                    $stmt->bind_param("iisss",
+                    $stmt->bind_param(
+                        "iisss",
                         $logged_user_id,
                         $form_id,
                         $_POST['graduate_name'][$i],
@@ -267,7 +275,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         $_POST['graduate_contact'][$i]
                     );
                     $stmt->execute();
-                    
+
                     // Send email notification to each alumnus
                     if (!empty($_POST['graduate_address'][$i])) {
                         sendTracerSubmissionEmail($_POST['graduate_address'][$i], $_POST['graduate_name'][$i]);
@@ -278,12 +286,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         $mysqli->commit();
-        
+
         echo json_encode(['status' => 'success', 'message' => 'Form submitted successfully']);
-        
     } catch (Exception $e) {
         $mysqli->rollback();
         echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
     }
 }
-?>

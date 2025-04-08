@@ -10,40 +10,40 @@ $employmentStatus = isset($_GET['employmentStatus']) ? $mysqli->real_escape_stri
 $fromYear = isset($_GET['fromYear']) ? (int)$_GET['fromYear'] : 0;
 $toYear = isset($_GET['toYear']) ? (int)$_GET['toYear'] : 0;
 
-$campusCondition = ($campus === '') ? "" : "AND eb.college_university = '$campus'";
-$courseCondition = ($course === '') ? "" : "AND eb.degree_specialization = '$course'";
+// Use personal_info for campus and course
+$campusCondition = ($campus === '') ? "" : "AND pi.campus = '$campus'";
+$courseCondition = ($course === '') ? "" : "AND pi.course = '$course'";
 $employmentStatusCondition = ($employmentStatus === '') ? "" : "AND ed.present_employment_status = '$employmentStatus'";
-// Year Condition Logic
+
+// Year Condition Logic (still using educational_background for graduation year)
 $yearCondition = "";
 if (!empty($fromYear) && !empty($toYear)) {
-    // Both fromYear and toYear are provided - filter within range
     $yearCondition = "AND eb.year_graduated BETWEEN '$fromYear' AND '$toYear'";
 } elseif (!empty($fromYear)) {
-    // Only fromYear is provided - filter from that year onward
     $yearCondition = "AND eb.year_graduated >= '$fromYear'";
 } elseif (!empty($toYear)) {
-    // Only toYear is provided - filter up to that year
     $yearCondition = "AND eb.year_graduated <= '$toYear'";
 }
 
-// Debugging: Log constructed year condition
 error_log("Year condition: $yearCondition");
-// Define possible work locations
+
+// Valid work locations
 $validLocations = ["local", "abroad", "work_from_home", "hybrid"];
 
-// Fetch data grouped by work location
+// Final query
 $query = "SELECT 
             ed.work_place, 
             COUNT(*) AS total_employees
-        FROM employment_data ed
-        LEFT JOIN educational_background eb ON ed.user_id = eb.user_id
-        WHERE ed.work_place IN ('" . implode("','", $validLocations) . "')
-        $campusCondition
-        $courseCondition
-        $employmentStatusCondition
-        $yearCondition
-        GROUP BY ed.work_place
-        ORDER BY total_employees DESC";
+          FROM employment_data ed
+          LEFT JOIN educational_background eb ON ed.user_id = eb.user_id
+          LEFT JOIN personal_info pi ON ed.user_id = pi.user_id
+          WHERE ed.work_place IN ('" . implode("','", $validLocations) . "')
+          $campusCondition
+          $courseCondition
+          $employmentStatusCondition
+          $yearCondition
+          GROUP BY ed.work_place
+          ORDER BY total_employees DESC";
 
 $result = $mysqli->query($query);
 
@@ -51,7 +51,7 @@ if (!$result) {
     die(json_encode(["error" => "SQL Error: " . $mysqli->error]));
 }
 
-// Map work_place values to readable labels
+// Human-readable labels
 $locationLabels = [
     "local" => "Local",
     "abroad" => "Abroad",
@@ -59,7 +59,7 @@ $locationLabels = [
     "hybrid" => "Hybrid"
 ];
 
-// Initialize data array with all locations to ensure order
+// Initialize output with default structure
 $formattedData = array_fill_keys(array_keys($locationLabels), ["location" => "", "total_employees" => 0]);
 
 while ($row = $result->fetch_assoc()) {
@@ -72,5 +72,4 @@ while ($row = $result->fetch_assoc()) {
     }
 }
 
-// Return JSON response with sorted data
 echo json_encode(array_values($formattedData));
