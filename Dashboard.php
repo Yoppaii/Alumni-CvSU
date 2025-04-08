@@ -844,7 +844,7 @@ if (!isset($_SESSION['admin_id'])) {
     <div class="dashboard">
         <aside class="sidebar">
             <div class="logo">
-                <img src="asset/images/res1.png" alt="CvSU Logo">
+                <img src="asset/images/2.png" alt="CvSU Logo">
                 <span>ADMIN</span>
             </div>
             <nav>
