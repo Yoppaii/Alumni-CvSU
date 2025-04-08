@@ -273,7 +273,7 @@ if(isset($_SESSION['admin_id'])) {
 
     <div class="login-container">
         <div class="logo-section">
-            <img src="/Alumni-CvSU/asset/images/res1.png" alt="Logo">
+            <img src="/Alumni-CvSU/asset/images/2.png" alt="Logo">
             <h2>Welcome Back</h2>
             <p>Please sign in to continue</p>
         </div>

@@ -120,7 +120,7 @@ $_SESSION['has_booking'] = $hasBooking;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo isset($_SESSION['username']) ? $_SESSION['username'] : 'Home'; ?></title>
-    <link rel="icon" href="user/bg/res1.png" type="image/x-icon">
+    <link rel="icon" href="user/bg/1.png" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <style>
@@ -693,7 +693,7 @@ $_SESSION['has_booking'] = $hasBooking;
             </button>
             <div class="user-profile">
                 <div class="profile-image-container">
-                    <img src="asset/images/res1.png" alt="Profile Picture" class="profile-image">
+                    <img src="asset/images/2.png" alt="Profile Picture" class="profile-image">
                     <div class="online-indicator"></div>
                 </div>
                 <div class="user-name"><?php echo isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest'; ?></div>
@@ -721,7 +721,7 @@ $_SESSION['has_booking'] = $hasBooking;
             <ul>
                 <li class="nav-item"><a href="index?pages=Home-Page" class="nav-link"><i class="fas fa-home"></i> Home</a></li>
                 <li class="nav-item"><a href="?section=home" class="nav-link"><i class="fas fa-columns"></i> Dashboard</a></li>
-                <li class="nav-item"><a href="?section=alumni-cvsu-chat-bot" class="nav-link"><i class="fas fa-robot"></i> Chatbot</a></li>
+                <!-- <li class="nav-item"><a href="?section=alumni-cvsu-chat-bot" class="nav-link"><i class="fas fa-robot"></i> Chatbot</a></li> -->
                 <?php if ($userStatus != 'Alumni'): ?>
                     <li class="nav-item"><a href="?section=alumni-id" class="nav-link"><i class="fas fa-id-card"></i> Alumni ID Card</a></li>
                 <?php endif; ?>
@@ -740,12 +740,12 @@ $_SESSION['has_booking'] = $hasBooking;
                         <i class="fas fa-chevron-down settings-arrow"></i>
                     </a>
                     <ul class="settings-menu">
-                        <li><a href="?section=profile-settings"><i class="fas fa-user-cog"></i> Profile</a></li>
-                        <li><a href="?section=account-information-settings"><i class="fas fa-cogs"></i> Account</a></li>
+                        <!--<li><a href="?section=profile-settings"><i class="fas fa-user-cog"></i> Profile</a></li>-->
+                        <!--<li><a href="?section=account-information-settings"><i class="fas fa-cogs"></i> Account</a></li>-->
                         <li><a href="?section=security-settings"><i class="fas fa-user-shield"></i> Security</a></li>
                         <li><a href="?section=notification-settings"><i class="fas fa-bell"></i> Notification</a></li>
                         <li><a href="?section=privacy-settings"><i class="fas fa-shield-alt"></i> Privacy</a></li>
-                        <li><a href="?section=support-settings"><i class="fas fa-phone"></i> Support</a></li>
+                       <!--  <li><a href="?section=support-settings"><i class="fas fa-phone"></i> Support</a></li>-->
                     </ul>
                 </li>
                 <li class="nav-item"><a href="user/logout" class="nav-link"><i class="fas fa-sign-out-alt"></i> Log Out</a></li>
