@@ -44,7 +44,6 @@
         background-image: url('asset/images/bground2.jpg');
 
         
-        
     }
     
     .slide-2 {
@@ -64,14 +63,31 @@
     }
     
     .slide-content h2 {
-        font-size: 32px;
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 35px;
         margin-bottom: 15px;
         font-weight: 700;
-        color: white;
+        color:rgb(223, 226, 30);
         opacity: 0;
         transform: translateY(-20px);
         transition: all 0.8s ease;
+        letter-spacing: 1px;
+        line-height: 1;
     }
+    .slide-content2 h2 {
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 35px;
+        margin-bottom: 15px;
+        font-weight: 700;
+        color:rgb(223, 226, 30);
+        opacity: 0;
+        transform: translateY(-20px);
+        transition: all 0.8s ease;
+        letter-spacing: 1px;
+        line-height: 1;
+    }
+
+    
     
     .slide-content p {
         font-size: 16px;
@@ -189,7 +205,7 @@
         font-weight: 700;
         position: relative;
         z-index: 2;
-        color: white;
+        color:rgb(209, 230, 22);
     }
 
     .herodaw p {
@@ -247,18 +263,80 @@
     width: 100%; /* Make the image responsive */
     height: auto; /* Maintain aspect ratio */
     display: block; /* Remove bottom space */
+
     }
 
     .slide-content {
         position: absolute; /* Position content over the image */
         top: 50%;
-        left: 50%;
+        left: 35%;
         transform: translate(-50%, -50%); /* Center the content */
-        text-align: center; /* Center text */
+        text-align: right; /* Center text */
         z-index: 2; /* Ensure content is above the image */
         color: white; /* Optional: Text color for contrast */
+
 }
 
+
+    .slide-content2 {
+            position: absolute; /* Position content over the image */
+            top: 50%;
+            left: 65%;
+            transform: translate(-50%, -50%); /* Center the content */
+            text-align: left; /* Center text */
+            z-index: 2; /* Ensure content is above the image */
+            color: white; /* Optional: Text color for contrast */
+    }
+
+
+
+    .support-icon {
+        display: flex;
+        width: 300px; /* Set width of the image */
+        height: 300px; /* Set height of the image */
+        margin-left: 700px; /* Space between image and text */
+        transition: transform 0.8s ease;
+
+    }
+    .support-icons {
+        display: flex;
+        width: 300px; /* Set width of the image */
+        height: 300px; /* Set height of the image */    
+        transition: transform 0.8s ease;    
+
+    }
+    .support-icon2 {
+        display: flex;
+        width: 600px; /* Set width of the image */
+        height: 400px; /* Set height of the image */
+        margin-right: 700px; /* Space between image and text */
+        transition: transform 0.8s ease;
+
+    }
+
+    .cta-btn {
+    display: inline-block; /* Make it behave like a button */
+    padding: 10px 20px; /* Add padding for size */
+    background-color: gold; /* Gold background color */
+    color: #000005; /* Text color */
+    font-size: 18px; /* Font size */
+    font-weight: bold; /* Bold text */
+    border: none; /* Remove border */
+    border-radius: 5px; /* Rounded corners */
+    text-align: center; /* Center text */
+    text-decoration: none; /* Remove underline */
+    transition: background-color 0.3s ease, transform 0.3s ease; /* Transition effects */
+    }
+
+    .cta-btn:hover {
+        background-color: darkgoldenrod; /* Darker gold on hover */
+        transform: scale(1.05); /* Scale effect on hover */
+    }
+
+    /* Adding animation class */
+    .animate__animated.animate__zoomIn {
+        animation-duration: 0.5s; /* Set animation duration */
+    }
 </style>
 
 <body>
@@ -268,31 +346,26 @@
             <div class="swiper-wrapper">
                 <!-- First slide -->
                 <div class="swiper-slide slide-1">
+                    <img src="asset/images/1.png" alt="Support Icon" class="support-icon">
+                    <img src="asset/images/2.png" alt="Support Icon" class="support-icons">
                     <div class="slide-content">
-                        <h2 class="animate__animated animate__fadeInDown">Welcome to Office of Alumni Affairs</h2>
-                        <p class="animate__animated animate__fadeInUp">Your easy solution for booking meeting rooms, events, and conferences at Cavite State University.</p>
-                        <a href="Room-Accomodation.php" class="cta-btn animate__animated animate__zoomIn">Explore Our Services</a>
+                        <h2 class="animate__animated animate__fadeInDown">Office of <br> Alumni Affairs<br><br></h2>
+                        <p class="animate__animated animate__fadeInUp">The Office of Alumni Affairs at Cavite State University is here to strengthen our connection with fellow graduates. We provide resources for networking, professional development, and community engagement, ensuring that our alumni remain involved and support each other. Together, we celebrate our achievements and foster a lasting sense of pride in our university..</p>
+                        <!--<a href="Room-Accomodation.php" class="cta-btn animate__animated animate__zoomIn">Explore Our Services</a> -->
                     </div>
                 </div>
                 
                 <!-- Second slide -->
                 <div class="swiper-slide slide-2">
-                    <div class="slide-content">
-                        <h2 class="animate__animated animate__fadeInDown">Connect With Fellow Alumni</h2>
-                        <p class="animate__animated animate__fadeInUp">Join our network of successful graduates and stay connected with your alma mater.</p>
-                        <a href="#network" class="cta-btn animate__animated animate__zoomIn">Join Network</a>
+                    <img src="asset/images/signup.png" alt="Support Icon" class="support-icon2">
+                    <div class="slide-content2">
+                        <h2 class="animate__animated animate__fadeInDown">Connect With Fellow Alumni<br><br></h2>
+                        <p class="animate__animated animate__fadeInUp">Join our network of successful graduates and stay connected with your alma mater. By participating, you can share your achievements and inspire future generations. Together, we can strengthen our community and create lasting relationships.<br><br></p>
+                        <a href="Account.php" class="cta-btn animate__animated animate__zoomIn">Sign-Up</a> 
                     </div>
                 </div>
                 
-                <!-- Third slide -->
-                <div class="swiper-slide slide-3">
-                    <div class="slide-content">
-                        <h2 class="animate__animated animate__fadeInDown">Alumni Services</h2>
-                        <p class="animate__animated animate__fadeInUp">Discover exclusive benefits and services available to all Cavite State University alumni.</p>
-                        <a href="#benefits" class="cta-btn animate__animated animate__zoomIn">View Benefits</a>
-                    </div>
-                </div>
-            </div>
+ 
             
             <!-- Add navigation buttons -->
             <div class="swiper-button-next"></div>
