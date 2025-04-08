@@ -16,10 +16,15 @@
             margin-bottom: 20px;
         }
 
-        .cr-search-header h1 {
-            color: #006400;
-            font-size: 24px;
-            margin: 0 0 10px 0;
+        #Job {
+            color: var(--cvsu-primary-green);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--cvsu-light-green);
         }
 
         .cr-search-box {
@@ -175,7 +180,10 @@
 <body>
     <div class="cr-container">
         <div class="cr-search-header">
-            <h1>Job Opportunities</h1>
+            <h2 id="Job">
+                    <i class="fas fa-job"></i>
+                    Job Opportunities
+                </h2>
         </div>
 
         <!-- Google Custom Search Box -->

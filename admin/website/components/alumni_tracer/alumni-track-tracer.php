@@ -27,7 +27,7 @@
 
         /* Page Header */
         .AT-page-header {
-            display: flex;
+
             justify-content: space-between;
             align-items: center;
             padding: 20px;
@@ -35,15 +35,24 @@
             margin-bottom: 30px;
         }
 
-        .AT-page-header h1 {
-            color: #006400;
-            font-size: 1.8em;
-            margin: 0;
+        #AT-Tracer {
+            color: var(--cvsu-primary-green);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--cvsu-light-green);
         }
 
         .AT-date-time {
+            flex-direction: column;
+            display: flex;
             color: #666;
             font-size: 1.1em;
+            padding-left: 85%;
+            margin-top: 50px;
         }
 
         /* Analytics Dashboard */
@@ -298,6 +307,9 @@
                 flex-direction: column;
             }
 
+            #AT-Tracer {
+                font-size: 1.5rem; /* Adjust font size for smaller screens */
+            }
             .analytics-summary {
                 grid-template-columns: repeat(2, 1fr);
             }
@@ -311,7 +323,14 @@
                 padding: 1rem;
                 height: 250px;
             }
+            
 
+        }
+
+        @media (max-width: 480px) {
+            #AT-Tracer {
+                font-size: 1.2rem; /* Further adjust for mobile */
+            }
         }
     </style>
 
@@ -321,11 +340,14 @@
 
 
     <header class="AT-page-header">
-        <h1>Alumni Tracer Information</h1>
+        <h2 id="AT-Tracer">
+                <i class="fas fa-user-graduate"></i>
+                Alumni Tracer Information
+            </h2>
         <div class="AT-date-time"></div>
     </header>
     
-    <div class="dashboard-row">
+    <div  class="dashboard-row">
         <div class="analytics-card">
             <div class="filter-bar">
                 <div class="filter-group">

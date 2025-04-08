@@ -39,6 +39,17 @@ $result = $stmt->get_result();
             gap: 2rem;
             margin-bottom: 3rem;
         }
+        
+        #Announce {
+            color: var(--cvsu-primary-green);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--cvsu-light-green);
+        }
 
         .news-item {
             background: white;
@@ -242,8 +253,10 @@ $result = $stmt->get_result();
 <body>
     <div class="news-container">
         <div class="section-header">
-            <h2 class="section-title">Latest News & Features</h2>
-            <p class="section-subtitle">Stay updated with the latest happenings at CvSU</p>
+            <h2 id="Announce">
+                    <i class="fas fa-newspaper"></i>
+                    Latest News and Features
+                </h2>
         </div>
 
         <div class="news-grid">

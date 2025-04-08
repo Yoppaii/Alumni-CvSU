@@ -7,7 +7,10 @@
 </head>
 <body>
     <div class="ev-container">
-        <h1 class="ev-page-title">CvSU Alumni Affairs Events</h1>
+        <h2 id="Events">
+                <i class="fas fa-calendar-alt"></i>
+                CvSU OAA Events
+            </h2>
         <div class="ev-filters">
             <select class="ev-year-select" id="yearSelect">
                 <option value="2024">2024</option>
@@ -104,11 +107,15 @@
     padding: 20px;
 }
 
-.ev-page-title {
-    color: #006400;
-    text-align: center;
-    font-size: 2.5em;
-    margin-bottom: 40px;
+#Events {
+    color: var(--cvsu-primary-green);
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--cvsu-light-green);
 }
 
 /* Filters Section */
