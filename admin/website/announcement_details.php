@@ -204,7 +204,7 @@ $latest_announcements = $stmt_latest->get_result();
     }
 
     .announcement-badge {
-        background-color: var(--cvsu-primary-green);
+        background-color: gold;
         color: white;
         padding: 0.15rem 0.5rem;
         border-radius: 999px;
@@ -215,7 +215,7 @@ $latest_announcements = $stmt_latest->get_result();
     }
 
     .announcement-title {
-        color: var(--cvsu-primary-green);
+        color: gold;
         font-size: 1rem;
         margin: 0;
         display: -webkit-box;
