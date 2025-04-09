@@ -307,7 +307,7 @@
     }
     .support-icon2 {
         display: flex;
-        width: 600px; /* Set width of the image */
+        width: 400px; /* Set width of the image */
         height: 400px; /* Set height of the image */
         margin-right: 700px; /* Space between image and text */
         transition: transform 0.8s ease;
@@ -357,7 +357,7 @@
                 
                 <!-- Second slide -->
                 <div class="swiper-slide slide-2">
-                    <img src="asset/images/signup.png" alt="Support Icon" class="support-icon2">
+                    <img src ="asset/images/signup1.png" alt="Support Icon" class="support-icon2">
                     <div class="slide-content2">
                         <h2 class="animate__animated animate__fadeInDown">Connect With Fellow Alumni<br><br></h2>
                         <p class="animate__animated animate__fadeInUp">Join our network of successful graduates and stay connected with your alma mater. By participating, you can share your achievements and inspire future generations. Together, we can strengthen our community and create lasting relationships.<br><br></p>

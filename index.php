@@ -284,24 +284,30 @@ if (session_status() === PHP_SESSION_NONE) {
         }
 
         .cvsu-login-btn {
-            background-color: transparent;
-            border: 1px solid var(--cvsu-text-light);
-            color: var(--cvsu-text-light);
+            background-color: #005bef;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add shadow effect */
+            transition: box-shadow 0.3s ease; /* Smooth transition for shadow */
         }
 
         .cvsu-login-btn:hover {
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color:rgb(0, 63, 163);
         }
 
         .cvsu-register-btn {
-            background-color: var(--cvsu-text-light);
-            color: var(--cvsu-primary-green);
-            border: 1px solid var(--cvsu-text-light);
+            background-color:#df3838;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add shadow effect */
+            transition: box-shadow 0.3s ease; /* Smooth transition for shadow */
         }
 
+
         .cvsu-register-btn:hover {
-            background-color: var(--cvsu-gray-light);
-            border-color: var(--cvsu-gray-light);
+            background-color:rgb(160, 42, 42);
+
+
         }
 
         .cvsu-menu-toggle {
