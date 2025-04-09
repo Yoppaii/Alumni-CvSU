@@ -360,6 +360,35 @@
         margin-left: 5px; /* Add margin to move it to the right */
         color: gold; /* Keep check mark color gold */
     }
+
+
+    /* Media Queries for Responsiveness */
+    @media (max-width: 768px) {
+        .slide-content, .slide-content2 {
+            left: 50%; /* Center content on smaller screens */
+            text-align: center; /* Center text */
+        }
+
+        .support-icon, .support-icon2, .support-icons {
+            width: 90%; /* Full width on smaller screens */
+            max-width: none; /* Remove max width */
+        }
+
+        .cta-btn {
+            font-size: 16px; /* Adjust font size for smaller screens */
+        }
+    }
+
+    @media (max-width: 480px) {
+        .check-icon {
+            width: 25px; /* Adjust width for small screens */
+            height: 25px; /* Adjust height for small screens */
+        }
+
+        .cta-btn {
+            padding: 8px 16px; /* Adjust padding for smaller buttons */
+        }
+    }
 </style>
 
 <body>
@@ -373,7 +402,7 @@
                     <img src="asset/images/2.png" alt="Support Icon" class="support-icons">
                     <div class="slide-content">
                         <h2 class="animate__animated animate__fadeInDown">OFFICE OF <br> ALUMNI AFFAIRS<br><br></h2>
-                        <p class="animate__animated animate__fadeInUp">The Office of Alumni Affairs at Cavite State University is here to strengthen our connection with fellow graduates. We provide resources for networking, professional development, and community engagement, ensuring that our alumni remain involved and support each other. Together, we celebrate our achievements and foster a lasting sense of pride in our university..</p>
+                        <p class="animate__animated animate__fadeInUp">The Office of Alumni Affairs at Cavite State University is here to strengthen our connection with fellow graduates. We provide resources for networking, professional development, and community engagement, ensuring that our alumni remain involved and support each other. Together, we celebrate our achievements and foster a lasting sense of pride in our university.</p>
                         <!--<a href="Room-Accomodation.php" class="cta-btn animate__animated animate__zoomIn">Explore Our Services</a> -->
                     </div>
                 </div>

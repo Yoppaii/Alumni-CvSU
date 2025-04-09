@@ -162,7 +162,7 @@ $mysqli->close();
             <a href="https://www.instagram.com/AlumniCvSU" target="_blank" class="fab fa-instagram"></a>
         </div>
         <div class="footer-content">
-            <p>&copy; 2024 Alumni Cavite State University. All rights reserved.</p>
+            <p>&copy; 2025 Alumni Cavite State University. All rights reserved.</p>
         </div>
     </footer>  
 
