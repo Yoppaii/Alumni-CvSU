@@ -37,8 +37,8 @@
 
         .cvsu-event-hero .cvsu-cta-btn {
             padding: 12px 25px;
-            background: #006400;
-            color: white;
+            background: gold;
+            color: black;
             border-radius: 25px;
             font-size: 16px;
             font-weight: 600;
@@ -54,7 +54,7 @@
         }
 
         .cvsu-event-hero .cvsu-cta-btn:hover {
-            background: #004d00;
+            background: #92940e;
             transform: translateX(-50%) translateY(-2px);
         }
 

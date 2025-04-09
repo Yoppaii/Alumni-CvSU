@@ -37,8 +37,8 @@
 
         .ev-hero .cta-btn {
             padding: 12px 25px;
-            background: #006400;
-            color: white;
+            background: gold;
+            color: black;
             border-radius: 25px;
             font-size: 16px;
             font-weight: 600;
@@ -54,7 +54,7 @@
         }
 
         .ev-hero .cta-btn:hover {
-            background: #004d00;
+            background: #92940e;
             transform: translateX(-50%) translateY(-2px);
         }
 
@@ -122,7 +122,7 @@
 <body>
     <section class="ev-hero">
         <h2>CvSU Alumni Events & Activities</h2>
-        <p>Stay connected with upcoming alumni gatherings, workshops, and special events at Cavite State University.</p>
+        <p>Stay connected with alumni gatherings, workshops, and special events at Cavite State University. Join us to network with fellow graduates and share experiences. Don’t miss out on opportunities to engage and grow within our vibrant community!</p>
         <a href="#services" class="cta-btn">View Events</a>
     </section>
 

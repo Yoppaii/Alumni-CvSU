@@ -42,8 +42,8 @@
 
     .ra-hero .cta-btn {
         padding: 12px 25px;
-        background: var(--cvsu-primary-green);
-        color: white;
+        background: gold;
+        color: black;
         border-radius: 25px;
         font-size: 16px;
         font-weight: 600;
@@ -59,7 +59,7 @@
     }
 
     .ra-hero .cta-btn:hover {
-        background: var(--cvsu-hover-green);
+        background: #92940e;
         transform: translateX(-50%) translateY(-2px);
     }
 
@@ -71,7 +71,7 @@
         right: 0;
         bottom: 0;
         height: 500px;
-        background-image: url('asset/images/bground.jpg');
+        background-image: url('asset/images/bg1.jpg');
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
@@ -128,8 +128,8 @@
 
 <body>
     <section class="ra-hero">
-        <h2>Room Accommodation Services</h2>
-        <p>Manage and book meeting rooms, conference halls, and event spaces at Cavite State University with ease and convenience.</p>
+        <h2>Room Services</h2>
+        <p>Easily manage and book meeting rooms, conference halls, and event spaces at Cavite State University. Our simple platform lets you browse available venues and make reservations in just a few clicks. Whether you’re planning a small meeting or a large event, we provide the tools you need for a smooth and convenient experience.</p>
         <a href="Account?section=Room-Reservation" class="cta-btn">Book Now!</a>
     </section>
     <?php include('components/online_services/alumni.php'); ?>

@@ -9,7 +9,7 @@
             <div class="footer-legal-container">
                 <div class="footer-nav-links">
                     <ul>
-                        <li><a href="/about"><i class="fas fa-info-circle"></i> About</a></li>
+                        <li><a href="about.php"><i class="fas fa-info-circle"></i> About</a></li>
                         <li><a href="?pages=contact-us"><i class="fas fa-phone-alt"></i> Contact Us</a></li>
                         <li><a href="?pages=terms-and-conditions"><i class="fas fa-file-contract"></i> Terms & Conditions</a></li>
                         <li><a href="?pages=privacy-policy"><i class="fas fa-user-shield"></i> Privacy Policy</a></li>
@@ -17,7 +17,7 @@
                 </div>
                 <p class="footer-rights">
                     <img src="asset/images/res1.png" alt="CvSU Logo" class="footer-rights-logo">
-                    All rights reserved &copy; 2024 Alumni Cavite State University
+                    All rights reserved &copy; 2025 Alumni Cavite State University
                 </p>
             </div>
         </div>
