@@ -7,6 +7,7 @@
     <title>Alumni Cavite State University</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
     <link rel="stylesheet" href="admin/website/components/home/home-styles.css">
+    
     <!-- Add animation library -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 
@@ -337,6 +338,28 @@
     .animate__animated.animate__zoomIn {
         animation-duration: 0.5s; /* Set animation duration */
     }
+
+
+
+    .check-icon {
+    display: inline-block;
+    width: 30px; /* Width of the circle */
+    height: 24px; /* Height of the circle */
+    border: 2px solid gold; /* Circle outline */
+    border-radius: 50%; /* Make it circular */
+    color: gold; /* Set check mark color to gold */
+    text-align: center; /* Center the check mark */
+    line-height: 24px; /* Center vertically */
+    margin-right: 10px; /* Space between the icon and text */
+    font-size: 18px; /* Adjust font size if needed */
+    padding-right: 20px;
+}
+
+    .check-icon::after{
+        content: '✔';
+        margin-left: 5px; /* Add margin to move it to the right */
+        color: gold; /* Keep check mark color gold */
+    }
 </style>
 
 <body>
@@ -349,7 +372,7 @@
                     <img src="asset/images/1.png" alt="Support Icon" class="support-icon">
                     <img src="asset/images/2.png" alt="Support Icon" class="support-icons">
                     <div class="slide-content">
-                        <h2 class="animate__animated animate__fadeInDown">Office of <br> Alumni Affairs<br><br></h2>
+                        <h2 class="animate__animated animate__fadeInDown">OFFICE OF <br> ALUMNI AFFAIRS<br><br></h2>
                         <p class="animate__animated animate__fadeInUp">The Office of Alumni Affairs at Cavite State University is here to strengthen our connection with fellow graduates. We provide resources for networking, professional development, and community engagement, ensuring that our alumni remain involved and support each other. Together, we celebrate our achievements and foster a lasting sense of pride in our university..</p>
                         <!--<a href="Room-Accomodation.php" class="cta-btn animate__animated animate__zoomIn">Explore Our Services</a> -->
                     </div>
@@ -359,9 +382,12 @@
                 <div class="swiper-slide slide-2">
                     <img src ="asset/images/signup1.png" alt="Support Icon" class="support-icon2">
                     <div class="slide-content2">
-                        <h2 class="animate__animated animate__fadeInDown">Connect With Fellow Alumni<br><br></h2>
-                        <p class="animate__animated animate__fadeInUp">Join our network of successful graduates and stay connected with your alma mater. By participating, you can share your achievements and inspire future generations. Together, we can strengthen our community and create lasting relationships.<br><br></p>
-                        <a href="Account.php" class="cta-btn animate__animated animate__zoomIn">Sign-Up</a> 
+                        <h2 class="animate__animated animate__fadeInDown">REGISTER & UPDATE<br>YOUR ALUMNI PROFILE<br></h2>
+                        <p class="animate__animated animate__fadeInUp"> To access exclusive alumni features: <br>
+                            <span class="check-icon">   </span>      Alumni ID<br>
+                            <span class="check-icon">   </span>      Alumni Tracer<br>
+                            <span class="check-icon">   </span>      Room Booking<br><br></p>
+                        <a href="Account.php" class="cta-btn animate__animated animate__zoomIn">Sign-Up Here</a> 
                     </div>
                 </div>
                 

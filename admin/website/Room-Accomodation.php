@@ -42,8 +42,8 @@
 
     .ra-hero .cta-btn {
         padding: 12px 25px;
-        background: var(--cvsu-primary-green);
-        color: white;
+        background: gold;
+        color: black;
         border-radius: 25px;
         font-size: 16px;
         font-weight: 600;
@@ -59,7 +59,7 @@
     }
 
     .ra-hero .cta-btn:hover {
-        background: var(--cvsu-hover-green);
+        background: #92940e;
         transform: translateX(-50%) translateY(-2px);
     }
 
