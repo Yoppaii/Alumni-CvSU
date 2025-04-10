@@ -66,7 +66,7 @@
             right: 0;
             bottom: 0;
             height: 500px;
-            background-image: url('asset/images/bground.jpg');
+            background-image: url('asset/images/bg1.jpg');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
