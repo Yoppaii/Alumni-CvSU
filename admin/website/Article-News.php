@@ -66,7 +66,7 @@
             right: 0;
             bottom: 0;
             height: 500px;
-            background-image: url('asset/images/bground.jpg');
+            background-image: url('asset/images/7.jpg');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -124,7 +124,7 @@
     <section class="news-hero">
         <h2>Latest News and Features</h2>
         <p>Stay updated with the latest happenings, alumni success stories, and university developments at Cavite State University.</p>
-        <a href="#news" class="news-btn">View All News</a>
+        <!--<a href="#news" class="news-btn">View All News</a>-->
     </section>
     
     <?php include('components/news/news.php'); ?>
