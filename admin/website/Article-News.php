@@ -123,7 +123,7 @@
 <body>
     <section class="news-hero">
         <h2>Latest News and Features</h2>
-        <p>Stay updated with the latest happenings, alumni success stories, and university developments at Cavite State University.</p>
+        <p>Stay informed about the latest happenings at Cavite State University. Discover inspiring alumni success stories and exciting university developments. Keep connected to be part of our vibrant community!</p>
         <!--<a href="#news" class="news-btn">View All News</a>-->
     </section>
     

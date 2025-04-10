@@ -123,9 +123,25 @@
     <section class="ev-hero">
         <h2>CvSU Alumni Events & Activities</h2>
         <p>Stay connected with alumni gatherings, workshops, and special events at Cavite State University. Join us to network with fellow graduates and share experiences. Don’t miss out on opportunities to engage and grow within our vibrant community!</p>
-        <a href="#services" class="cta-btn">View Events</a>
+        <a href="#services" class="cta-btn" id="scroll-btn">View Events</a>
     </section>
 
+    <section id="services">
+
+    
+    <script>
+    document.getElementById('scroll-btn').addEventListener('click', function(event) {
+        event.preventDefault(); // Prevent the default anchor behavior
+        
+        const targetId = this.getAttribute('href'); // Get the target section ID
+        const targetElement = document.querySelector(targetId); // Select the target element
+
+        // Scroll to the target element smoothly
+        targetElement.scrollIntoView({
+            behavior: 'smooth' // Enable smooth scrolling
+        });
+    });
+    </script>
     <?php include('components/events/events.php'); ?>
 
 </body>
