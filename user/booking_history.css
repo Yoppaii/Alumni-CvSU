@@ -549,3 +549,9 @@
         border-radius: 6px;
         border: 1px solid #ccc;
     }
+
+    .center-text td,
+    .center-text th {
+        text-align: center;
+        vertical-align: middle;
+    }

@@ -18,7 +18,7 @@ $query = "SELECT
             CONCAT(departure_date, ' ', departure_time) as departure_datetime
           FROM bookings 
           WHERE room_number = ? 
-          AND status != 'cancelled'
+          AND status NOT IN ('pending','cancelled', 'completed', 'no_show')
           AND (
               (arrival_date <= CURRENT_DATE() AND departure_date >= CURRENT_DATE())
               OR arrival_date >= CURRENT_DATE()

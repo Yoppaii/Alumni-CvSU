@@ -592,9 +592,13 @@ $bookingsResult = $mysqli->query($bookingsQuery);
                                 default => ''
                             };
                             ?>
-                            <tr data-user-id="<?php echo htmlspecialchars($booking['user_id']); ?>">
+                            <tr data-user-id="<?php echo htmlspecialchars($booking['user_id']); ?>"
+                                data-reference-number="<?php echo htmlspecialchars($booking['reference_number']); ?>"
+                                data-price-per-day="<?php echo htmlspecialchars($booking['price_per_day']); ?>"
+                                data-mattress-fee="<?php echo htmlspecialchars($booking['mattress_fee']); ?>"
+                                data-total-price="<?php echo htmlspecialchars($booking['total_price']); ?>">
                                 <td>
-                                    <i class="fas fa-bookmark"></i>
+                                    <i class=" fas fa-bookmark"></i>
                                     <?php echo htmlspecialchars($booking['reference_number']); ?>
                                 </td>
                                 <td>
@@ -676,6 +680,25 @@ $bookingsResult = $mysqli->query($bookingsQuery);
                 <div class="alm-user-details">
                     <div class="alm-detail-grid">
                         <div class="alm-detail-section">
+                            <h3><i class="fas fa-bed"></i> Booking Details</h3>
+                            <div class="alm-detail-item">
+                                <label><i class="fas fa-hashtag"></i> Reference Number:</label>
+                                <span id="alm-modal-reference-number"></span>
+                            </div>
+                            <div class="alm-detail-item">
+                                <label><i class="fas fa-money-bill-wave"></i> Price Per Day:</label>
+                                <span id="alm-modal-price-per-day"></span>
+                            </div>
+                            <div class="alm-detail-item">
+                                <label><i class="fas fa-money-bill-wave"></i> Mattress Fee:</label>
+                                <span id="alm-modal-mattress-fee"></span>
+                            </div>
+                            <div class="alm-detail-item">
+                                <label><i class="fas fa-receipt"></i> Total Price:</label>
+                                <span id="alm-modal-total-price"></span>
+                            </div>
+                        </div>
+                        <div class="alm-detail-section">
                             <h3><i class="fas fa-info-circle"></i> Basic Information</h3>
                             <div class="alm-detail-item">
                                 <label><i class="fas fa-user"></i> Username:</label>
@@ -726,6 +749,8 @@ $bookingsResult = $mysqli->query($bookingsQuery);
                                 <span id="alm-modal-verified"></span>
                             </div>
                         </div>
+
+
                     </div>
                 </div>
             </div>
@@ -1225,12 +1250,20 @@ $bookingsResult = $mysqli->query($bookingsQuery);
                         updateField('alm-modal-username', data.user.username);
                         updateField('alm-modal-email', data.user.email);
 
+                        const referenceNumber = this.getAttribute('data-reference-number') || 'N/A';
+                        const pricePerDay = this.getAttribute('data-price-per-day') || '0';
+                        const mattressFee = this.getAttribute('data-mattress-fee') || '0';
+                        const totalPrice = this.getAttribute('data-total-price') || '0';
+
                         const fullName = [
                             data.user_details.first_name,
                             data.user_details.middle_name,
                             data.user_details.last_name
                         ].filter(Boolean).join(' ');
-
+                        updateField('alm-modal-reference-number', referenceNumber);
+                        updateField('alm-modal-price-per-day', pricePerDay);
+                        updateField('alm-modal-mattress-fee', `₱${parseFloat(mattressFee).toFixed(2)}`);
+                        updateField('alm-modal-total-price', `₱${parseFloat(totalPrice).toFixed(2)}`);
                         updateField('alm-modal-fullname', fullName);
                         updateField('alm-modal-position', data.user_details.position);
                         updateField('alm-modal-address', data.user_details.address);

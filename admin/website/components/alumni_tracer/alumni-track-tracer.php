@@ -308,8 +308,10 @@
             }
 
             #AT-Tracer {
-                font-size: 1.5rem; /* Adjust font size for smaller screens */
+                font-size: 1.5rem;
+                /* Adjust font size for smaller screens */
             }
+
             .analytics-summary {
                 grid-template-columns: repeat(2, 1fr);
             }
@@ -323,13 +325,14 @@
                 padding: 1rem;
                 height: 250px;
             }
-            
+
 
         }
 
         @media (max-width: 480px) {
             #AT-Tracer {
-                font-size: 1.2rem; /* Further adjust for mobile */
+                font-size: 1.2rem;
+                /* Further adjust for mobile */
             }
         }
     </style>
@@ -341,13 +344,13 @@
 
     <header class="AT-page-header">
         <h2 id="AT-Tracer">
-                <i class="fas fa-user-graduate"></i>
-                Alumni Tracer Information
-            </h2>
+            <i class="fas fa-user-graduate"></i>
+            Alumni Tracer Information
+        </h2>
         <div class="AT-date-time"></div>
     </header>
-    
-    <div  class="dashboard-row">
+
+    <div class="dashboard-row">
         <div class="analytics-card">
             <div class="filter-bar">
                 <div class="filter-group">
@@ -382,7 +385,7 @@
     <div class="dashboard-row">
         <div class="analytics-card">
             <div class="analytics-header">
-                <h2>Total Graduates Per Campus</h2>
+                <h2>Total Repondents Per Campus</h2>
             </div>
             <div class="analytics-content">
                 <canvas id="totalGraduatesChart"></canvas>
@@ -421,7 +424,7 @@
     <div class="dashboard-row">
         <div class="analytics-card">
             <div class="analytics-header">
-                <h2>Employment Time</h2>
+                <h2>Time to Land First Job</h2>
             </div>
             <div class="analytics-content">
                 <canvas id="employmentTimeChart"></canvas>
@@ -429,7 +432,7 @@
         </div>
         <div class="analytics-card">
             <div class="analytics-header">
-                <h2>Employment Type by Location</h2>
+                <h2>Work Location Type</h2>
             </div>
             <div class="analytics-content">
                 <canvas id="employmentLocationChart"></canvas>

@@ -901,11 +901,7 @@ function fetchTotalGraduates(campus, course, employmentStatus, fromYear, toYear)
                                         }
                                     }
                                 },
-                                title: {
-                                    display: true,
-                                    text: 'Total Graduates Per Campus',
-                                    font: { size: 16 }
-                                }
+
                             }
                         }
                     });

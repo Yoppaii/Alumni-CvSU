@@ -5,39 +5,42 @@ if (!isset($_SESSION)) {
 
 require 'main_db.php';
 
-$lobby_query = "SELECT MAX(occupancy) as max_occupancy FROM lobby_pricing";
-$conference_query = "SELECT MAX(occupancy) as max_occupancy FROM conference_pricing";
-$board_query = "SELECT MAX(occupancy) as max_occupancy FROM board_pricing";
-$room_query = "SELECT MAX(occupancy) as max_occupancy FROM room_price";
-$building_query = "SELECT MAX(occupancy) as max_occupancy FROM building_pricing"; // Added building query
+function getRoomData($mysqli, $tableName)
+{
+    $query = "SELECT occupancy, price FROM {$tableName} ORDER BY occupancy DESC LIMIT 1";
+    $result = $mysqli->query($query);
+    if ($result && $row = $result->fetch_assoc()) {
+        return [
+            'max_occupancy' => $row['occupancy'],
+            'price' => $row['price']
+        ];
+    }
+    return [
+        'max_occupancy' => 0,
+        'price' => 0
+    ];
+}
 
-$lobby_result = $mysqli->query($lobby_query);
-$conference_result = $mysqli->query($conference_query);
-$board_result = $mysqli->query($board_query);
-$room_result = $mysqli->query($room_query);
-$building_result = $mysqli->query($building_query); // Added building result
-
-$lobby_max = $lobby_result->fetch_assoc()['max_occupancy'];
-$conference_max = $conference_result->fetch_assoc()['max_occupancy'];
-$board_max = $board_result->fetch_assoc()['max_occupancy'];
-$room_max = $room_result->fetch_assoc()['max_occupancy'];
-$building_max = $building_result->fetch_assoc()['max_occupancy']; // Added building max
+$roomData = getRoomData($mysqli, 'room_price');
+$boardData = getRoomData($mysqli, 'board_pricing');
+$conferenceData = getRoomData($mysqli, 'conference_pricing');
+$lobbyData = getRoomData($mysqli, 'lobby_pricing');
+$buildingData = getRoomData($mysqli, 'building_pricing');
 
 $book_rooms = [
-    ['id' => 1, 'name' => 'Room 1', 'max_occupancy' => $room_max, 'base_price' => 1800, 'price_per_person' => 25],
-    ['id' => 2, 'name' => 'Room 2', 'max_occupancy' => $room_max, 'base_price' => 1800, 'price_per_person' => 25],
-    ['id' => 3, 'name' => 'Room 3', 'max_occupancy' => $room_max, 'base_price' => 1800, 'price_per_person' => 30],
-    ['id' => 4, 'name' => 'Room 4', 'max_occupancy' => $room_max, 'base_price' => 1800, 'price_per_person' => 30],
-    ['id' => 5, 'name' => 'Room 5', 'max_occupancy' => $room_max, 'base_price' => 1800, 'price_per_person' => 20],
-    ['id' => 6, 'name' => 'Room 6', 'max_occupancy' => $room_max, 'base_price' => 1800, 'price_per_person' => 25],
-    ['id' => 7, 'name' => 'Room 7', 'max_occupancy' => $room_max, 'base_price' => 1800, 'price_per_person' => 28],
-    ['id' => 8, 'name' => 'Room 8', 'max_occupancy' => $room_max, 'base_price' => 1800, 'price_per_person' => 30],
-    ['id' => 9, 'name' => 'Board Room', 'max_occupancy' => $board_max, 'base_price' => 2500, 'price_per_person' => 15],
-    ['id' => 10, 'name' => 'Conference Room', 'max_occupancy' => $conference_max, 'base_price' => 5000, 'price_per_person' => 10],
-    ['id' => 11, 'name' => 'Lobby', 'max_occupancy' => $lobby_max, 'base_price' => 5000, 'price_per_person' => 8],
-    ['id' => 12, 'name' => 'Building', 'max_occupancy' => $building_max, 'base_price' => 10000, 'price_per_person' => 5] // Added building entry
+    ['id' => 1, 'name' => 'Room 1', 'max_occupancy' => $roomData['max_occupancy'], 'price' => $roomData['price']],
+    ['id' => 2, 'name' => 'Room 2', 'max_occupancy' => $roomData['max_occupancy'], 'price' => $roomData['price']],
+    ['id' => 3, 'name' => 'Room 3', 'max_occupancy' => $roomData['max_occupancy'], 'price' => $roomData['price']],
+    ['id' => 4, 'name' => 'Room 4', 'max_occupancy' => $roomData['max_occupancy'], 'price' => $roomData['price']],
+    ['id' => 5, 'name' => 'Room 5', 'max_occupancy' => $roomData['max_occupancy'], 'price' => $roomData['price']],
+    ['id' => 6, 'name' => 'Room 6', 'max_occupancy' => $roomData['max_occupancy'], 'price' => $roomData['price']],
+    ['id' => 7, 'name' => 'Room 7', 'max_occupancy' => $roomData['max_occupancy'], 'price' => $roomData['price']],
+    ['id' => 8, 'name' => 'Room 8', 'max_occupancy' => $roomData['max_occupancy'], 'price' => $roomData['price']],
+    ['id' => 9, 'name' => 'Board Room', 'max_occupancy' => $boardData['max_occupancy'], 'price' => $boardData['price']],
+    ['id' => 10, 'name' => 'Conference Room', 'max_occupancy' => $conferenceData['max_occupancy'], 'price' => $conferenceData['price']],
+    ['id' => 11, 'name' => 'Lobby', 'max_occupancy' => $lobbyData['max_occupancy'], 'price' => $lobbyData['price']],
+    ['id' => 12, 'name' => 'Building', 'max_occupancy' => $buildingData['max_occupancy'], 'price' => $buildingData['price']],
 ];
-
 $mysqli->close();
 ?>
 <!DOCTYPE html>
@@ -503,14 +506,13 @@ $mysqli->close();
                     <?php foreach ($book_rooms as $room): ?>
                         <div class="book-room-card"
                             data-room-id="<?php echo $room['id']; ?>"
-                            data-base-price="<?php echo $room['base_price']; ?>"
-                            data-price-per-person="<?php echo $room['price_per_person']; ?>"
+                            data-price="<?php echo $room['price']; ?>"
                             data-max-occupancy="<?php echo $room['max_occupancy']; ?>">
                             <h3><?php echo htmlspecialchars($room['name']); ?></h3>
                             <div class="book-room-info">
                                 <p>Max Occupancy: <?php echo $room['max_occupancy']; ?> persons</p>
                                 <p class="book-room-price" style="color: var(--primary-color); font-weight: 600;">
-                                    Base Price: ₱<?php echo $room['base_price']; ?>/per day
+                                    Price: ₱<?php echo number_format($room['price']); ?> / per day
                                 </p>
                                 <p class="book-calculated-price" style="display: none; margin-top: 8px; font-weight: 600; color: #111827;"></p>
                             </div>
@@ -523,6 +525,7 @@ $mysqli->close();
                     <?php endforeach; ?>
                 </div>
             </div>
+
 
             <div id="book-step2" class="book-step-content" style="display: none;">
                 <div class="book-date-time-container">
@@ -680,12 +683,14 @@ $mysqli->close();
                     return [];
                 }
             }
-
+ 
             function isDateBooked(date, bookings) {
+                // Format the date in YYYY-MM-DD consistently
                 const dateStr = date.toISOString().split('T')[0];
                 return bookings.some(booking => {
                     const arrivalDate = booking.arrival_date;
                     const departureDate = booking.departure_date;
+                    // Consider the date booked if it falls within any booking period
                     return dateStr >= arrivalDate && dateStr <= departureDate;
                 });
             }
@@ -705,6 +710,86 @@ $mysqli->close();
                     const bookedDates = data.bookedDates || [];
                     const bookingTimes = data.bookingTimes || [];
 
+                    // Create a map of dates to their status for easier access
+                    const dateStatusMap = new Map();
+
+                    // Get all arrival and departure dates to understand boundaries
+                    const allBookings = [];
+                    bookingTimes.forEach(booking => {
+                        if (booking.arrival_date && booking.departure_date) {
+                            allBookings.push({
+                                arrival_date: booking.arrival_date,
+                                arrival_time: booking.arrival_time,
+                                departure_date: booking.departure_date,
+                                departure_time: booking.departure_time
+                            });
+                        }
+                    });
+
+                    // Mark fully booked dates
+                    bookedDates.forEach(date => {
+                        dateStatusMap.set(date, {
+                            status: 'fully-booked',
+                            title: 'Fully booked',
+                            class: 'fully-booked-date',
+                            isSelectable: false
+                        });
+                    });
+
+                    // Mark checkout dates
+                    bookingTimes.forEach(booking => {
+                        const checkoutDate = booking.date;
+                        const departureTime = new Date(booking.departure_time);
+                        const availableTime = new Date(departureTime.getTime() + (2 * 60 * 60 * 1000)); // 2 hours for cleaning
+
+                        // Check if the day after this checkout is booked
+                        const nextDayStr = new Date(new Date(checkoutDate).getTime() + 86400000).toISOString().split('T')[0];
+                        const isNextDayBooked = bookedDates.includes(nextDayStr) || allBookings.some(b => b.arrival_date === nextDayStr);
+
+                        // If next day is booked, treat this as fully booked as requested
+                        if (isNextDayBooked) {
+                            dateStatusMap.set(checkoutDate, {
+                                status: 'fully-booked',
+                                title: 'Fully booked',
+                                class: 'fully-booked-date',
+                                isSelectable: false
+                            });
+                        } else {
+                            // Otherwise, mark as a normal checkout day available for new check-ins
+                            dateStatusMap.set(checkoutDate, {
+                                status: 'checkout-date',
+                                title: `Available after ${availableTime.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', hour12: true})}`,
+                                availableTime: availableTime,
+                                class: 'checkout-available-date',
+                                isSelectable: true
+                            });
+                        }
+                    });
+
+                    // Mark check-in dates
+                    allBookings.forEach(booking => {
+                        const checkinDate = booking.arrival_date;
+                        const checkinTime = new Date(booking.arrival_time);
+
+                        if (dateStatusMap.has(checkinDate) && dateStatusMap.get(checkinDate).status === 'checkout-date') {
+                            // This is both a checkout and checkin date
+                            const currentData = dateStatusMap.get(checkinDate);
+                            dateStatusMap.set(checkinDate, {
+                                ...currentData,
+                                status: 'transition-date',
+                                class: 'transition-available-date',
+                                title: `Transition day: Available after ${currentData.availableTime.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', hour12: true})}`
+                            });
+                        } else if (!dateStatusMap.has(checkinDate)) {
+                            dateStatusMap.set(checkinDate, {
+                                status: 'checkin-date',
+                                title: 'Check-in day',
+                                class: 'checkin-date',
+                                isSelectable: false // Can't check in on a day when someone else is checking in
+                            });
+                        }
+                    });
+
                     const baseConfig = {
                         enableTime: true,
                         dateFormat: "Y-m-d h:i K",
@@ -720,24 +805,96 @@ $mysqli->close();
 
                     const onDayCreateHandler = function(dObj, dStr, fp, dayElem) {
                         const dateStr = flatpickr.formatDate(dayElem.dateObj, "Y-m-d");
-                        const dateBooking = bookingTimes.find(b => b.date === dateStr);
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
 
-                        if (dateBooking) {
-                            dayElem.classList.add('checkout-date');
+                        // Check if the date is in the past
+                        if (dayElem.dateObj < today) {
+                            dayElem.classList.add('past-date');
+                            dayElem.title = 'Past date';
+                            dayElem.classList.add('flatpickr-disabled');
+                            return;
+                        }
 
-                            const departureTime = new Date(dateBooking.departure_time);
-                            const availableTime = new Date(departureTime.getTime() + (2 * 60 * 60 * 1000));
-                            const formattedTime = availableTime.toLocaleTimeString('en-US', {
-                                hour: 'numeric',
-                                minute: '2-digit',
-                                hour12: true
-                            });
-                            dayElem.title = `Available after ${formattedTime}`;
-                        } else if (bookedDates.includes(dateStr)) {
-                            dayElem.classList.add('booked-date');
-                            dayElem.title = "Fully booked";
+                        const dateStatus = dateStatusMap.get(dateStr);
+
+                        if (dateStatus) {
+                            dayElem.classList.add(dateStatus.class);
+                            dayElem.title = dateStatus.title;
+
+                            // Make sure checkout-available-date and transition-available-date are not disabled
+                            if ((dateStatus.class === 'checkout-available-date' || dateStatus.class === 'transition-available-date') &&
+                                dayElem.classList.contains('flatpickr-disabled')) {
+                                dayElem.classList.remove('flatpickr-disabled');
+                            }
+                        } else {
+                            dayElem.classList.add('available-date');
+                            dayElem.title = 'Available for booking';
                         }
                     };
+
+                    // Helper function to check if a date is valid for arrival
+                    function isValidArrivalDate(date) {
+                        // Check if date is in the past
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        if (date < today) {
+                            return false;
+                        }
+
+                        const dateStr = flatpickr.formatDate(date, "Y-m-d");
+                        const dateStatus = dateStatusMap.get(dateStr);
+
+                        // If no status, it's available
+                        if (!dateStatus) return true;
+
+                        // If fully booked or checkin date, it's not available
+                        if (dateStatus.status === 'fully-booked' || dateStatus.status === 'checkin-date') {
+                            return false;
+                        }
+
+                        // If it's a checkout or transition date, it's always valid initially
+                        // Time constraints will be handled in the onChange event
+                        if (dateStatus.status === 'checkout-date' || dateStatus.status === 'transition-date') {
+                            return true;
+                        }
+
+                        return true;
+                    }
+
+                    // Helper function to check if a date is valid for departure
+                    function isValidDepartureDate(date, arrivalDate) {
+                        // Check if date is in the past
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        if (date < today) {
+                            return false;
+                        }
+
+                        const dateStr = flatpickr.formatDate(date, "Y-m-d");
+                        const dateStatus = dateStatusMap.get(dateStr);
+
+                        // Must be after arrival date
+                        if (arrivalDate && date <= arrivalDate) {
+                            return false;
+                        }
+
+                        // If no status, it's available
+                        if (!dateStatus) return true;
+
+                        // If fully booked, it's not available
+                        if (dateStatus.status === 'fully-booked') {
+                            return false;
+                        }
+
+                        // If it's a checkin date, can't use for checkout (someone else is arriving)
+                        if (dateStatus.status === 'checkin-date') {
+                            return false;
+                        }
+
+                        // Can checkout on a checkout day if it doesn't conflict
+                        return true;
+                    }
 
                     if (window.arrivalCalendar) {
                         window.arrivalCalendar.destroy();
@@ -748,26 +905,23 @@ $mysqli->close();
                             if (selectedDates.length > 0) {
                                 const selectedDate = selectedDates[0];
                                 const dateStr = flatpickr.formatDate(selectedDate, "Y-m-d");
-                                const dateBooking = bookingTimes.find(b => b.date === dateStr);
+                                const dateStatus = dateStatusMap.get(dateStr);
 
-                                if (dateBooking) {
-                                    const departureTime = new Date(dateBooking.departure_time);
-                                    const availableTime = new Date(departureTime.getTime() + (2 * 60 * 60 * 1000));
-
-                                    if (selectedDate < availableTime) {
-                                        const formattedTime = availableTime.toLocaleTimeString('en-US', {
+                                if (dateStatus && (dateStatus.status === 'checkout-date' || dateStatus.status === 'transition-date')) {
+                                    if (selectedDate < dateStatus.availableTime) {
+                                        const formattedTime = dateStatus.availableTime.toLocaleTimeString('en-US', {
                                             hour: 'numeric',
                                             minute: '2-digit',
                                             hour12: true
                                         });
-                                        NotificationSystem.show(`Room will be available after cleaning. Time adjusted to ${formattedTime}`, 'success');
-                                        window.arrivalCalendar.setDate(availableTime);
-                                        bookingData.arrival = availableTime;
+                                        NotificationSystem.show(`Room will be available after cleaning. Time adjusted to ${formattedTime}`, 'info');
+                                        window.arrivalCalendar.setDate(dateStatus.availableTime);
+                                        bookingData.arrival = dateStatus.availableTime;
                                     } else {
                                         bookingData.arrival = selectedDate;
                                     }
-                                } else if (bookedDates.includes(dateStr)) {
-                                    NotificationSystem.show('This date is fully booked. Please select another date.', 'error');
+                                } else if (!isValidArrivalDate(selectedDate)) {
+                                    NotificationSystem.show('This date is not available for check-in. Please select another date.', 'error');
                                     window.arrivalCalendar.clear();
                                     return;
                                 } else {
@@ -776,6 +930,10 @@ $mysqli->close();
 
                                 if (window.departureCalendar) {
                                     window.departureCalendar.set('minDate', bookingData.arrival);
+
+                                    // Update departure calendar with new constraints
+                                    window.departureCalendar.set('disable', [(date) => !isValidDepartureDate(date, bookingData.arrival)]);
+
                                     if (bookingData.departure && bookingData.departure <= bookingData.arrival) {
                                         window.departureCalendar.clear();
                                         bookingData.departure = null;
@@ -785,7 +943,24 @@ $mysqli->close();
                                 updateSummary();
                             }
                         },
-                        onDayCreate: onDayCreateHandler
+                        onDayCreate: onDayCreateHandler,
+                        disable: [(date) => {
+                            // Disable past dates
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0);
+                            if (date < today) {
+                                return true;
+                            }
+
+                            // Only disable dates that are fully booked or checkin dates
+                            const dateStr = flatpickr.formatDate(date, "Y-m-d");
+                            const dateStatus = dateStatusMap.get(dateStr);
+
+                            if (!dateStatus) return false; // Available
+
+                            // Only fully-booked and checkin dates are disabled
+                            return dateStatus.status === 'fully-booked' || dateStatus.status === 'checkin-date';
+                        }]
                     });
 
                     if (window.departureCalendar) {
@@ -797,10 +972,9 @@ $mysqli->close();
                         onChange: function(selectedDates) {
                             if (selectedDates.length > 0) {
                                 const selectedDate = selectedDates[0];
-                                const dateStr = flatpickr.formatDate(selectedDate, "Y-m-d");
 
-                                if (bookingData.arrival && selectedDate <= bookingData.arrival) {
-                                    NotificationSystem.show('Departure time must be after arrival time', 'error');
+                                if (!isValidDepartureDate(selectedDate, bookingData.arrival)) {
+                                    NotificationSystem.show('This date is not available for checkout. Please select another date.', 'error');
                                     window.departureCalendar.clear();
                                 } else {
                                     bookingData.departure = selectedDate;
@@ -808,36 +982,177 @@ $mysqli->close();
                                 }
                             }
                         },
-                        onDayCreate: onDayCreateHandler
+                        onDayCreate: onDayCreateHandler,
+                        disable: [(date) => {
+                            // Disable past dates
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0);
+                            if (date < today) {
+                                return true;
+                            }
+
+                            return !isValidDepartureDate(date, bookingData.arrival);
+                        }]
                     });
+
+                    // Add a MutationObserver to ensure checkout-available-date is never disabled
+                    // This is a safety measure in case flatpickr attempts to disable these dates
+                    const observer = new MutationObserver(mutations => {
+                        mutations.forEach(mutation => {
+                            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                                const dayElem = mutation.target;
+
+                                // Don't enable past dates
+                                if (dayElem.classList.contains('past-date')) {
+                                    if (!dayElem.classList.contains('flatpickr-disabled')) {
+                                        dayElem.classList.add('flatpickr-disabled');
+                                    }
+                                    return;
+                                }
+
+                                if (dayElem.classList.contains('checkout-available-date') ||
+                                    dayElem.classList.contains('transition-available-date')) {
+                                    if (dayElem.classList.contains('flatpickr-disabled')) {
+                                        dayElem.classList.remove('flatpickr-disabled');
+                                    }
+                                }
+                            }
+                        });
+                    });
+
+                    // Start observing after a short delay to ensure flatpickr has rendered
+                    setTimeout(() => {
+                        const calendarDays = document.querySelectorAll('.flatpickr-day');
+                        calendarDays.forEach(day => {
+                            observer.observe(day, {
+                                attributes: true
+                            });
+                        });
+                    }, 500);
 
                     const calendarStyles = document.createElement('style');
                     calendarStyles.textContent = `
-                        .flatpickr-day.checkout-date {
+                        /* Available date styling */
+                        .flatpickr-day.available-date {
+                            background-color: #f1f8e9 !important;
+                            color: #558b2f !important;
+                            border-color: #c5e1a5 !important;
+                            pointer-events: auto !important;
+                        }
+                        
+                        .flatpickr-day.available-date:hover {
+                            background-color: #dcedc8 !important;
+                            color: #33691e !important;
+                        }
+                        
+                        /* Past date styling */
+                        .flatpickr-day.past-date {
+                            background-color: #f5f5f5 !important;
+                            color: #9e9e9e !important;
+                            border-color: #e0e0e0 !important;
+                            cursor: not-allowed !important;
+                            pointer-events: none !important;
+                            text-decoration: line-through !important;
+                            opacity: 0.6 !important;
+                        }
+                        
+                        /* Checkout but available after cleaning */
+                        .flatpickr-day.checkout-available-date {
                             background-color: #fff3e0 !important;
                             color: #ff9800 !important;
                             border-color: #ffe0b2 !important;
                             text-decoration: none !important;
                             cursor: pointer !important;
+                            pointer-events: auto !important;
+                            /* Add a small checkout indicator */
+                            background-image: linear-gradient(135deg, #ff980033 25%, transparent 25%) !important;
+                            background-size: 10px 10px !important;
                         }
 
-                        .flatpickr-day.checkout-date:hover {
+                        .flatpickr-day.checkout-available-date:hover {
                             background-color: #ffe0b2 !important;
                             color: #f57c00 !important;
                         }
+                        
+                        /* Make sure flatpickr-disabled is overridden for checkout-available-date */
+                        .flatpickr-day.checkout-available-date.flatpickr-disabled {
+                            color: #ff9800 !important;
+                            background-color: #fff3e0 !important;
+                            cursor: pointer !important;
+                            opacity: 1 !important;
+                        }
+                        
+                        /* Transition days - both checkout and checkin */
+                        .flatpickr-day.transition-available-date {
+                            background-color: #e3f2fd !important;
+                            color: #1976d2 !important;
+                            border-color: #bbdefb !important;
+                            cursor: pointer !important;
+                            pointer-events: auto !important;
+                            /* Diagonal split background */
+                            background-image: linear-gradient(135deg, #fff3e0 50%, #e3f2fd 50%) !important;
+                        }
 
-                        .flatpickr-day.booked-date {
+                        .flatpickr-day.transition-available-date:hover {
+                            background-color: #bbdefb !important;
+                            color: #0d47a1 !important;
+                        }
+                        
+                        /* Make sure flatpickr-disabled is overridden for transition-available-date */
+                        .flatpickr-day.transition-available-date.flatpickr-disabled {
+                            color: #1976d2 !important;
+                            background-color: #e3f2fd !important;
+                            background-image: linear-gradient(135deg, #fff3e0 50%, #e3f2fd 50%) !important;
+                            cursor: pointer !important;
+                            opacity: 1 !important;
+                        }
+                        
+                        /* Check-in days */
+                        .flatpickr-day.checkin-date {
+                            background-color: #e8f5e9 !important;
+                            color: #388e3c !important;
+                            border-color: #a5d6a7 !important;
+                            background-image: linear-gradient(45deg, #a5d6a733 25%, transparent 25%) !important;
+                            background-size: 10px 10px !important;
+                        }
+                        
+                        /* Fully booked days */
+                        .flatpickr-day.fully-booked-date {
                             background-color: #ffebee !important;
                             color: #d32f2f !important;
-                            text-decoration: line-through;
+                            text-decoration: line-through !important;
                             border-color: #ffcdd2 !important;
                         }
 
-                        .flatpickr-day.booked-date:hover {
+                        .flatpickr-day.fully-booked-date:hover {
                             background-color: #ffebee !important;
                             color: #d32f2f !important;
                         }
 
+                        /* Calendar legend */
+                        .calendar-legend {
+                            display: flex;
+                            flex-wrap: wrap;
+                            margin-top: 10px;
+                            font-size: 0.85rem;
+                        }
+                        
+                        .legend-item {
+                            display: flex;
+                            align-items: center;
+                            margin-right: 10px;
+                            margin-bottom: 5px;
+                        }
+                        
+                        .legend-color {
+                            width: 15px;
+                            height: 15px;
+                            margin-right: 5px;
+                            border-radius: 3px;
+                            border: 1px solid #ddd;
+                        }
+                        
+                        /* Responsive calendar */
                         @media (max-width: 768px) {
                             .flatpickr-calendar {
                                 width: 100% !important;
@@ -858,16 +1173,61 @@ $mysqli->close();
                             .flatpickr-day {
                                 max-width: none !important;
                             }
+                            
+                            .calendar-legend {
+                                justify-content: center;
+                            }
                         }
                     `;
                     document.head.appendChild(calendarStyles);
+
+                    // Add legend to explain colors
+                    const legend = document.createElement('div');
+                    legend.className = 'calendar-legend';
+                    legend.innerHTML = `
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #f1f8e9;"></div>
+                            <span>Available</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #fff3e0; background-image: linear-gradient(135deg, #ff980033 25%, transparent 25%); background-size: 10px 10px;"></div>
+                            <span>Checkout day (available after cleaning)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-image: linear-gradient(135deg, #fff3e0 50%, #e3f2fd 50%);"></div>
+                            <span>Transition day (checkout/checkin)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #e8f5e9; background-image: linear-gradient(45deg, #a5d6a733 25%, transparent 25%); background-size: 10px 10px;"></div>
+                            <span>Check-in day</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #ffebee;"></div>
+                            <span>Fully booked</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #f5f5f5; opacity: 0.6; text-decoration: line-through;"></div>
+                            <span>Past date</span>
+                        </div>
+                    `;
+
+                    // Insert the legend after each calendar
+                    const arrivalCalendarContainer = document.querySelector('#book-arrival-datetime').closest('.flatpickr-calendar-container');
+                    const departureCalendarContainer = document.querySelector('#book-departure-datetime').closest('.flatpickr-calendar-container');
+
+                    if (arrivalCalendarContainer) {
+                        arrivalCalendarContainer.appendChild(legend.cloneNode(true));
+                    }
+
+                    if (departureCalendarContainer) {
+                        departureCalendarContainer.appendChild(legend.cloneNode(true));
+                    }
 
                 } catch (error) {
                     console.error('Error initializing calendars:', error);
                     NotificationSystem.show('Error loading calendar data', 'error');
                 }
             }
-
 
             const urlParams = new URLSearchParams(window.location.search);
             const selectRoomId = urlParams.get('select_room');
@@ -1080,6 +1440,7 @@ $mysqli->close();
                         NotificationSystem.show(error.message || 'An error occurred', 'error');
                     });
             }
+
             document.getElementById('book-next-button').addEventListener('click', function() {
                 if (!validateCurrentStep()) return;
 

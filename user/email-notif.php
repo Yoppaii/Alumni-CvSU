@@ -1,10 +1,25 @@
 <?php
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-function sendBookingStatusEmail($email, $fullName, $bookingRef, $status, $roomNumber, $checkIn, $checkOut, $price, $price_per_day, $arrivalTime, $departureTime) {
+function sendBookingStatusEmail(
+    $email,
+    $fullName,
+    $bookingRef,
+    $status,
+    $roomNumber,
+    $checkIn,
+    $checkOut,
+    $price,
+    $price_per_day,
+    $mattress_fee,      // New
+    $total_price,       // New
+    $arrivalTime,
+    $departureTime
+) {
     $mail = new PHPMailer(true);
 
     $checkInDate = date('F d, Y', strtotime($checkIn));
@@ -39,8 +54,11 @@ function sendBookingStatusEmail($email, $fullName, $bookingRef, $status, $roomNu
                         <p style="margin: 5px 0;"><strong>Room:</strong> ' . htmlspecialchars($roomNumber) . '</p>
                         <p style="margin: 5px 0;"><strong>Check-in:</strong> ' . $checkInDate . ' at ' . htmlspecialchars($arrivalTime) . '</p>
                         <p style="margin: 5px 0;"><strong>Check-out:</strong> ' . $checkOutDate . ' at ' . htmlspecialchars($departureTime) . '</p>
-                        <p style="margin: 5px 0;"><strong>Price per Day:</strong> ₱' . number_format($price_per_day, 2) . '</p>
-                        <p style="margin: 5px 0;"><strong>Total Price:</strong> ₱' . number_format($price, 2) . '</p>
+<p style="margin: 5px 0;"><strong>Price per Day:</strong> ₱' . number_format($price_per_day, 2) . '</p>
+<p style="margin: 5px 0;"><strong>Room Price (Subtotal):</strong> ₱' . number_format($price, 2) . '</p>
+<p style="margin: 5px 0;"><strong>Mattress Fee:</strong> ₱' . number_format($mattress_fee, 2) . '</p>
+<p style="margin: 5px 0;"><strong>Total Price:</strong> <span style="font-weight: bold; color: #1e40af;">₱' . number_format($total_price, 2) . '</span></p>
+
                         <p style="margin: 5px 0;"><strong>Status:</strong> <span style="color: ' . $statusColor . ';">Pending</span></p>
                     </div>
 
@@ -92,4 +110,3 @@ function sendBookingStatusEmail($email, $fullName, $bookingRef, $status, $roomNu
         return false;
     }
 }
-?>

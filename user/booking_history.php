@@ -59,12 +59,13 @@ $history_result = $history_stmt->get_result();
         <div class="booking-content">
             <div class="booking-section">
                 <?php if ($active_result->num_rows > 0): ?>
-                    <table class="booking-table">
+                    <table class="booking-table center-text">
                         <thead>
                             <tr>
                                 <th>Reference No.</th>
                                 <th>Room</th>
                                 <th>Occupancy</th>
+                                <th>Mattress Fee</th>
                                 <th>Price</th>
                                 <th>Check In</th>
                                 <th>Check Out</th>
@@ -76,10 +77,11 @@ $history_result = $history_stmt->get_result();
                         <tbody>
                             <?php while ($booking = $active_result->fetch_assoc()): ?>
                                 <?php $status = strtolower($booking['status']); ?>
-                                <tr>
+                                <tr data-user-id="<?php echo htmlspecialchars($booking['user_id']); ?>">
                                     <td data-label="Reference No."><?php echo htmlspecialchars($booking['reference_number']); ?></td>
                                     <td data-label="Room">Room <?php echo htmlspecialchars($booking['room_number']); ?></td>
                                     <td data-label="Occupancy"><?php echo htmlspecialchars($booking['occupancy']); ?> Person</td>
+                                    <td data-label="Matress Fee"><?php echo number_format($booking['mattress_fee'], 2); ?></td>
                                     <td data-label="Price"><?php echo number_format($booking['price'], 2); ?></td>
                                     <td data-label="Check In"><?php echo date('M d, Y', strtotime($booking['arrival_date'])) . ' ' . date('h:i A', strtotime($booking['arrival_time'])); ?></td>
                                     <td data-label="Check Out"><?php echo date('M d, Y', strtotime($booking['departure_date'])) . ' ' . date('h:i A', strtotime($booking['departure_time'])); ?></td>
@@ -176,12 +178,13 @@ $history_result = $history_stmt->get_result();
 
                 <div id="booking-history-section" style="display: none;">
                     <?php if ($history_result->num_rows > 0): ?>
-                        <table class="booking-table" id="booking-history">
+                        <table class="booking-table center-text" id="booking-history">
                             <thead>
                                 <tr>
                                     <th>Reference No.</th>
                                     <th>Room</th>
                                     <th>Occupancy</th>
+                                    <th>Mattress Fee</th>
                                     <th>Price</th>
                                     <th>Check In</th>
                                     <th>Check Out</th>
@@ -193,10 +196,11 @@ $history_result = $history_stmt->get_result();
                             <tbody>
                                 <?php while ($booking = $history_result->fetch_assoc()): ?>
                                     <?php $status = strtolower($booking['status']); ?>
-                                    <tr>
+                                    <tr data-user-id="<?php echo htmlspecialchars($booking['user_id']); ?>">
                                         <td data-label="Reference No."><?php echo htmlspecialchars($booking['reference_number']); ?></td>
                                         <td data-label="Room">Room <?php echo htmlspecialchars($booking['room_number']); ?></td>
                                         <td data-label="Occupancy"><?php echo htmlspecialchars($booking['occupancy']); ?> Person</td>
+                                        <td data-label="Mattress Fee"><?php echo number_format($booking['mattress_fee'], 2); ?></td>
                                         <td data-label="Price"><?php echo number_format($booking['price'], 2); ?></td>
                                         <td data-label="Check In"><?php echo date('M d, Y', strtotime($booking['arrival_date'])) . ' ' . date('h:i A', strtotime($booking['arrival_time'])); ?></td>
                                         <td data-label="Check Out"><?php echo date('M d, Y', strtotime($booking['departure_date'])) . ' ' . date('h:i A', strtotime($booking['departure_time'])); ?></td>
@@ -469,15 +473,38 @@ $history_result = $history_stmt->get_result();
                 try {
                     showLoading('Generating invoice...');
 
-                    const refNo = row.querySelector('[data-label="Reference No."]').textContent;
-                    const room = row.querySelector('[data-label="Room"]').textContent;
-                    const occupancy = row.querySelector('[data-label="Occupancy"]').textContent;
-                    const price = row.querySelector('[data-label="Price"]').textContent;
-                    const checkIn = row.querySelector('[data-label="Check In"]').textContent;
-                    const checkOut = row.querySelector('[data-label="Check Out"]').textContent;
+                    // Extract booking details from the row
+                    const refNo = row.querySelector('[data-label="Reference No."]').textContent.trim();
+                    const room = row.querySelector('[data-label="Room"]').textContent.trim();
+                    const occupancy = row.querySelector('[data-label="Occupancy"]').textContent.trim();
+                    const price = row.querySelector('[data-label="Price"]').textContent.trim();
+                    const mattressFee = row.querySelector('[data-label="Mattress Fee"]').textContent.trim();
+                    const checkIn = row.querySelector('[data-label="Check In"]').textContent.trim();
+                    const checkOut = row.querySelector('[data-label="Check Out"]').textContent.trim();
 
-                    const response = await fetch('user/get_user_details.php');
-                    const userData = await response.json();
+                    const userId = row.getAttribute('data-user-id');
+
+                    if (!userId) {
+                        throw new Error('Missing user ID on row element.');
+                    }
+
+                    // Fetch user and booking details
+                    const response = await fetch('user/get_user_details.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `user_id=${encodeURIComponent(userId)}`
+                    });
+
+                    const result = await response.json();
+
+                    if (!result.success) throw new Error(result.message);
+
+                    const userData = {
+                        ...result.user_details,
+                        ...result.booking
+                    };
 
                     const doc = new jsPDF({
                         orientation: 'portrait',
@@ -513,13 +540,7 @@ $history_result = $history_stmt->get_result();
                     doc.text('From:', leftMargin, yPos);
                     yPos += 6;
                     doc.setFont('helvetica', 'normal');
-                    const organizationDetails = [
-                        'Cavite State University',
-                        'Office of Alumni Affairs',
-                        'Indang, Cavite',
-                        'Philippines'
-                    ];
-                    organizationDetails.forEach(line => {
+                    ['Cavite State University', 'Office of Alumni Affairs', 'Indang, Cavite', 'Philippines'].forEach(line => {
                         doc.text(line, leftMargin, yPos);
                         yPos += 5;
                     });
@@ -530,7 +551,7 @@ $history_result = $history_stmt->get_result();
                     yPos += 6;
                     doc.setFont('helvetica', 'normal');
                     const billToDetails = [
-                        `Full Name: ${userData.first_name} ${userData.middle_name} ${userData.last_name}`,
+                        `Full Name: ${userData.first_name} ${userData.middle_name || ''} ${userData.last_name}`,
                         `Position: ${userData.position || 'N/A'}`,
                         `Primary Address: ${userData.address || 'N/A'}`,
                         `Secondary Address: ${userData.second_address || 'N/A'}`,
@@ -548,7 +569,7 @@ $history_result = $history_stmt->get_result();
                     doc.text('Invoice Details:', rightColumn, rightYPos);
                     rightYPos += 6;
                     doc.setFont('helvetica', 'normal');
-                    const invoiceDetails = [
+                    [
                         ['Invoice Number:', refNo],
                         ['Date:', new Date().toLocaleDateString('en-US', {
                             month: 'long',
@@ -557,8 +578,7 @@ $history_result = $history_stmt->get_result();
                         })],
                         ['Check In:', checkIn],
                         ['Check Out:', checkOut]
-                    ];
-                    invoiceDetails.forEach(([label, value]) => {
+                    ].forEach(([label, value]) => {
                         doc.setFont('helvetica', 'bold');
                         doc.text(label, rightColumn, rightYPos);
                         doc.setFont('helvetica', 'normal');
@@ -569,8 +589,7 @@ $history_result = $history_stmt->get_result();
                     yPos = Math.max(yPos, rightYPos) + 20;
                     const tableHeaders = ['Description', 'Quantity', 'Unit Price', 'Amount'];
                     const columnWidths = [80, 25, 30, 30];
-                    const firstColumn = leftMargin;
-                    let xPos = firstColumn;
+                    let xPos = leftMargin;
 
                     doc.setFillColor(240, 240, 240);
                     doc.rect(leftMargin, yPos - 5, pageWidth - (2 * leftMargin), 8, 'F');
@@ -582,15 +601,21 @@ $history_result = $history_stmt->get_result();
 
                     yPos += 10;
                     doc.setFont('helvetica', 'normal');
-                    xPos = firstColumn;
+                    xPos = leftMargin;
+
+                    const parsedPrice = parseFloat(price.replace(/,/g, '')) || 0;
+                    const parsedMattressFee = parseFloat(mattressFee.replace(/,/g, '')) || 0;
+                    const totalAmount = (parsedPrice + parsedMattressFee).toFixed(2);
+
                     const tableContent = [
-                        room,
+                        `${room} + Mattress Fee`,
                         '1',
-                        price,
-                        price
+                        parsedPrice.toFixed(2),
+                        totalAmount
                     ];
+
                     tableContent.forEach((text, i) => {
-                        doc.text(text, xPos, yPos);
+                        doc.text(text.toString(), xPos, yPos);
                         xPos += columnWidths[i];
                     });
 
@@ -600,15 +625,14 @@ $history_result = $history_stmt->get_result();
                     doc.line(leftMargin, yPos, pageWidth - leftMargin, yPos);
                     yPos += 10;
 
-                    const totalsSection = [
-                        ['Subtotal:', price],
-                        ['Total:', price],
-                        ['Amount Paid:', price]
-                    ];
-                    totalsSection.forEach(([label, value]) => {
+                    [
+                        ['Room Price:', parsedPrice.toFixed(2)],
+                        ['Mattress Fee:', parsedMattressFee.toFixed(2)],
+                        ['Total:', totalAmount]
+                    ].forEach(([label, value]) => {
                         doc.setFont('helvetica', 'bold');
                         doc.text(label, pageWidth - 80, yPos);
-                        doc.text(value, pageWidth - leftMargin, yPos, {
+                        doc.text(value.toString(), pageWidth - leftMargin, yPos, {
                             align: 'right'
                         });
                         yPos += 8;
@@ -618,10 +642,10 @@ $history_result = $history_stmt->get_result();
                     doc.setFontSize(11);
                     doc.setFont('helvetica', 'bold');
                     doc.text('Terms & Policies:', leftMargin, yPos);
-
                     yPos += 8;
                     doc.setFontSize(9);
                     doc.setFont('helvetica', 'normal');
+
                     const termsAndPolicies = [
                         '1. Present this invoice and valid ID upon check-in',
                         '2. Check-in time | Check-out: time',
@@ -631,8 +655,7 @@ $history_result = $history_stmt->get_result();
                     ];
 
                     doc.setFillColor(248, 248, 248);
-                    doc.rect(leftMargin - 3, yPos - 5, pageWidth - (2 * (leftMargin - 3)),
-                        termsAndPolicies.length * 6 + 6, 'F');
+                    doc.rect(leftMargin - 3, yPos - 5, pageWidth - (2 * (leftMargin - 3)), termsAndPolicies.length * 6 + 6, 'F');
 
                     termsAndPolicies.forEach(term => {
                         doc.text(term, leftMargin, yPos);
@@ -642,7 +665,7 @@ $history_result = $history_stmt->get_result();
                     yPos = 270;
                     doc.setFontSize(8);
                     doc.setFont('helvetica', 'normal');
-                    doc.text('Thank you for your business!', pageWidth / 2, yPos, {
+                    doc.text('Thank you for your booking!', pageWidth / 2, yPos, {
                         align: 'center'
                     });
 
