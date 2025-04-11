@@ -365,10 +365,10 @@
                     <label class="filter-label">Graduation Year:</label>
                     <div class="year-range">
                         <label for="fromYearFilter">From:</label>
-                        <input type="number" id="fromYearFilter" min="1900" max="2099" placeholder="e.g. 2005">
+                        <input type="number" class="year-input" id="fromYearFilter" min="1900" max="2099" placeholder="e.g. 2005">
 
                         <label for="toYearFilter">To:</label>
-                        <input type="number" id="toYearFilter" min="1900" max="2099" placeholder="e.g. 2023">
+                        <input type="number" class="year-input" id="toYearFilter" min="1900" max="2099" placeholder="e.g. 2023">
 
                     </div>
                 </div>
@@ -552,7 +552,10 @@
                 }
             });
 
-
+            // Empty all inputs
+            document.querySelectorAll(".year-input").forEach(year => {
+                year.value = " ";
+            });
             // Reset all toggles
             document.querySelectorAll(".toggle-input").forEach(toggle => {
                 toggle.checked = true;

@@ -5,6 +5,29 @@ if (!isset($_SESSION)) {
 
 require 'main_db.php';
 
+$amenityIcons = [
+    'Free Wi-Fi' => 'wifi',
+    'TV' => 'tv',
+    'Air Conditioning' => 'snowflake',
+    'Coffee Maker' => 'coffee',
+    'Private Bathroom' => 'bath',
+    'Room Safe' => 'shield-alt',
+    'Mini Fridge' => 'box',
+    'Work Desk' => 'briefcase',
+    'Kitchen' => 'utensils',
+    'Lounge Area' => 'couch',
+    'Hair Dryer' => 'wind',
+    'Iron' => 'magnet',
+    'Balcony' => 'tree',
+    'Telephone' => 'phone',
+    'Heater' => 'fire',
+    'Towels' => 'tshirt',
+    'Toiletries' => 'soap',
+    'Microwave' => 'burn',
+    'Closet' => 'archive',
+    'Alarm Clock' => 'clock',
+];
+
 $book_rooms = [
     [
         'id' => 1,
@@ -166,7 +189,6 @@ if (!empty($occupancies)) {
     .room-details-body {
         background: var(--background-color);
         min-height: 100vh;
-        padding: 20px;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         margin: 0;
     }
@@ -447,47 +469,16 @@ if (!empty($occupancies)) {
                             <?php foreach ($room['amenities'] as $amenity): ?>
                                 <div class="room-details-amenity">
                                     <?php
-                                    $icon = '';
-                                    switch ($amenity) {
-                                        case 'Free Wi-Fi':
-                                            $icon = 'wifi';
-                                            break;
-                                        case 'TV':
-                                            $icon = 'tv';
-                                            break;
-                                        case 'Air Conditioning':
-                                            $icon = 'snowflake';
-                                            break;
-                                        case 'Coffee Maker':
-                                            $icon = 'coffee';
-                                            break;
-                                        case 'Private Bathroom':
-                                            $icon = 'bath';
-                                            break;
-                                        case 'Room Safe':
-                                            $icon = 'shield-alt';
-                                            break;
-                                        case 'Mini Fridge':
-                                            $icon = 'box';
-                                            break;
-                                        case 'Work Desk':
-                                            $icon = 'desk';
-                                            break;
-                                        case 'Kitchen':
-                                            $icon = 'utensils';
-                                            break;
-                                        case 'Lounge Area':
-                                            $icon = 'couch';
-                                            break;
-                                    }
+                                    $icon = $amenityIcons[$amenity] ?? 'check'; // default to 'check' if not listed
                                     ?>
                                     <i class="fas fa-<?php echo $icon; ?>"></i>
                                     <span><?php echo htmlspecialchars($amenity); ?></span>
                                 </div>
                             <?php endforeach; ?>
+
                         </div>
                     </div>
- 
+
                     <div class="room-details-sidebar">
                         <div class="room-details-guest-selection">
                             <label style="display: block; margin-bottom: 8px; color: #4b5563; font-weight: 500;">
@@ -504,6 +495,20 @@ if (!empty($occupancies)) {
                                     data-guests="<?php echo $maxOccupancy; ?>"
                                     style="display: block;">
                                     💰 Price: ₱<?php echo number_format($maxPrice); ?> per day
+                                </p>
+                                <!-- Add Mattress Section -->
+                                <div class="room-details-mattress-selection" style="margin-top: 16px;">
+                                    <label style="display: block; margin-bottom: 6px; color: #4b5563; font-weight: 500;">Add Mattresses (₱300 each):</label>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <button type="button" id="mattress-decrease" style="padding: 4px 10px;">-</button>
+                                        <span id="mattress-count">0</span>
+                                        <button type="button" id="mattress-increase" style="padding: 4px 10px;">+</button>
+                                    </div>
+                                </div>
+
+                                <!-- Total Price Display -->
+                                <p id="room-details-total-display" class="room-details-price-display" style="margin-top: 12px;">
+                                    🧾 Total: ₱<span id="total-price"><?php echo number_format($maxPrice); ?></span> per day
                                 </p>
                             <?php else: ?>
                                 <p style="color: red;">Room details not available.</p>
@@ -567,30 +572,57 @@ if (!empty($occupancies)) {
 
         document.addEventListener('DOMContentLoaded', function() {
             const priceDisplay = document.getElementById('room-details-price-display');
+            const totalDisplay = document.getElementById('room-details-total-display');
+            const totalPriceSpan = document.getElementById('total-price');
             const bookButton = document.getElementById('room-details-book-button');
 
-            if (!priceDisplay || !bookButton) return;
+            const mattressCountSpan = document.getElementById('mattress-count');
+            const mattressIncrease = document.getElementById('mattress-increase');
+            const mattressDecrease = document.getElementById('mattress-decrease');
 
-            const price = priceDisplay.dataset.price;
+            if (!priceDisplay || !bookButton || !totalDisplay) return;
+
+            const basePrice = parseInt(priceDisplay.dataset.price, 10);
             const guests = priceDisplay.dataset.guests;
+            const mattressPrice = 300;
+            let mattressCount = 0;
 
-            console.log('Loaded values → Price:', price, '| Guests:', guests);
+            const updateTotal = () => {
+                const total = basePrice + mattressCount * mattressPrice;
+                totalPriceSpan.textContent = total.toLocaleString();
+                sessionStorage.setItem('selectedTotalPrice', total);
+                sessionStorage.setItem('selectedMattresses', mattressCount);
+            };
 
-            if (price && guests) {
+            if (basePrice && guests) {
                 bookButton.disabled = false;
-                sessionStorage.setItem('selectedPrice', price);
+                sessionStorage.setItem('selectedPrice', basePrice);
                 sessionStorage.setItem('selectedGuests', guests);
-                // Update the text content to ensure it's displaying correctly
-                priceDisplay.textContent = `💰 Price: ₱${Number(price).toLocaleString()} per day`;
+                updateTotal();
             } else {
                 priceDisplay.style.color = 'red';
                 priceDisplay.textContent = '⚠️ Error: Price not available';
                 bookButton.disabled = true;
             }
 
+            mattressIncrease.addEventListener('click', () => {
+                mattressCount++;
+                mattressCountSpan.textContent = mattressCount;
+                updateTotal();
+            });
+
+            mattressDecrease.addEventListener('click', () => {
+                if (mattressCount > 0) {
+                    mattressCount--;
+                    mattressCountSpan.textContent = mattressCount;
+                    updateTotal();
+                }
+            });
+
             bookButton.addEventListener('click', function() {
-                if (!guests || !price) return;
-                window.location.href = `?section=Room-Reservation&select_room=<?php echo $room_id; ?>&guests=${guests}&price=${price}`;
+                if (!guests || !basePrice) return;
+                const total = basePrice + mattressCount * mattressPrice;
+                window.location.href = `?section=Room-Reservation&select_room=<?php echo $room_id; ?>&guests=${guests}&price=${basePrice}&mattresses=${mattressCount}&total=${total}`;
             });
         });
     </script>
