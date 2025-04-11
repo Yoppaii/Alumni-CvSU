@@ -1,6 +1,8 @@
 <section class="features">
     <div class="container">
-        <h2 class="features-title">Available Rooms</h2>
+        <h2 class="features-title">
+            <i class="fas fa-bed"></i>
+                Available Rooms</h2>
 
         <div class="slider-wrapper">
             <div class="swiper slider">
@@ -56,7 +58,7 @@
                                 <div class="feature-content">
                                     <h3><?php echo $room; ?></h3>
                                     <p class="room-description"><?php echo $descriptions[$index]; ?></p>
-                                    <a href="#" class="feature-link">Learn More <i class="fas fa-arrow-right"></i></a>
+                                    <a href="Alumni.php" class="feature-link">Learn More <i class="fas fa-arrow-right"></i></a>
                                 </div>
                             </div>
                         </div>
@@ -79,11 +81,14 @@
     }
     
     .features-title {
-        text-align: center;
-        margin-bottom: 40px;
-        font-size: 32px;
-        color: #333;
-        position: relative;
+    color: var(--cvsu-primary-green);
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--cvsu-light-green);
     }
     
     .features-title:after {
@@ -395,3 +400,7 @@
         setInterval(ensureParagraphsVisible, 2000);
     });
 </script>
+
+
+
+
