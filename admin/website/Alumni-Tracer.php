@@ -122,9 +122,27 @@
 <body>
     <section class="ats-hero">
         <h2>Welcome to Alumni Statistics</h2>
-        <p>The alumni data results can be viewed by querying the database to display relevant metrics, such as graduation year, employment status, and field of expertise.</p>
-        <a href="#services" class="cta-btn">Explore Alumni Statistics</a>
+        <p>You can view alumni data by querying the database for relevant metrics. This includes details like graduation year, employment status, and field of expertise. These insights help in understanding alumni trends and achievements.</p>
+        <a href="#services" class="cta-btn"  id="scroll-btn">Explore Alumni Statistics</a>
     </section>
+
+
+    <section id="services">
+
+    
+    <script>
+    document.getElementById('scroll-btn').addEventListener('click', function(event) {
+        event.preventDefault(); // Prevent the default anchor behavior
+        
+        const targetId = this.getAttribute('href'); // Get the target section ID
+        const targetElement = document.querySelector(targetId); // Select the target element
+
+        // Scroll to the target element smoothly
+        targetElement.scrollIntoView({
+            behavior: 'smooth' // Enable smooth scrolling
+        });
+    });
+    </script>
 
     <?php include('components/alumni_tracer/alumni-track-tracer.php'); ?>
 

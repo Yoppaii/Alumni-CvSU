@@ -122,9 +122,27 @@
 <body>
     <section class="car-hero">
         <h2>Career Opportunities & Job Portal</h2>
-        <p>Explore exciting career opportunities, job listings, and professional development resources for CvSU alumni.</p>
-        <a href="#services" class="car-btn">Browse Jobs</a>
+        <p>Discover exciting career opportunities and job listings available for CvSU alumni. Access valuable professional development resources to enhance your skills. Stay connected and take the next step in your career journey!</p>
+        <a href="#services" class="car-btn" id="scroll-btn">Browse Jobs</a>
     </section>
+
+    <section id="services">
+
+        
+    <script>
+    document.getElementById('scroll-btn').addEventListener('click', function(event) {
+        event.preventDefault(); // Prevent the default anchor behavior
+        
+        const targetId = this.getAttribute('href'); // Get the target section ID
+        const targetElement = document.querySelector(targetId); // Select the target element
+
+        // Scroll to the target element smoothly
+        targetElement.scrollIntoView({
+            behavior: 'smooth' // Enable smooth scrolling
+        });
+    });
+    </script>
+
 
     <?php include('components/career/employment-data.php'); ?>
 

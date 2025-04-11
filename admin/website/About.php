@@ -123,8 +123,25 @@
     <section class="cvsu-event-hero">
         <h2>About</h2>
         <p>Explore our information that offers visitors insight into the organization or individual behind the site, including its mission, values, and goals.</p>
-        <a href="#services" class="cvsu-cta-btn">View About</a>
+        <a href="#services" class="cvsu-cta-btn" id="scroll-btn">View About</a>
     </section>
+
+    <section id="services">
+
+    
+    <script>
+    document.getElementById('scroll-btn').addEventListener('click', function(event) {
+        event.preventDefault(); // Prevent the default anchor behavior
+        
+        const targetId = this.getAttribute('href'); // Get the target section ID
+        const targetElement = document.querySelector(targetId); // Select the target element
+
+        // Scroll to the target element smoothly
+        targetElement.scrollIntoView({
+            behavior: 'smooth' // Enable smooth scrolling
+        });
+    });
+    </script>
 
     <?php include('components/about/organization.php'); ?>
     
