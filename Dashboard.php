@@ -847,7 +847,7 @@ if (!isset($_SESSION['admin_id'])) {
                 <img src="asset/images/2.png" alt="CvSU Logo">
                 <span>ADMIN</span>
             </div>
-            
+
             <nav>
                 <div class="nav-section">
                     <div class="nav-section-title">Main</div>
@@ -1062,7 +1062,7 @@ if (!isset($_SESSION['admin_id'])) {
                 case 'Room-Reservation':
                     include 'admin/walk-in-booking.php';
                     break;
-                case 'room-details':
+                case 'Walkin-details':
                     include 'admin/walk-in-room-details.php';
                     break;
                 case 'Alumni-analytics':

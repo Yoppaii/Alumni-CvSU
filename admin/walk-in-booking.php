@@ -517,7 +517,7 @@ $mysqli->close();
                                 <p class="book-calculated-price" style="display: none; margin-top: 8px; font-weight: 600; color: #111827;"></p>
                             </div>
                             <div class="book-room-actions">
-                                <a href="?section=room-details&id=<?php echo $room['id']; ?>" class="book-view-details">
+                                <a href="?section=Walkin-details&id=<?php echo $room['id']; ?>" class="book-view-details">
                                     View Details
                                 </a>
                             </div>
