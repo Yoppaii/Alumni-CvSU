@@ -306,9 +306,9 @@ if (session_status() === PHP_SESSION_NONE) {
     }
 
     .cvsu-login-btn {
-        background-color: #005bef;
+        background-color: #f1f1f1;
         font-weight: bold;
-        color: white;
+        color: #0f461e;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         /* Add shadow effect */
         transition: box-shadow 0.3s ease;
@@ -316,12 +316,12 @@ if (session_status() === PHP_SESSION_NONE) {
     }
 
     .cvsu-login-btn:hover {
-        background-color: rgb(0, 63, 163);
+        background-color:rgb(196, 196, 196);
     }
 
     .cvsu-register-btn {
-        background-color: #6a38df;
-        color: white;
+        background-color: #f1e429;
+        color: #0f461e;
         font-weight: bold;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         /* Add shadow effect */
@@ -331,7 +331,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 
     .cvsu-register-btn:hover {
-        background-color: rgb(72, 38, 150);
+        background-color:rgb(172, 162, 34);
 
 
     }
@@ -433,13 +433,13 @@ if (session_status() === PHP_SESSION_NONE) {
         }
 
         .cvsu-nav-list .cvsu-login-btn {
-            background-color: #005bef;
+            background-color: #f1f1f1;
             border-color: var(--cvsu-border-color);
             color: white;
         }
 
         .cvsu-nav-list .cvsu-register-btn {
-            background-color: #6a38df;
+            background-color: #f1e429;
             border-color: var(--cvsu-primary-green);
             color: white;
         }
