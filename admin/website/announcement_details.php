@@ -32,7 +32,7 @@ $latest_announcements = $stmt_latest->get_result();
                 <i class="fas fa-arrow-left"></i> Back
             </a>
             <div class="announcement-details-header">
-                <span class="announcement-badge"><?php echo htmlspecialchars($selected_announcement['badge']); ?></span>
+                <span id="announcement-badge"><?php echo htmlspecialchars($selected_announcement['badge']); ?></span>
                 <h1><?php echo htmlspecialchars($selected_announcement['title']); ?></h1>
                 <div class="announcement-meta">
                     <span class="announcement-date">
@@ -74,7 +74,7 @@ $latest_announcements = $stmt_latest->get_result();
                     ?>
                             <div class="announcement-item">
                                 <div class="announcement-header">
-                                    <span class="announcement-badge"><?php echo htmlspecialchars($row['badge']); ?></span>
+                                    <span id="announcement-badge"><?php echo htmlspecialchars($row['badge']); ?></span>
                                     <h3 class="announcement-title"><?php echo htmlspecialchars($row['title']); ?></h3>
                                 </div>
                                 <p class="announcement-content"><?php echo htmlspecialchars($truncated_content); ?></p>
@@ -113,6 +113,7 @@ $latest_announcements = $stmt_latest->get_result();
 
 <style>
     :root {
+        --cvsu-gold:rgb(230, 233, 71);
         --cvsu-primary-green: #006400;
         --cvsu-hover-green: #004d00;
         --cvsu-light-green: #e8f5e8;
@@ -230,7 +231,7 @@ $latest_announcements = $stmt_latest->get_result();
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
-    .announcement-badge {
+    #announcement-badge {
         background-color: var(--cvsu-gold);  /* Using gold color variable */
         color: white;
         padding: 0.15rem 0.5rem;

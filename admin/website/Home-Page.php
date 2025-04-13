@@ -38,8 +38,6 @@
         justify-content: center;
     }
     
-
-    
     /* Individual slide backgrounds */
     .slide-1 {
         background-image: url('asset/images/bground2.jpg');
@@ -68,19 +66,7 @@
         font-size: 35px;
         margin-bottom: 15px;
         font-weight: 700;
-        color:rgb(223, 226, 30);
-        opacity: 0;
-        transform: translateY(-20px);
-        transition: all 0.8s ease;
-        letter-spacing: 1px;
-        line-height: 1;
-    }
-    .slide-content2 h2 {
-        font-family: 'Times New Roman', Times, serif;
-        font-size: 35px;
-        margin-bottom: 15px;
-        font-weight: 700;
-        color:rgb(223, 226, 30);
+        color: rgb(223, 226, 30);
         opacity: 0;
         transform: translateY(-20px);
         transition: all 0.8s ease;
@@ -88,7 +74,18 @@
         line-height: 1;
     }
 
-    
+    .slide-content2 h2 {
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 35px;
+        margin-bottom: 15px;
+        font-weight: 700;
+        color: rgb(223, 226, 30);
+        opacity: 0;
+        transform: translateY(-20px);
+        transition: all 0.8s ease;
+        letter-spacing: 1px;
+        line-height: 1;
+    }
     
     .slide-content p {
         font-size: 16px;
@@ -153,47 +150,6 @@
         background: white;
     }
     
-    @media (max-width: 768px) {
-        .hero-swiper-container {
-            height: 400px;
-        }
-        
-        .slide-content h2,
-        .slide-content2 h2 {
-            font-size: 28px;
-        }
-        
-        .slide-content p {
-            font-size: 15px;
-        }
-        
-        .slide-content .cta-btn {
-            padding: 10px 20px;
-            font-size: 15px;
-        }
-    }
-    
-    @media (max-width: 480px) {
-        .hero-swiper-container {
-            height: 350px;
-        }
-        
-        .slide-content h2,
-        .slide-content2 h2 {
-            font-size: 24px;
-        }
-        
-        .slide-content p {
-            font-size: 14px;
-            line-height: 1.5;
-        }
-        
-        .slide-content .cta-btn {
-            padding: 8px 18px;
-            font-size: 14px;
-        }
-    }
-
     /* Original herodaw for backward compatibility - can be removed if replaced */
     .herodaw {
         color: white;
@@ -213,7 +169,7 @@
         font-weight: 700;
         position: relative;
         z-index: 2;
-        color:rgb(209, 230, 22);
+        color: rgb(209, 230, 22);
     }
 
     .herodaw p {
@@ -283,7 +239,6 @@
         color: white; /* Optional: Text color for contrast */
     }
 
-
     .slide-content2 {
         position: absolute; /* Position content over the image */
         top: 50%;
@@ -299,7 +254,6 @@
     .swiper-slide-active .slide-content2 {
         opacity: 1;
     }
-
 
     .support-icon {
         display: flex;
@@ -373,8 +327,6 @@
         animation-duration: 0.5s; /* Set animation duration */
     }
 
-
-
     .check-icon {
         display: inline-block;
         width: 30px; /* Width of the circle */
@@ -395,95 +347,201 @@
         color: gold; /* Keep check mark color gold */
     }
 
+    /* Mobile alternative section - shown only on small screens */
+    .mobile-hero-alternative {
+        display: none;
+        background-image: url('asset/images/bground2.jpg');
+        background-size: cover;
+        background-position: center;
+        padding: 40px 20px;
+        text-align: center;
+        color: white;
+    }
+
+    .mobile-hero-content {
+        padding: 30px 15px;
+        background-color: rgba(0, 0, 0, 0.6);
+        border-radius: 10px;
+        margin-bottom: 30px;
+    }
+
+    .mobile-hero-content h2 {
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 24px;
+        margin-bottom: 15px;
+        font-weight: 700;
+        color: rgb(223, 226, 30);
+    }
+
+    .mobile-hero-content p {
+        font-size: 14px;
+        margin-bottom: 20px;
+        line-height: 1.4;
+    }
+
+    .mobile-feature-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        justify-content: flex-start;
+        text-align: left;
+    }
+
+    .mobile-feature-text {
+        flex: 1;
+    }
+
+    .mobile-image-container {
+        text-align: center;
+        margin: 15px 0;
+    }
+
+    .mobile-image-container img {
+        max-width: 150px;
+        height: auto;
+        margin: 0 auto;
+    }
 
     /* Enhanced Media Queries for Responsiveness */
     @media (max-width: 1200px) {
         .support-icon, .support-icons {
+            width: 250px;
+            height: 250px;
             margin-left: auto;
             margin-right: auto;
             position: relative;
-            top: -50px;
         }
         
         .support-icon2 {
+            width: 300px;
+            height: 300px;
             margin-left: auto;
             margin-right: auto;
             position: relative;
+        }
+
+        .slide-content {
+            left: 40%;
+            width: 45%;
+        }
+
+        .slide-content2 {
+            left: 60%;
+            width: 45%;
         }
     }
 
     @media (max-width: 992px) {
-        .slide-content, .slide-content2 {
-            width: 80%;
+        .slide-content {
+            left: 30%;
+            width: 50%;
         }
         
-        .support-icon, .support-icons, .support-icon2 {
+        .slide-content2 {
+            left: 70%;
+            width: 50%;
+        }
+        
+        .support-icon, .support-icons {
+            width: 200px;
+            height: 200px;
+        }
+        
+        .support-icon2 {
             width: 250px;
             height: 250px;
+        }
+        
+        .hero-swiper-container {
+            height: 450px;
+        }
+        
+        .slide-content h2, .slide-content2 h2 {
+            font-size: 28px;
         }
     }
 
     @media (max-width: 768px) {
         .slide-content, .slide-content2 {
-            left: 50%; /* Center content on smaller screens */
-            text-align: center; /* Center text */
+            position: relative;
+            left: auto;
+            transform: none;
+            text-align: center;
             width: 90%;
+            margin: 20px auto;
+            padding: 15px;
         }
 
-        .support-icon, .support-icon2, .support-icons {
-            width: 200px; /* Smaller on medium screens */
-            height: 200px;
+        .support-icon, .support-icons, .support-icon2 {
+            width: 180px;
+            height: 180px;
             margin: 0 auto;
-            position: relative;
-            top: -60px;
+            display: block;
+        }
+
+        .hero-swiper-container {
+            height: auto;
+            min-height: 400px;
+        }
+
+        .swiper-slide {
+            flex-direction: column;
+            padding: 30px 0;
+        }
+
+        .check-icon {
+            width: 25px;
+            height: 20px;
+            margin-right: 8px;
+            font-size: 14px;
         }
 
         .cta-btn {
-            font-size: 16px; /* Adjust font size for smaller screens */
+            font-size: 16px;
+            padding: 8px 16px;
         }
     }
 
     @media (max-width: 576px) {
-        .support-icon, .support-icon2, .support-icons {
-            width: 150px; /* Even smaller on small screens */
-            height: 150px;
-            top: -40px;
+        .hero-swiper-section {
+            display: none; /* Hide swiper on small screens */
+        }
+        
+        .mobile-hero-alternative {
+            display: block; /* Show the mobile alternative */
+        }
+        
+        .support-icon, .support-icons, .support-icon2 {
+            width: 120px;
+            height: 120px;
         }
         
         .slide-content h2, .slide-content2 h2 {
             font-size: 22px;
         }
         
-        .slide-content p {
-            font-size: 13px;
+        .slide-content p, .slide-content2 p {
+            font-size: 14px;
         }
     }
 
     @media (max-width: 480px) {
-        .check-icon {
-            width: 25px; /* Adjust width for small screens */
-            height: 25px; /* Adjust height for small screens */
-        }
-
-        .cta-btn {
-            padding: 8px 16px; /* Adjust padding for smaller buttons */
-            font-size: 14px;
+        .mobile-hero-content h2 {
+            font-size: 20px;
         }
         
-        .support-icon, .support-icon2, .support-icons {
-            width: 120px; /* Smallest size */
-            height: 120px;
-            top: -30px;
+        .mobile-hero-content p {
+            font-size: 13px;
         }
         
-        .hero-swiper-container {
-            height: 450px; /* Give more height on small screens */
+        .mobile-image-container img {
+            max-width: 120px;
         }
     }
 </style>
 
 <body>
-    <!-- Hero Swiper Section - Replace your original herodaw section with this -->
+    <!-- Hero Swiper Section - For tablets and larger screens -->
     <section class="hero-swiper-section">
         <div class="swiper hero-swiper-container">
             <div class="swiper-wrapper">
@@ -500,7 +558,7 @@
                 
                 <!-- Second slide -->
                 <div class="swiper-slide slide-2">
-                    <img src ="asset/images/signup1.png" alt="Support Icon" class="support-icon2">
+                    <img src="asset/images/signup1.png" alt="Support Icon" class="support-icon2">
                     <div class="slide-content2">
                         <h2 class="animate__animated animate__fadeInDown">REGISTER & UPDATE<br>YOUR ALUMNI PROFILE<br></h2>
                         <p class="animate__animated animate__fadeInUp"> To access exclusive alumni features: <br>
@@ -521,6 +579,43 @@
         </div>
     </section>
 
+    <!-- Mobile alternative hero section - Only shown on mobile devices -->
+    <section class="mobile-hero-alternative">
+        <!-- First mobile panel -->
+        <div class="mobile-hero-content">
+            <h2>OFFICE OF ALUMNI AFFAIRS</h2>
+            <div class="mobile-image-container">
+                <img src="asset/images/1.png" alt="Alumni Icon">
+                <img src="asset/images/2.png" alt="Alumni Icon">
+            </div>
+            <p>The Office of Alumni Affairs at Cavite State University is here to strengthen our connection with fellow graduates. We provide resources for networking, professional development, and community engagement.</p>
+        </div>
+        
+        <!-- Second mobile panel -->
+        <div class="mobile-hero-content">
+            <h2>REGISTER & UPDATE YOUR ALUMNI PROFILE</h2>
+            <div class="mobile-image-container">
+                <img src="asset/images/signup1.png" alt="Sign Up Icon">
+            </div>
+            <p>To access exclusive alumni features:</p>
+            <div class="mobile-feature-item">
+                <span class="check-icon"></span>
+                <div class="mobile-feature-text">Alumni ID</div>
+            </div>
+            <div class="mobile-feature-item">
+                <span class="check-icon"></span>
+                <div class="mobile-feature-text">Alumni Tracer</div>
+            </div>
+            <div class="mobile-feature-item">
+                <span class="check-icon"></span>
+                <div class="mobile-feature-text">Room Booking</div>
+            </div>
+            <div style="margin-top: 20px;">
+                <a href="Account.php" class="cta-btn">Sign-Up Here</a>
+            </div>
+        </div>
+    </section>
+
     <!-- Rest of your content remains unchanged -->
     <?php include('components/home/announcement.php'); ?>
     <?php include('components/home/features.php'); ?>
@@ -531,125 +626,149 @@
     <!-- Initialize Swiper -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const heroSwiper = new Swiper('.hero-swiper-container', {
-                // Optional parameters
-                direction: 'horizontal',
-                loop: true,
-                grabCursor: true,
-                effect: 'slide', // Changed from fade to slide animation
-                
-                // Auto play - ensure it's always running
-                autoplay: {
-                    delay: 5000,
-                    disableOnInteraction: false,
-                },
-                
-                // Speed
-                speed: 1000,
-                
-                // Pagination
-                pagination: {
-                    el: '.swiper-pagination',
-                    clickable: true,
-                },
-                
-                // Navigation arrows
-                navigation: {
-                    nextEl: '.swiper-button-next',
-                    prevEl: '.swiper-button-prev',
-                },
-                
-                // On slide change event - for custom animations
-                on: {
-                    init: function() {
-                        setTimeout(() => {
-                            // Add animation classes to first slide on init
+            // Check if the hero swiper section is visible (not on mobile)
+            if (window.getComputedStyle(document.querySelector('.hero-swiper-section')).display !== 'none') {
+                const heroSwiper = new Swiper('.hero-swiper-container', {
+                    // Optional parameters
+                    direction: 'horizontal',
+                    loop: true,
+                    grabCursor: true,
+                    effect: 'slide', // Changed from fade to slide animation
+                    
+                    // Auto play - ensure it's always running
+                    autoplay: {
+                        delay: 5000,
+                        disableOnInteraction: false,
+                    },
+                    
+                    // Speed
+                    speed: 1000,
+                    
+                    // Pagination
+                    pagination: {
+                        el: '.swiper-pagination',
+                        clickable: true,
+                    },
+                    
+                    // Navigation arrows
+                    navigation: {
+                        nextEl: '.swiper-button-next',
+                        prevEl: '.swiper-button-prev',
+                    },
+                    
+                    // On slide change event - for custom animations
+                    on: {
+                        init: function() {
+                            setTimeout(() => {
+                                // Add animation classes to first slide on init
+                                const activeSlide = document.querySelector('.swiper-slide-active');
+                                this.animateSlide(activeSlide);
+                            }, 100);
+                        },
+                        
+                        slideChangeTransitionStart: function() {
+                            // Hide all slide content first
+                            const slides = document.querySelectorAll('.swiper-slide');
+                            slides.forEach(slide => {
+                                const h2 = slide.querySelector('h2');
+                                const p = slide.querySelector('p');
+                                const btn = slide.querySelector('.cta-btn');
+                                const icons = slide.querySelectorAll('img[class^="support"]');
+                                
+                                if (h2) {
+                                    h2.classList.remove('animate__fadeInDown');
+                                    h2.style.opacity = 0;
+                                }
+                                if (p) {
+                                    p.classList.remove('animate__fadeInUp');
+                                    p.style.opacity = 0;
+                                }
+                                if (btn) {
+                                    btn.classList.remove('animate__zoomIn');
+                                    btn.style.opacity = 0;
+                                }
+                                if (icons) {
+                                    icons.forEach(icon => {
+                                        icon.style.opacity = 0;
+                                    });
+                                }
+                            });
+                        },
+                        
+                        slideChangeTransitionEnd: function() {
+                            // Animate the active slide
                             const activeSlide = document.querySelector('.swiper-slide-active');
                             this.animateSlide(activeSlide);
-                        }, 100);
-                    },
+                        }
+                    }
+                });
+                
+                // Add custom animation method to Swiper instance
+                heroSwiper.animateSlide = function(slide) {
+                    if (!slide) return;
                     
-                    slideChangeTransitionStart: function() {
-                        // Hide all slide content first
-                        const slides = document.querySelectorAll('.swiper-slide');
-                        slides.forEach(slide => {
-                            const h2 = slide.querySelector('h2');
-                            const p = slide.querySelector('p');
-                            const btn = slide.querySelector('.cta-btn');
-                            const icons = slide.querySelectorAll('img[class^="support"]');
-                            
-                            if (h2) {
-                                h2.classList.remove('animate__fadeInDown');
-                                h2.style.opacity = 0;
-                            }
-                            if (p) {
-                                p.classList.remove('animate__fadeInUp');
-                                p.style.opacity = 0;
-                            }
-                            if (btn) {
-                                btn.classList.remove('animate__zoomIn');
-                                btn.style.opacity = 0;
-                            }
-                            if (icons) {
-                                icons.forEach(icon => {
-                                    icon.style.opacity = 0;
-                                });
-                            }
+                    const h2 = slide.querySelector('h2');
+                    const p = slide.querySelector('p');
+                    const btn = slide.querySelector('.cta-btn');
+                    const icons = slide.querySelectorAll('img[class^="support"]');
+                    
+                    // First animate the icons with a small delay
+                    if (icons) {
+                        icons.forEach((icon, index) => {
+                            setTimeout(() => {
+                                icon.style.opacity = 1;
+                                icon.style.transform = 'translateX(0) translateY(0)';
+                            }, index * 200);
                         });
-                    },
-                    
-                    slideChangeTransitionEnd: function() {
-                        // Animate the active slide
-                        const activeSlide = document.querySelector('.swiper-slide-active');
-                        this.animateSlide(activeSlide);
-                    }
-                }
-            });
-            
-            // Add custom animation method to Swiper instance
-            heroSwiper.animateSlide = function(slide) {
-                if (!slide) return;
-                
-                const h2 = slide.querySelector('h2');
-                const p = slide.querySelector('p');
-                const btn = slide.querySelector('.cta-btn');
-                const icons = slide.querySelectorAll('img[class^="support"]');
-                
-                // First animate the icons with a small delay
-                if (icons) {
-                    icons.forEach((icon, index) => {
-                        setTimeout(() => {
-                            icon.style.opacity = 1;
-                            icon.style.transform = 'translateX(0) translateY(0)';
-                        }, index * 200);
-                    });
-                }
-                
-                // Then animate text content with sequential delays
-                setTimeout(() => {
-                    if (h2) {
-                        h2.classList.add('animate__fadeInDown');
-                        h2.style.opacity = 1;
-                        h2.style.animationDuration = '0.8s';
                     }
                     
+                    // Then animate text content with sequential delays
                     setTimeout(() => {
-                        if (p) {
-                            p.classList.add('animate__fadeInUp');
-                            p.style.opacity = 1;
-                            p.style.animationDuration = '0.8s';
+                        if (h2) {
+                            h2.classList.add('animate__fadeInDown');
+                            h2.style.opacity = 1;
+                            h2.style.animationDuration = '0.8s';
                         }
                         
                         setTimeout(() => {
-                            if (btn) {
-                                btn.classList.add('animate__zoomIn');
-                                btn.style.opacity = 1;
-                                btn.style.animationDuration = '0.5s';
+                            if (p) {
+                                p.classList.add('animate__fadeInUp');
+                                p.style.opacity = 1;
+                                p.style.animationDuration = '0.8s';
                             }
+                            
+                            setTimeout(() => {
+                                if (btn) {
+                                    btn.classList.add('animate__zoomIn');
+                                    btn.style.opacity = 1;
+                                    btn.style.animationDuration = '0.5s';
+                                }
+                            }, 300);
                         }, 300);
-                    }, 300);
-                }, 500);
-            };
+                    }, 500);
+                };
+            }
+
+            // Handle window resize and update Swiper instance if needed
+            window.addEventListener('resize', function() {
+                // Check if we've crossed the breakpoint
+                const heroSection = document.querySelector('.hero-swiper-section');
+                const isMobile = window.matchMedia('(max-width: 576px)').matches;
+                
+                if (isMobile) {
+                    heroSection.style.display = 'none';
+                    document.querySelector('.mobile-hero-alternative').style.display = 'block';
+                } else {
+                    heroSection.style.display = 'block';
+                    document.querySelector('.mobile-hero-alternative').style.display = 'none';
+                    
+                    // Reinitialize Swiper if needed
+                    if (typeof heroSwiper === 'undefined' || !heroSwiper) {
+                        // Initialize swiper again if needed
+                        location.reload();
+                    }
+                }
+            });
         });
     </script>
 </body>
