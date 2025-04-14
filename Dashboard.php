@@ -850,10 +850,11 @@ if (!isset($_SESSION['admin_id'])) {
 
             <nav>
                 <div class="nav-section">
-                    <div class="nav-section-title">Bookings</div>
                     <a href="?section=Dashboard" class="nav-item <?php echo (!isset($_GET['section']) || $_GET['section'] == 'Dashboard') ? 'active' : ''; ?>">
-                        <i class="fas fa-chart-line"></i>Dashboard
-                    </a>
+                            <i class="fas fa-chart-line"></i>Dashboard
+                        </a>
+                    <div class="nav-section-title">Bookings</div>
+
                     <a href="?section=Room-Reservation" class="nav-item <?php echo (!isset($_GET['section']) || $_GET['section'] == 'Room-Reservation') ? 'active' : ''; ?>">
                         <i class="fas fa-bolt"></i> Walk-in Booking
                     </a>

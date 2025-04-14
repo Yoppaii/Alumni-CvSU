@@ -64,9 +64,11 @@ body {
 }
 
 .cvsu-logo span {
-    font-size: 1.3rem;
-    font-weight: bold;
+    font-family: 'Montserrat';
+    font-size: 1.1rem;
+    /* font-weight: bold; */
     white-space: nowrap;
+    line-height: 1;
 }
 
 .cvsu-auth-buttons {
