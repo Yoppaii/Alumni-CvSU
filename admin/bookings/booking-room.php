@@ -4,7 +4,8 @@ require_once 'main_db.php';
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-function getTableName($type) {
+function getTableName($type)
+{
     return $type === 'room' ? 'room_price' : $type . '_pricing';
 }
 
@@ -12,19 +13,19 @@ if (isset($_POST['delete'])) {
     while (ob_get_level()) {
         ob_end_clean();
     }
-    
+
     header('Content-Type: application/json');
     header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
     header("Cache-Control: post-check=0, pre-check=0", false);
     header("Pragma: no-cache");
-    
+
     $id = $_POST['id'];
     $table = getTableName($_POST['table']);
-    
+
     $delete_query = "DELETE FROM $table WHERE id = ?";
     $stmt = $mysqli->prepare($delete_query);
     $stmt->bind_param("i", $id);
-    
+
     try {
         if ($stmt->execute()) {
             echo json_encode([
@@ -43,7 +44,7 @@ if (isset($_POST['delete'])) {
             'message' => 'Error: ' . $e->getMessage()
         ]);
     }
-    
+
     $stmt->close();
     exit();
 }
@@ -54,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit'])) {
         $occupancy = $_POST['occupancy'];
         $type = $_POST['type'];
         $table = getTableName($type);
-        
+
         if (isset($_POST['edit_id'])) {
 
             $id = intval($_POST['edit_id']);
@@ -67,23 +68,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit'])) {
             $stmt = $mysqli->prepare($insert_query);
             $stmt->bind_param("ds", $price, $occupancy);
         }
-        
+
         if ($stmt->execute()) {
             $_SESSION['message'] = "Record saved successfully!";
             $_SESSION['message_type'] = "success";
         } else {
             throw new Exception("Error saving record: " . $stmt->error);
         }
-        
+
         $stmt->close();
 
         while (ob_get_level()) {
             ob_end_clean();
         }
-        
+
         header("Location: ?section=booking-room&tab=" . $type);
         exit();
-        
     } catch (Exception $e) {
         $_SESSION['message'] = "Error: " . $e->getMessage();
         $_SESSION['message_type'] = "error";
@@ -91,21 +91,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit'])) {
         while (ob_get_level()) {
             ob_end_clean();
         }
-        
+
         header("Location: ?section=booking-room&tab=" . $type);
         exit();
     }
 }
 
-function fetchPricingRecords($mysqli, $type) {
+function fetchPricingRecords($mysqli, $type)
+{
     $table = getTableName($type);
     $query = "SELECT id, price, occupancy FROM $table ORDER BY price ASC";
     $result = $mysqli->query($query);
-    
+
     if (!$result) {
         die("Error fetching records: " . $mysqli->error);
     }
-    
+
     return $result;
 }
 
@@ -115,12 +116,19 @@ $pricing_types = ['room', 'lobby', 'conference', 'board', 'building'];
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pricing Management</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
+        .center-text th,
+        .center-text td {
+            text-align: center;
+            vertical-align: middle;
+        }
+
         .pricing-container {
             max-width: 1200px;
             margin: 0 auto;
@@ -130,7 +138,7 @@ $pricing_types = ['room', 'lobby', 'conference', 'board', 'building'];
         .pricing-card {
             background: white;
             border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             padding: 20px;
         }
 
@@ -188,7 +196,7 @@ $pricing_types = ['room', 'lobby', 'conference', 'board', 'building'];
         .form-input:focus {
             outline: none;
             border-color: #10b981;
-            box-shadow: 0 0 0 3px rgba(16,185,129,0.1);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
         }
 
         .btn {
@@ -273,7 +281,7 @@ $pricing_types = ['room', 'lobby', 'conference', 'board', 'building'];
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.5);
+            background-color: rgba(0, 0, 0, 0.5);
             align-items: center;
             justify-content: center;
             z-index: 1000;
@@ -346,13 +354,14 @@ $pricing_types = ['room', 'lobby', 'conference', 'board', 'building'];
         }
     </style>
 </head>
+
 <body>
     <div class="pricing-container">
         <div class="pricing-card">
             <div class="pricing-tabs">
                 <?php foreach ($pricing_types as $type): ?>
-                    <div class="pricing-tab <?php echo ($current_tab == $type) ? 'active' : ''; ?>" 
-                         data-tab="<?php echo $type; ?>">
+                    <div class="pricing-tab <?php echo ($current_tab == $type) ? 'active' : ''; ?>"
+                        data-tab="<?php echo $type; ?>">
                         <?php echo ucfirst($type); ?> Pricing
                     </div>
                 <?php endforeach; ?>
@@ -360,32 +369,32 @@ $pricing_types = ['room', 'lobby', 'conference', 'board', 'building'];
 
             <?php if (isset($_SESSION['message'])): ?>
                 <div class="alert alert-<?php echo $_SESSION['message_type']; ?>">
-                    <?php 
-                        echo $_SESSION['message'];
-                        unset($_SESSION['message']);
-                        unset($_SESSION['message_type']);
+                    <?php
+                    echo $_SESSION['message'];
+                    unset($_SESSION['message']);
+                    unset($_SESSION['message_type']);
                     ?>
                 </div>
             <?php endif; ?>
 
-            <?php foreach ($pricing_types as $type): 
+            <?php foreach ($pricing_types as $type):
                 $is_active = ($current_tab == $type);
             ?>
-                <div class="tab-content <?php echo $is_active ? 'active' : ''; ?>" 
-                     id="<?php echo $type; ?>-content" 
-                     style="display: <?php echo $is_active ? 'block' : 'none'; ?>">
-                    
+                <div class="tab-content <?php echo $is_active ? 'active' : ''; ?>"
+                    id="<?php echo $type; ?>-content"
+                    style="display: <?php echo $is_active ? 'block' : 'none'; ?>">
+
                     <form method="POST" class="pricing-form">
                         <input type="hidden" name="type" value="<?php echo $type; ?>">
                         <div class="form-group">
                             <label class="form-label">Price (₱)</label>
                             <input type="number" name="price" class="form-input" step="0.01" required
-                                   placeholder="Enter price">
+                                placeholder="Enter price">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Occupancy</label>
                             <input type="text" name="occupancy" class="form-input" required
-                                   placeholder="Enter occupancy">
+                                placeholder="Enter occupancy">
                         </div>
                         <div class="form-group">
                             <label class="form-label">&nbsp;</label>
@@ -396,10 +405,11 @@ $pricing_types = ['room', 'lobby', 'conference', 'board', 'building'];
                     </form>
 
                     <div class="table-container">
-                        <table class="pricing-table">
+                        <table class="pricing-table center-text">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
+                                    <!-- <th>ID</th> -->
+                                    <th>No.</th>
                                     <th>Price</th>
                                     <th>Occupancy</th>
                                     <th>Actions</th>
@@ -408,27 +418,29 @@ $pricing_types = ['room', 'lobby', 'conference', 'board', 'building'];
                             <tbody>
                                 <?php
                                 $result = fetchPricingRecords($mysqli, $type);
+                                $counter = 1; // ← start row counter
                                 while ($row = $result->fetch_assoc()):
                                 ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($row['id']); ?></td>
-                                    <td>₱<?php echo number_format($row['price'], 2); ?></td>
-                                    <td><?php echo htmlspecialchars($row['occupancy']); ?></td>
-                                    <td>
-                                        <div class="action-buttons">
-                                            <button type="button" class="btn-icon btn-edit"
+                                    <tr>
+                                        <td><?php echo $counter++; ?></td> <!-- This displays the current row number -->
+                                        <td>₱<?php echo number_format($row['price'], 2); ?></td>
+                                        <td><?php echo htmlspecialchars($row['occupancy']); ?></td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button type="button" class="btn-icon btn-edit"
                                                     onclick="editPrice('<?php echo $type; ?>', <?php echo htmlspecialchars(json_encode($row)); ?>)">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button type="button" class="btn-icon btn-delete"
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button type="button" class="btn-icon btn-delete"
                                                     onclick="deletePrice('<?php echo $type; ?>', <?php echo $row['id']; ?>)">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
                                 <?php endwhile; ?>
                             </tbody>
+
                         </table>
                     </div>
                 </div>
@@ -479,7 +491,7 @@ $pricing_types = ['room', 'lobby', 'conference', 'board', 'building'];
         let deleteId = null;
         document.addEventListener('DOMContentLoaded', function() {
             const tabs = document.querySelectorAll('.pricing-tab');
-            
+
             tabs.forEach(tab => {
                 tab.addEventListener('click', () => {
                     tabs.forEach(t => t.classList.remove('active'));
@@ -515,7 +527,7 @@ $pricing_types = ['room', 'lobby', 'conference', 'board', 'building'];
             document.getElementById('edit_type').value = type;
             document.getElementById('edit_price').value = data.price;
             document.getElementById('edit_occupancy').value = data.occupancy;
-            
+
             const modal = document.getElementById('editModal');
             modal.style.display = 'flex';
         }
@@ -548,59 +560,59 @@ $pricing_types = ['room', 'lobby', 'conference', 'board', 'building'];
             formData.append('table', deleteType);
 
             fetch(window.location.href, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.text())  
-            .then(rawResponse => {
-                let data;
-                try {
-                    data = JSON.parse(rawResponse);
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.text())
+                .then(rawResponse => {
+                    let data;
+                    try {
+                        data = JSON.parse(rawResponse);
 
-                    showAlert(data.status, data.message);
-                    
-                    if (data.status === 'success') {
-                        setTimeout(() => {
-                            const currentTab = document.querySelector('.pricing-tab.active').getAttribute('data-tab');
-                            window.location.href = `?section=booking-room&tab=${currentTab}`;
-                        }, 1000);
+                        showAlert(data.status, data.message);
+
+                        if (data.status === 'success') {
+                            setTimeout(() => {
+                                const currentTab = document.querySelector('.pricing-tab.active').getAttribute('data-tab');
+                                window.location.href = `?section=booking-room&tab=${currentTab}`;
+                            }, 1000);
+                        }
+                    } catch (e) {
+                        console.error('Parse error:', rawResponse);
+                        if (rawResponse.includes('success')) {
+                            showAlert('success', 'Record deleted successfully');
+                            setTimeout(() => {
+                                const currentTab = document.querySelector('.pricing-tab.active').getAttribute('data-tab');
+                                window.location.href = `?section=booking-room&tab=${currentTab}`;
+                            }, 1000);
+                        } else {
+                            showAlert('error', 'Error processing the response');
+                        }
                     }
-                } catch (e) {
-                    console.error('Parse error:', rawResponse);
-                    if (rawResponse.includes('success')) {
-                        showAlert('success', 'Record deleted successfully');
-                        setTimeout(() => {
-                            const currentTab = document.querySelector('.pricing-tab.active').getAttribute('data-tab');
-                            window.location.href = `?section=booking-room&tab=${currentTab}`;
-                        }, 1000);
-                    } else {
-                        showAlert('error', 'Error processing the response');
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showAlert('success', 'Record deleted successfully');
-                setTimeout(() => {
-                    const currentTab = document.querySelector('.pricing-tab.active').getAttribute('data-tab');
-                    window.location.href = `?section=booking-room&tab=${currentTab}`;
-                }, 1000);
-            })
-            .finally(() => {
-                closeDeleteModal();
-            });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showAlert('success', 'Record deleted successfully');
+                    setTimeout(() => {
+                        const currentTab = document.querySelector('.pricing-tab.active').getAttribute('data-tab');
+                        window.location.href = `?section=booking-room&tab=${currentTab}`;
+                    }, 1000);
+                })
+                .finally(() => {
+                    closeDeleteModal();
+                });
         }
 
         function showAlert(type, message) {
             const alertDiv = document.createElement('div');
             alertDiv.className = `alert alert-${type}`;
             alertDiv.textContent = message;
-            
+
             document.querySelector('.pricing-card').insertBefore(
                 alertDiv,
                 document.querySelector('.pricing-tabs').nextSibling
             );
-            
+
             setTimeout(() => {
                 alertDiv.remove();
             }, 3000);
@@ -609,7 +621,7 @@ $pricing_types = ['room', 'lobby', 'conference', 'board', 'building'];
         window.onclick = function(event) {
             const editModal = document.getElementById('editModal');
             const deleteModal = document.getElementById('deleteModal');
-            
+
             if (event.target === editModal) {
                 closeEditModal();
             }
@@ -626,4 +638,5 @@ $pricing_types = ['room', 'lobby', 'conference', 'board', 'building'];
         });
     </script>
 </body>
+
 </html>

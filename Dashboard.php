@@ -850,22 +850,25 @@ if (!isset($_SESSION['admin_id'])) {
 
             <nav>
                 <div class="nav-section">
-                    <div class="nav-section-title">Main</div>
+                    <div class="nav-section-title">Bookings</div>
                     <a href="?section=Dashboard" class="nav-item <?php echo (!isset($_GET['section']) || $_GET['section'] == 'Dashboard') ? 'active' : ''; ?>">
                         <i class="fas fa-chart-line"></i>Dashboard
                     </a>
                     <a href="?section=Room-Reservation" class="nav-item <?php echo (!isset($_GET['section']) || $_GET['section'] == 'Room-Reservation') ? 'active' : ''; ?>">
                         <i class="fas fa-bolt"></i> Walk-in Booking
                     </a>
+                    <a href="?section=view-all-bookings" class="nav-item <?php echo (isset($_GET['section']) && $_GET['section'] == 'view-all-bookings') ? 'active' : ''; ?>">
+                        <i class="fas fa-bed"></i>All Bookings
+                    </a>
 
                 </div>
+
+
+
                 <div class="nav-section">
                     <!-- <a href="?section=user-live-chat" class="nav-item <?php echo (isset($_GET['section']) && $_GET['section'] == 'user-live-chat') ? 'active' : ''; ?>">
                         <i class="fas fa-comment"></i>Live Chat
                     </a> -->
-                    <a href="?section=Alumni-analytics" class="nav-item <?php echo (isset($_GET['section']) && $_GET['section'] == 'Alumni-analytics') ? 'active' : ''; ?>">
-                        <i class="fas fa-user"></i>Alumni Tracer
-                    </a>
                     <!-- <div class="dropdown">
                         <a href="?section=Alumni-analytics" class="dropdown-item">
                             <i class="fas fa-user"></i>Tracer Analytics
@@ -880,6 +883,11 @@ if (!isset($_SESSION['admin_id'])) {
                             <i class="fas fa-calendar-day"></i>Question Ratings
                         </a> -->
                     <!-- </div> -->
+
+                    <div class="nav-section-title">Alumni</div>
+                    <a href="?section=Alumni-analytics" class="nav-item <?php echo (isset($_GET['section']) && $_GET['section'] == 'Alumni-analytics') ? 'active' : ''; ?>">
+                        <i class="fas fa-user"></i>Alumni Tracer
+                    </a>
                     <a href="#" class="nav-item has-dropdown">
                         <i class="fas fa-id-card"></i>Alumni ID
                     </a>
@@ -897,10 +905,6 @@ if (!isset($_SESSION['admin_id'])) {
                             <i class="fas fa-cogs"></i>Alumni ID Management
                         </a>
                     </div>
-                    <div class="nav-section-title">Management</div>
-                    <a href="?section=view-all-bookings" class="nav-item <?php echo (isset($_GET['section']) && $_GET['section'] == 'view-all-bookings') ? 'active' : ''; ?>">
-                        <i class="fas fa-bed"></i>All Bookings
-                    </a>
                     <!-- <a href="#" class="nav-item has-dropdown">
                         <i class="fas fa-graduation-cap"></i>Alumni Records
                     </a>
@@ -928,6 +932,40 @@ if (!isset($_SESSION['admin_id'])) {
                         </a>
                     </div> -->
 
+
+
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">System</div>
+                    <!-- <a href="#" class="nav-item has-dropdown">
+                        <i class="fas fa-user-shield"></i>System User Management
+                    </a>
+                    <div class="dropdown">
+                        <a href="?section=all-users" class="dropdown-item">
+                            <i class="fas fa-users-cog"></i>All Users
+                        </a>
+                        <a href="?section=user-roles" class="dropdown-item">
+                            <i class="fas fa-user-tag"></i>Roles & Permissions
+                        </a>
+                    </div> -->
+                    <a href="?section=all-users-bookings" class="dropdown-item">
+                        <i class="fas fa-users-cog"></i>All Users
+                    </a>
+                    <a href="#" class="nav-item has-dropdown">
+                        <i class="fas fa-globe"></i>Website Managements
+                    </a>
+                    <div class="dropdown">
+                        <a href="?section=Latest-Announcements" class="dropdown-item">
+                            <i class="fas fa-bullhorn"></i>Announcement
+                        </a>
+                        <a href="?section=Latest-News-and-Features" class="dropdown-item">
+                            <i class="fas fa-newspaper"></i>News / Features
+                        </a>
+                        <a href="?section=CvSU-Events" class="dropdown-item">
+                            <i class="fas fa-calendar-day"></i>Events
+                        </a>
+                    </div>
                     <a href="#" class="nav-item has-dropdown">
                         <i class="fas fa-calendar-alt"></i>Bookings Managements
                     </a>
@@ -948,38 +986,6 @@ if (!isset($_SESSION['admin_id'])) {
                             <i class="fas fa-calendar-week"></i>Calendar View -->
                         <!-- </a> -->
                     </div>
-                    <a href="#" class="nav-item has-dropdown">
-                        <i class="fas fa-globe"></i>Website Managements
-                    </a>
-                    <div class="dropdown">
-                        <a href="?section=Latest-Announcements" class="dropdown-item">
-                            <i class="fas fa-bullhorn"></i>Announcement
-                        </a>
-                        <a href="?section=Latest-News-and-Features" class="dropdown-item">
-                            <i class="fas fa-newspaper"></i>News / Features
-                        </a>
-                        <a href="?section=CvSU-Events" class="dropdown-item">
-                            <i class="fas fa-calendar-day"></i>Events
-                        </a>
-                    </div>
-                </div>
-
-                <div class="nav-section">
-                    <div class="nav-section-title">System</div>
-                    <!-- <a href="#" class="nav-item has-dropdown">
-                        <i class="fas fa-user-shield"></i>System User Management
-                    </a>
-                    <div class="dropdown">
-                        <a href="?section=all-users" class="dropdown-item">
-                            <i class="fas fa-users-cog"></i>All Users
-                        </a>
-                        <a href="?section=user-roles" class="dropdown-item">
-                            <i class="fas fa-user-tag"></i>Roles & Permissions
-                        </a>
-                    </div> -->
-                    <a href="?section=all-users-bookings" class="dropdown-item">
-                        <i class="fas fa-users-cog"></i>All Users
-                    </a>
                     <!-- <a href="#" class="nav-item has-dropdown">
                         <i class="fas fa-user-shield"></i>User Management
                     </a>

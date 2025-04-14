@@ -39,35 +39,44 @@ try {
         throw new Exception('Please Verify Your Account');
     }
 
-    $roomName = "";
-    if ($data['room_number'] >= 1 && $data['room_number'] <= 8) {
-        $roomName = "Room " . $data['room_number'];
-    } elseif ($data['room_number'] == 9) {
-        $roomName = "Board Room";
-    } elseif ($data['room_number'] == 10) {
-        $roomName = "Conference Room";
-    } elseif ($data['room_number'] == 11) {
-        $roomName = "Lobby";
+    // Resolve room name for email
+    $roomName = match ($data['room_number']) {
+        9 => "Board Room",
+        10 => "Conference Room",
+        11 => "Lobby",
+        default => ($data['room_number'] >= 1 && $data['room_number'] <= 8) ? "Room " . $data['room_number'] : "Unknown Room"
+    };
+
+    // Prepare data
+    $mattress_fee = $data['mattresses'] * 500;
+    $total_price = $data['price']; // Optional: recalculate server-side for extra security
+
+    // Prepare INSERT
+    $bookingStmt = $mysqli->prepare("
+        INSERT INTO bookings 
+            (reference_number, user_id, room_number, occupancy, price, price_per_day,
+             mattress_fee, total_price,
+             arrival_date, arrival_time, departure_date, departure_time, status) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
+    ");
+    if (!$bookingStmt) {
+        throw new Exception($mysqli->error);
     }
 
-    $bookingStmt = $mysqli->prepare("INSERT INTO bookings 
-    (reference_number, user_id, room_number, occupancy, price, price_per_day,
-     arrival_date, arrival_time, departure_date, departure_time, status, is_walkin) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)");
-
     $bookingStmt->bind_param(
-        "siiiidsssss",
+        "siiiidddssss",
         $data['reference_number'],
         $userId,
         $data['room_number'],
         $data['occupancy'],
         $data['price'],
         $data['price_per_day'],
+        $mattress_fee,
+        $total_price,
         $data['arrival_date'],
         $data['arrival_time'],
         $data['departure_date'],
-        $data['departure_time'],
-        $isWalkin
+        $data['departure_time']
     );
 
 
@@ -75,6 +84,7 @@ try {
         throw new Exception($bookingStmt->error);
     }
 
+    // Send confirmation email
     $emailSent = sendBookingStatusEmail(
         $userData['email'],
         $userData['full_name'],
@@ -85,12 +95,15 @@ try {
         $data['departure_date'],
         $data['price'],
         $data['price_per_day'],
+        $mattress_fee,
+        $total_price,
         $data['arrival_time'],
         $data['departure_time']
     );
 
-    if (isset($userStmt)) $userStmt->close();
-    if (isset($bookingStmt)) $bookingStmt->close();
+    // Clean up
+    $userStmt->close();
+    $bookingStmt->close();
     $mysqli->close();
 
     echo json_encode([

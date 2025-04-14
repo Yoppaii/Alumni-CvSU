@@ -5,6 +5,12 @@ if (!isset($_SESSION)) {
 
 require 'main_db.php';
 
+
+$mattresses = isset($_GET['mattresses']) ? (int)$_GET['mattresses'] : 0;
+$totalPrice = isset($_GET['total']) ? (int)$_GET['total'] : 0;
+$guestCount = isset($_GET['guests']) ? (int)$_GET['guests'] : 1; // Default to 1 guest
+
+
 function getRoomData($mysqli, $tableName)
 {
     $query = "SELECT occupancy, price FROM {$tableName} ORDER BY occupancy DESC LIMIT 1";
@@ -41,6 +47,7 @@ $book_rooms = [
     ['id' => 11, 'name' => 'Lobby', 'max_occupancy' => $lobbyData['max_occupancy'], 'price' => $lobbyData['price']],
     ['id' => 12, 'name' => 'Building', 'max_occupancy' => $buildingData['max_occupancy'], 'price' => $buildingData['price']],
 ];
+
 $mysqli->close();
 ?>
 <!DOCTYPE html>
@@ -56,14 +63,20 @@ $mysqli->close();
 </head>
 <style>
     :root {
-        --primary-color: #10b981;
-        --secondary-color: #64748b;
+        --primary-color: #2d6936;
+        --secondary-color: #1e40af;
         --background-color: #f4f6f8;
         --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
         --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 
-
+    body {
+        background: var(--background-color);
+        min-height: 100vh;
+        padding: 10px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        margin: 0;
+    }
 
     .notification-container {
         position: fixed;
@@ -490,7 +503,7 @@ $mysqli->close();
 
     <div class="book-card">
         <div class="book-header">
-            <h1><i class="fas fa-hotel"></i>Walk in Booking</h1>
+            <h1><i class="fas fa-hotel"></i>Booking</h1>
         </div>
 
         <div class="book-content">
@@ -525,7 +538,6 @@ $mysqli->close();
                     <?php endforeach; ?>
                 </div>
             </div>
-
 
             <div id="book-step2" class="book-step-content" style="display: none;">
                 <div class="book-date-time-container">
@@ -579,6 +591,12 @@ $mysqli->close();
                         <span class="book-summary-label" style="font-weight: 600;">Price per Night:</span>
                         <span class="book-summary-value" id="book-summary-price">-</span>
                     </div>
+                    <div class="book-summary-item" style="margin-bottom: 10px;">
+                        <span class="book-summary-label" style="font-weight: 600;">Mattress Fee:</span>
+                        <span class="book-summary-value" id="book-summary-mattresses">-</span>
+                    </div>
+
+
 
                     <div class="book-summary-item" style="margin-top: 20px; padding-top: 10px;">
                         <span class="book-summary-label" style="font-size: 1.2em; font-weight: bold;">Total Price:</span>
@@ -596,6 +614,16 @@ $mysqli->close();
     </div>
 
     <script>
+        function getQueryParam(key) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(key);
+        }
+
+        const mattressCount = parseInt(getQueryParam('mattresses') || '0', 10);
+        const totalPrice = parseFloat(getQueryParam('total') || '0');
+        const basePrice = parseFloat(getQueryParam('price') || '0');
+        const guests = parseInt(getQueryParam('guests') || '0');
+
         function showLoading() {
             const overlay = document.getElementById('loadingOverlay');
             overlay.style.display = 'flex';
@@ -657,6 +685,9 @@ $mysqli->close();
             let bookingData = {
                 room: null,
                 guests: null,
+                mattresses: mattressCount,
+                basePrice: basePrice,
+                totalPrice: totalPrice,
                 arrival: null,
                 departure: null,
                 basePrice: null,
@@ -694,6 +725,7 @@ $mysqli->close();
                     return dateStr >= arrivalDate && dateStr <= departureDate;
                 });
             }
+
 
             async function initializeCalendars(roomId) {
                 try {
@@ -908,9 +940,20 @@ $mysqli->close();
                         }
                     };
 
+                    function isValidArrivalTime(date) {
+                        // Check if the time is after 7 PM (19:00)
+                        const hours = date.getHours();
+                        return hours < 19; // Returns false if hours is 19 or greater (7 PM or later)
+                    }
+
                     // Helper function to check if a date is valid for arrival
                     // Find where in the code dates like April 23 are being incorrectly classified as available for check-in
                     function isValidArrivalDate(date) {
+                        // First check the 7 PM cutoff
+                        if (!isValidArrivalTime(date)) {
+                            return false;
+                        }
+
                         // Check if date is in the past
                         const today = new Date();
                         today.setHours(0, 0, 0, 0);
@@ -922,7 +965,7 @@ $mysqli->close();
                         const dateStatus = dateStatusMap.get(dateStr);
 
                         // If no status, it's available
-                        if (!dateStatus) return true; // This might be where the issue is
+                        if (!dateStatus) return true;
 
                         // If fully booked or checkin date, it's not available
                         if (dateStatus.status === 'fully-booked' || dateStatus.status === 'checkin-date') {
@@ -1040,6 +1083,7 @@ $mysqli->close();
                     });
 
                     // First create the arrival calendar
+                    // Modify the onChange function in the arrival calendar initialization
                     window.arrivalCalendar = flatpickr("#book-arrival-datetime", {
                         ...baseConfig,
                         onChange: function(selectedDates) {
@@ -1047,6 +1091,38 @@ $mysqli->close();
                                 const selectedDate = selectedDates[0];
                                 const dateStr = flatpickr.formatDate(selectedDate, "Y-m-d");
                                 const dateStatus = dateStatusMap.get(dateStr);
+
+                                // First check for 7 PM cutoff
+                                if (!isValidArrivalTime(selectedDate)) {
+                                    NotificationSystem.show('Check-ins are not allowed after 7:00 PM. Please select an earlier time or a different date.', 'error');
+
+                                    // Reset the time to 7:00 PM
+                                    const adjustedDate = new Date(selectedDate);
+                                    adjustedDate.setHours(19, 0, 0, 0);
+                                    // Set to 7:00 PM of the previous day if possible
+                                    adjustedDate.setDate(adjustedDate.getDate() - 1);
+
+                                    // Only set this time if the previous day is valid
+                                    const prevDayStr = flatpickr.formatDate(adjustedDate, "Y-m-d");
+                                    const prevDayStatus = dateStatusMap.get(prevDayStr);
+
+                                    if (isValidArrivalDate(adjustedDate) && (!prevDayStatus ||
+                                            (prevDayStatus && (prevDayStatus.status === 'checkout-date' ||
+                                                prevDayStatus.status === 'transition-date' ||
+                                                !prevDayStatus.status)))) {
+                                        window.arrivalCalendar.setDate(adjustedDate);
+                                        bookingData.arrival = adjustedDate;
+                                        NotificationSystem.show('Time adjusted to 7:00 PM of the previous day', 'info');
+                                    } else {
+                                        // If previous day isn't valid, just set to 7:00 PM
+                                        adjustedDate.setDate(adjustedDate.getDate() + 1); // Move back to selected day
+                                        adjustedDate.setHours(18, 59, 0, 0); // Set to 6:59 PM
+                                        window.arrivalCalendar.setDate(adjustedDate);
+                                        bookingData.arrival = adjustedDate;
+                                        NotificationSystem.show('Time adjusted to 6:59 PM', 'info');
+                                    }
+                                    return;
+                                }
 
                                 if (dateStatus && (dateStatus.status === 'checkout-date' || dateStatus.status === 'transition-date')) {
                                     if (selectedDate < dateStatus.availableTime) {
@@ -1540,11 +1616,15 @@ $mysqli->close();
                         `${days} day${days !== 1 ? 's' : ''}`;
 
                     if (bookingData.totalPrice) {
-                        const totalPriceWithDuration = bookingData.totalPrice * days;
+                        const totalRoomPrice = bookingData.totalPrice * days;
+                        // Multiply mattress price by the number of days
+                        const mattressPrice = bookingData.mattresses * 500 * days;
+                        const totalPriceWithExtras = totalRoomPrice + mattressPrice;
+
                         document.getElementById('book-summary-price').textContent =
                             `₱${bookingData.totalPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} per day`;
                         document.getElementById('book-summary-total-price').textContent =
-                            `₱${totalPriceWithDuration.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${days} day${days !== 1 ? 's' : ''})`;
+                            `₱${totalPriceWithExtras.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${days} day${days !== 1 ? 's' : ''})`;
                     }
                 } else {
                     document.getElementById('book-summary-duration').textContent = '-';
@@ -1552,7 +1632,14 @@ $mysqli->close();
                         bookingData.totalPrice ? `₱${bookingData.totalPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} per day` : '-';
                     document.getElementById('book-summary-total-price').textContent = '-';
                 }
+
+                // Update mattress line to show daily rate
+                const mattressEl = document.getElementById('book-summary-mattresses');
+                if (mattressEl) {
+                    mattressEl.textContent = bookingData.mattresses ? `${bookingData.mattresses} × 500 per day` : 'None';
+                }
             }
+
 
             function validateCurrentStep() {
                 switch (currentStep) {
@@ -1621,7 +1708,10 @@ $mysqli->close();
 
                 const timeDiff = bookingData.departure - bookingData.arrival;
                 const days = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-                const totalPriceForStay = bookingData.totalPrice * days;
+                const totalRoomPrice = bookingData.totalPrice * days;
+                // Multiply mattress price by the number of days
+                const mattressPrice = bookingData.mattresses * 500 * days;
+                const totalPriceForStay = totalRoomPrice + mattressPrice;
 
                 const bookingPayload = {
                     reference_number: 'BK' + Date.now().toString().slice(-8),
@@ -1632,7 +1722,8 @@ $mysqli->close();
                     arrival_date: bookingData.arrival.toISOString().split('T')[0],
                     arrival_time: bookingData.arrival.toTimeString().split(' ')[0],
                     departure_date: bookingData.departure.toISOString().split('T')[0],
-                    departure_time: bookingData.departure.toTimeString().split(' ')[0]
+                    departure_time: bookingData.departure.toTimeString().split(' ')[0],
+                    mattresses: bookingData.mattresses
                 };
 
                 console.log('Sending booking payload:', bookingPayload);
@@ -1708,5 +1799,6 @@ $mysqli->close();
         });
     </script>
 </body>
+
 
 </html>

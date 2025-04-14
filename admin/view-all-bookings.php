@@ -594,6 +594,7 @@ $bookingsResult = $mysqli->query($bookingsQuery);
                             ?>
                             <tr data-user-id="<?php echo htmlspecialchars($booking['user_id']); ?>"
                                 data-reference-number="<?php echo htmlspecialchars($booking['reference_number']); ?>"
+                                data-occupancy="<?php echo htmlspecialchars($booking['occupancy']); ?>"
                                 data-price-per-day="<?php echo htmlspecialchars($booking['price_per_day']); ?>"
                                 data-mattress-fee="<?php echo htmlspecialchars($booking['mattress_fee']); ?>"
                                 data-total-price="<?php echo htmlspecialchars($booking['total_price']); ?>">
@@ -690,6 +691,10 @@ $bookingsResult = $mysqli->query($bookingsQuery);
                                 <span id="alm-modal-price-per-day"></span>
                             </div>
                             <div class="alm-detail-item">
+                                <label><i class="fas fa-users"></i> Occupancy:</label>
+                                <span id="alm-modal-occupancy"></span>
+                            </div>
+                            <div class="alm-detail-item">
                                 <label><i class="fas fa-money-bill-wave"></i> Mattress Fee:</label>
                                 <span id="alm-modal-mattress-fee"></span>
                             </div>
@@ -736,10 +741,6 @@ $bookingsResult = $mysqli->query($bookingsQuery);
 
                         <div class="alm-detail-section">
                             <h3><i class="fas fa-user-check"></i> Status Information</h3>
-                            <div class="alm-detail-item">
-                                <label><i class="fas fa-users"></i> Accompanying Persons:</label>
-                                <span id="alm-modal-accompanying"></span>
-                            </div>
                             <div class="alm-detail-item">
                                 <label><i class="fas fa-user-shield"></i> User Status:</label>
                                 <span id="alm-modal-user-status"></span>
@@ -1251,6 +1252,7 @@ $bookingsResult = $mysqli->query($bookingsQuery);
                         updateField('alm-modal-email', data.user.email);
 
                         const referenceNumber = this.getAttribute('data-reference-number') || 'N/A';
+                        const occupancy = this.getAttribute('data-occupancy') || '0';
                         const pricePerDay = this.getAttribute('data-price-per-day') || '0';
                         const mattressFee = this.getAttribute('data-mattress-fee') || '0';
                         const totalPrice = this.getAttribute('data-total-price') || '0';
@@ -1261,6 +1263,7 @@ $bookingsResult = $mysqli->query($bookingsQuery);
                             data.user_details.last_name
                         ].filter(Boolean).join(' ');
                         updateField('alm-modal-reference-number', referenceNumber);
+                        updateField('alm-modal-occupancy', occupancy);
                         updateField('alm-modal-price-per-day', pricePerDay);
                         updateField('alm-modal-mattress-fee', `₱${parseFloat(mattressFee).toFixed(2)}`);
                         updateField('alm-modal-total-price', `₱${parseFloat(totalPrice).toFixed(2)}`);
@@ -1269,7 +1272,6 @@ $bookingsResult = $mysqli->query($bookingsQuery);
                         updateField('alm-modal-address', data.user_details.address);
                         updateField('alm-modal-phone', data.user_details.phone_number);
                         updateField('alm-modal-telephone', data.user_details.telephone);
-                        updateField('alm-modal-accompanying', data.user_details.accompanying_persons);
                         updateField('alm-modal-user-status', data.user_details.user_status);
                         updateField('alm-modal-verified', data.user_details.verified ? 'Verified' : 'Not Verified');
 
