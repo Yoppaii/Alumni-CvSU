@@ -47,7 +47,7 @@ $result = $mysqli->query($query);
             }
             ?>
         </div>
-        <a href="all_announcements.php" class="announcement-view-all">
+        <a href="?pages=news-features" class="announcement-view-all">
             See all announcements
             <i class="fas fa-chevron-right"></i>
         </a>
