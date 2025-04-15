@@ -24,31 +24,33 @@ $stmt_latest->execute();
 $latest_announcements = $stmt_latest->get_result();
 ?>
 
+
 <div class="announcement-page-layout">
+
     <?php if ($selected_announcement): ?>
-    <section id="announcement-details-section">
-        <div class="announcement-details-container">
-            <a href="javascript:history.back()" class="back-button">
-                <i class="fas fa-arrow-left"></i> Back
-            </a>
-            <div class="announcement-details-header">
-                <span id="announcement-badge"><?php echo htmlspecialchars($selected_announcement['badge']); ?></span>
-                <h1><?php echo htmlspecialchars($selected_announcement['title']); ?></h1>
-                <div class="announcement-meta">
-                    <span class="announcement-date">
-                        <i class="fas fa-calendar-alt"></i>
-                        <?php 
-                        $detail_date = new DateTime($selected_announcement['created_at']);
-                        echo $detail_date->format('F d, Y'); 
-                        ?>
-                    </span>
+        <section id="announcement-details-section">
+            <div class="announcement-details-container">
+                <a href="javascript:history.back()" class="back-button">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
+                <div class="announcement-details-header">
+                    <span id="announcement-badge"><?php echo htmlspecialchars($selected_announcement['badge']); ?></span>
+                    <h1><?php echo htmlspecialchars($selected_announcement['title']); ?></h1>
+                    <div class="announcement-meta">
+                        <span class="announcement-date">
+                            <i class="fas fa-calendar-alt"></i>
+                            <?php
+                            $detail_date = new DateTime($selected_announcement['created_at']);
+                            echo $detail_date->format('F d, Y');
+                            ?>
+                        </span>
+                    </div>
+                </div>
+                <div class="announcement-details-content">
+                    <?php echo nl2br(htmlspecialchars($selected_announcement['content'])); ?>
                 </div>
             </div>
-            <div class="announcement-details-content">
-                <?php echo nl2br(htmlspecialchars($selected_announcement['content'])); ?>
-            </div>
-        </div>
-    </section>
+        </section>
     <?php endif; ?>
 
     <section id="latest-announcements-section">
@@ -57,7 +59,6 @@ $latest_announcements = $stmt_latest->get_result();
                 <i class="fas fa-bullhorn"></i>
                 Other Announcements
             </h2>
-            
             <!-- Carousel wrapper -->
             <div class="announcement-carousel-container">
                 <div class="announcement-carousel">
@@ -66,7 +67,7 @@ $latest_announcements = $stmt_latest->get_result();
                         while ($row = $latest_announcements->fetch_assoc()) {
                             $date = new DateTime($row['created_at']);
                             $formatted_date = $date->format('M d, Y');
-                            
+
                             $truncated_content = mb_substr($row['content'], 0, 150);
                             if (strlen($row['content']) > 150) {
                                 $truncated_content .= '...';
@@ -95,7 +96,7 @@ $latest_announcements = $stmt_latest->get_result();
                     }
                     ?>
                 </div>
-                
+
                 <!-- Carousel navigation -->
                 <div class="carousel-navigation">
                     <button class="carousel-prev-btn" aria-label="Previous announcement">
@@ -113,20 +114,21 @@ $latest_announcements = $stmt_latest->get_result();
 
 <style>
     :root {
-        --cvsu-gold:rgb(230, 233, 71);
+        --cvsu-gold: rgb(230, 233, 71);
         --cvsu-primary-green: #006400;
         --cvsu-hover-green: #004d00;
         --cvsu-light-green: #e8f5e8;
         --cvsu-text-dark: #333;
         --cvsu-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
-        --cvsu-gold: #D4AF37; /* Gold color for badges */
+        --cvsu-gold: #D4AF37;
+        /* Gold color for badges */
     }
 
     .announcement-page-layout {
         display: flex;
         gap: 2rem;
-        padding: 1rem;
-        max-width: 1600px;
+        padding: 1rem 0 10rem 0;
+        max-width: 1200px;
         margin: 0 auto;
     }
 
@@ -232,7 +234,8 @@ $latest_announcements = $stmt_latest->get_result();
     }
 
     #announcement-badge {
-        background-color: var(--cvsu-gold);  /* Using gold color variable */
+        background-color: var(--cvsu-gold);
+        /* Using gold color variable */
         color: white;
         padding: 0.15rem 0.5rem;
         border-radius: 999px;
@@ -310,7 +313,7 @@ $latest_announcements = $stmt_latest->get_result();
         background: var(--cvsu-light-green);
         border-radius: 8px;
     }
-    
+
     /* Carousel Navigation */
     .carousel-navigation {
         display: flex;
@@ -319,7 +322,7 @@ $latest_announcements = $stmt_latest->get_result();
         gap: 1rem;
         margin-top: 1rem;
     }
-    
+
     .carousel-prev-btn,
     .carousel-next-btn {
         background-color: var(--cvsu-primary-green);
@@ -334,17 +337,17 @@ $latest_announcements = $stmt_latest->get_result();
         cursor: pointer;
         transition: background-color 0.3s ease;
     }
-    
+
     .carousel-prev-btn:hover,
     .carousel-next-btn:hover {
         background-color: var(--cvsu-hover-green);
     }
-    
+
     .carousel-indicators {
         display: flex;
         gap: 0.5rem;
     }
-    
+
     .carousel-indicator {
         width: 8px;
         height: 8px;
@@ -353,7 +356,7 @@ $latest_announcements = $stmt_latest->get_result();
         cursor: pointer;
         transition: background-color 0.3s ease;
     }
-    
+
     .carousel-indicator.active {
         background-color: var(--cvsu-primary-green);
     }
@@ -376,11 +379,12 @@ $latest_announcements = $stmt_latest->get_result();
     }
 
     @media (max-width: 576px) {
+
         .announcement-container,
         .announcement-details-container {
             padding: 0.75rem;
         }
-        
+
         .announcement-heading {
             font-size: 1.25rem;
         }
@@ -388,15 +392,15 @@ $latest_announcements = $stmt_latest->get_result();
         .announcement-item {
             height: 250px;
         }
-        
+
         .announcement-details-header h1 {
             font-size: 1.5rem;
         }
-        
+
         .carousel-navigation {
             gap: 0.5rem;
         }
-        
+
         .carousel-prev-btn,
         .carousel-next-btn {
             width: 28px;
@@ -406,89 +410,95 @@ $latest_announcements = $stmt_latest->get_result();
 </style>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const carousel = document.querySelector('.announcement-carousel');
-    const prevBtn = document.querySelector('.carousel-prev-btn');
-    const nextBtn = document.querySelector('.carousel-next-btn');
-    const indicators = document.querySelector('.carousel-indicators');
-    const items = carousel.querySelectorAll('.announcement-item');
-    
-    let currentIndex = 0;
-    
-    // Create indicator dots
-    items.forEach((_, index) => {
-        const dot = document.createElement('div');
-        dot.classList.add('carousel-indicator');
-        if (index === 0) dot.classList.add('active');
-        dot.addEventListener('click', () => goToSlide(index));
-        indicators.appendChild(dot);
-    });
-    
-    // Update indicators
-    function updateIndicators() {
-        document.querySelectorAll('.carousel-indicator').forEach((dot, index) => {
-            dot.classList.toggle('active', index === currentIndex);
-        });
-    }
-    
-    // Navigate to specific slide
-    function goToSlide(index) {
+    document.addEventListener('DOMContentLoaded', function() {
+        const carousel = document.querySelector('.announcement-carousel');
+        const prevBtn = document.querySelector('.carousel-prev-btn');
+        const nextBtn = document.querySelector('.carousel-next-btn');
+        const indicators = document.querySelector('.carousel-indicators');
         const items = carousel.querySelectorAll('.announcement-item');
-        if (index < 0) index = items.length - 1;
-        if (index >= items.length) index = 0;
-        
-        currentIndex = index;
-        const itemWidth = items[0].offsetWidth;
-        carousel.scrollTo({
-            left: itemWidth * currentIndex,
-            behavior: 'smooth'
+
+        let currentIndex = 0;
+
+        // Create indicator dots
+        items.forEach((_, index) => {
+            const dot = document.createElement('div');
+            dot.classList.add('carousel-indicator');
+            if (index === 0) dot.classList.add('active');
+            dot.addEventListener('click', () => goToSlide(index));
+            indicators.appendChild(dot);
         });
-        
-        updateIndicators();
-    }
-    
-    // Previous button
-    prevBtn.addEventListener('click', () => {
-        goToSlide(currentIndex - 1);
-    });
-    
-    // Next button
-    nextBtn.addEventListener('click', () => {
-        goToSlide(currentIndex + 1);
-    });
-    
-    // Touch swipe support
-    let touchStartX = 0;
-    let touchEndX = 0;
-    
-    carousel.addEventListener('touchstart', e => {
-        touchStartX = e.changedTouches[0].screenX;
-    }, {passive: true});
-    
-    carousel.addEventListener('touchend', e => {
-        touchEndX = e.changedTouches[0].screenX;
-        handleSwipe();
-    }, {passive: true});
-    
-    function handleSwipe() {
-        const swipeThreshold = 50;
-        if (touchStartX - touchEndX > swipeThreshold) {
-            // Swipe left - go to next
-            goToSlide(currentIndex + 1);
-        } else if (touchEndX - touchStartX > swipeThreshold) {
-            // Swipe right - go to previous
-            goToSlide(currentIndex - 1);
+
+        // Update indicators
+        function updateIndicators() {
+            document.querySelectorAll('.carousel-indicator').forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentIndex);
+            });
         }
-    }
-    
-    // Detect scroll end to update indicators
-    carousel.addEventListener('scroll', function() {
-        clearTimeout(carousel.scrollTimer);
-        carousel.scrollTimer = setTimeout(function() {
+
+        // Navigate to specific slide
+        function goToSlide(index) {
+            const items = carousel.querySelectorAll('.announcement-item');
+            if (index < 0) index = items.length - 1;
+            if (index >= items.length) index = 0;
+
+            currentIndex = index;
             const itemWidth = items[0].offsetWidth;
-            currentIndex = Math.round(carousel.scrollLeft / itemWidth);
+            carousel.scrollTo({
+                left: itemWidth * currentIndex,
+                behavior: 'smooth'
+            });
+
             updateIndicators();
-        }, 100);
-    }, {passive: true});
-});
+        }
+
+        // Previous button
+        prevBtn.addEventListener('click', () => {
+            goToSlide(currentIndex - 1);
+        });
+
+        // Next button
+        nextBtn.addEventListener('click', () => {
+            goToSlide(currentIndex + 1);
+        });
+
+        // Touch swipe support
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        carousel.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, {
+            passive: true
+        });
+
+        carousel.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, {
+            passive: true
+        });
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            if (touchStartX - touchEndX > swipeThreshold) {
+                // Swipe left - go to next
+                goToSlide(currentIndex + 1);
+            } else if (touchEndX - touchStartX > swipeThreshold) {
+                // Swipe right - go to previous
+                goToSlide(currentIndex - 1);
+            }
+        }
+
+        // Detect scroll end to update indicators
+        carousel.addEventListener('scroll', function() {
+            clearTimeout(carousel.scrollTimer);
+            carousel.scrollTimer = setTimeout(function() {
+                const itemWidth = items[0].offsetWidth;
+                currentIndex = Math.round(carousel.scrollLeft / itemWidth);
+                updateIndicators();
+            }, 100);
+        }, {
+            passive: true
+        });
+    });
 </script>

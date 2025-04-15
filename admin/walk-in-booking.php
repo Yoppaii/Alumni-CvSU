@@ -73,7 +73,6 @@ $mysqli->close();
     body {
         background: var(--background-color);
         min-height: 100vh;
-        padding: 10px;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         margin: 0;
     }

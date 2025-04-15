@@ -185,7 +185,7 @@ $history_result = $history_stmt->get_result();
                                     <th>Room</th>
                                     <th>Occupancy</th>
                                     <th>Mattress Fee</th>
-                                    <th>Price</th>
+                                    <th>Total Price</th>
                                     <th>Check In</th>
                                     <th>Check Out</th>
                                     <th>Status</th>
@@ -601,23 +601,45 @@ $history_result = $history_stmt->get_result();
 
                     yPos += 10;
                     doc.setFont('helvetica', 'normal');
+
+                    // Parse the prices correctly
+                    const parsedRoomPrice = parseFloat(price.replace(/[₱,]/g, '')) || 0;
+                    const parsedMattressFee = parseFloat(mattressFee.replace(/[₱,]/g, '')) || 0;
+
+                    // Adjust room price by subtracting mattress fee since it's already included
+                    const adjustedRoomPrice = parsedRoomPrice - parsedMattressFee;
+                    const totalAmount = (adjustedRoomPrice + parsedMattressFee).toFixed(2);
+
+                    // First row - Room price (adjusted)
                     xPos = leftMargin;
-
-                    const parsedPrice = parseFloat(price.replace(/,/g, '')) || 0;
-                    const parsedMattressFee = parseFloat(mattressFee.replace(/,/g, '')) || 0;
-                    const totalAmount = (parsedPrice + parsedMattressFee).toFixed(2);
-
-                    const tableContent = [
-                        `${room} + Mattress Fee`,
+                    const roomContent = [
+                        `${room} Accommodation`,
                         '1',
-                        parsedPrice.toFixed(2),
-                        totalAmount
+                        adjustedRoomPrice.toFixed(2),
+                        adjustedRoomPrice.toFixed(2)
                     ];
 
-                    tableContent.forEach((text, i) => {
+                    roomContent.forEach((text, i) => {
                         doc.text(text.toString(), xPos, yPos);
                         xPos += columnWidths[i];
                     });
+
+                    // Only add mattress row if there's a mattress fee
+                    if (parsedMattressFee > 0) {
+                        yPos += 8;
+                        xPos = leftMargin;
+                        const mattressContent = [
+                            'Extra Mattress Fee',
+                            '1',
+                            parsedMattressFee.toFixed(2),
+                            parsedMattressFee.toFixed(2)
+                        ];
+
+                        mattressContent.forEach((text, i) => {
+                            doc.text(text.toString(), xPos, yPos);
+                            xPos += columnWidths[i];
+                        });
+                    }
 
                     yPos += 20;
                     doc.setDrawColor(200, 200, 200);
@@ -625,8 +647,9 @@ $history_result = $history_stmt->get_result();
                     doc.line(leftMargin, yPos, pageWidth - leftMargin, yPos);
                     yPos += 10;
 
+                    // Summary totals
                     [
-                        ['Room Price:', parsedPrice.toFixed(2)],
+                        ['Room Price:', adjustedRoomPrice.toFixed(2)], // Use adjusted room price here
                         ['Mattress Fee:', parsedMattressFee.toFixed(2)],
                         ['Total:', totalAmount]
                     ].forEach(([label, value]) => {

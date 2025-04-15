@@ -4,7 +4,7 @@ if (!isset($_SESSION)) {
 }
 
 require 'main_db.php';
-
+ 
 $amenityIcons = [
     'Free Wi-Fi' => 'wifi',
     'TV' => 'tv',

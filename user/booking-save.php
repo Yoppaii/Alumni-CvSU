@@ -7,6 +7,7 @@ header('Content-Type: application/json');
 session_start();
 
 try {
+
     if (!isset($_SESSION['user_id'])) {
         throw new Exception('User not logged in');
     }
@@ -48,7 +49,7 @@ try {
     };
 
     // Prepare data
-    $mattress_fee = $data['mattresses'] * 300;
+    $mattress_fee = $data['mattresses'] * 500;
     $total_price = $data['price']; // Optional: recalculate server-side for extra security
 
     // Prepare INSERT

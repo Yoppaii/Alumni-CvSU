@@ -56,8 +56,8 @@ try {
         INSERT INTO bookings 
             (reference_number, user_id, room_number, occupancy, price, price_per_day,
              mattress_fee, total_price,
-             arrival_date, arrival_time, departure_date, departure_time, status) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
+             arrival_date, arrival_time, departure_date, departure_time, is_walkin) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,'yes')
     ");
     if (!$bookingStmt) {
         throw new Exception($mysqli->error);
