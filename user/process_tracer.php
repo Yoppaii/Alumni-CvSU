@@ -8,6 +8,7 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 require __DIR__ . '/../vendor/autoload.php';
+date_default_timezone_set('Asia/Manila');
 
 // Set error handling to prevent HTML errors being output
 ini_set('display_errors', 0);
@@ -41,6 +42,11 @@ function sendTracerSubmissionEmail($email, $fullName)
                         <p style="margin: 5px 0;">We would like to invite you to register and fill up the Alumni Tracer Form in our system.</p>
                         <p style="margin: 5px 0;">Your participation will help our institution track the career paths of our graduates and improve our academic programs.</p>
                         <p style="margin: 5px 0;">Your input is valuable for our institution\'s continuous improvement efforts.</p>
+                        
+                        <!-- Website Link Button -->
+                        <div style="text-align: center; margin-top: 20px;">
+                            <a href="https://alumnicvsu.com/" style="background-color: #4682B4; color: white; padding: 12px 25px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;">Visit Our Website</a>
+                        </div>
                     </div>
                     
                     <div style="background: #e8f4fd; border: 1px solid #d1e9ff; color: #0c5460; padding: 15px; border-radius: 4px; margin-top: 20px;">
@@ -52,6 +58,7 @@ function sendTracerSubmissionEmail($email, $fullName)
             <div style="background: #f8f9fa; padding: 15px; text-align: center; font-size: 12px; color: #666;">
                 <p style="margin: 5px 0;">This is an automated message, please do not reply to this email.</p>
                 <p style="margin: 5px 0;">Alumni Tracer System</p>
+                <p style="margin: 5px 0;"><a href="https://alumnicvsu.com/" style="color: #4682B4; text-decoration: none;">alumnicvsu.com</a></p>
                 <p style="margin: 5px 0;">Time sent: ' . date('Y-m-d H:i:s') . '</p>
             </div>
         </div>

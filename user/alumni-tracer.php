@@ -91,6 +91,8 @@ ob_end_flush();
     select,
     input[type="date"],
     input[type="text"],
+    input[type="number"],
+    input[type="email"],
     textarea {
         width: 100%;
         padding: 12px;
@@ -576,15 +578,15 @@ ob_end_flush();
                     <label>Educational Attainment (Baccalaureate Degree Only)</label>
                     <div>
                         <label for="degree_specialization">Degree(s) & Specialization(s)</label>
-                        <input type="text" name="degree_specialization" id="degree_specialization" placeholder="e.g., BS Computer Science" required>
+                        <input type="text" name="degree_specialization" id="degree_specialization" placeholder="e.g., BS in Nursing, Major in Community Health">
                     </div>
                     <div>
                         <label for="college_university">College or University</label>
-                        <input type="text" name="college_university" id="college_university" placeholder="e.g., Cavite State University" required>
+                        <input type="text" name="college_university" id="college_university" placeholder="e.g., Cavite State University">
                     </div>
                     <div>
                         <label for="year_graduated">Year Graduated</label>
-                        <input type="number" name="year_graduated" id="year_graduated" placeholder="e.g., 2023" min="1900" max="2100" required>
+                        <input type="number" name="year_graduated" id="year_graduated" placeholder="e.g., 2023" min="1900" max="2100">
                     </div>
                     <div>
                         <label for="honors_or_awards">Honor(s) or Award(s) Received</label>
@@ -594,7 +596,7 @@ ob_end_flush();
 
                 <div class="form-group">
                     <label for="professionalExams">Professional Examination(s) Passed</label>
-                    <select name="professionalExams" id="professionalExams" required>
+                    <select name="professionalExams" id="professionalExams">
                         <option value="">Select Professional Examination</option>
                         <option value="licensure">Licensure Examination</option>
                         <option value="civil_service">Civil Service Examination</option>
@@ -684,22 +686,22 @@ ob_end_flush();
 
                 <div class="form-group">
                     <label for="trainingTitle">Title of Training or Advance Study</label>
-                    <input type="text" name="trainingTitle" id="trainingTitle" placeholder="Enter the title of your training or advance study" required>
+                    <input type="text" name="trainingTitle" id="trainingTitle" placeholder="Enter the title of your training or advance study">
                 </div>
 
                 <div class="form-group">
                     <label for="duration">Duration and Credits Earned</label>
-                    <input type="text" name="duration" id="duration" placeholder="e.g., 6 months - 30 credits" required>
+                    <input type="text" name="duration" id="duration" placeholder="e.g., 6 months - 30 credits">
                 </div>
 
                 <div class="form-group">
                     <label for="institution">Name of Training Institution/College/University</label>
-                    <input type="text" name="institution" id="institution" placeholder="Enter the name of the institution" required>
+                    <input type="text" name="institution" id="institution" placeholder="Enter the name of the institution">
                 </div>
 
                 <div class="form-group">
                     <label for="advanceReason">What made you pursue advance studies?</label>
-                    <select name="advanceReason" id="advanceReason" required>
+                    <select name="advanceReason" id="advanceReason">
                         <option value="">Select your reason</option>
                         <option value="career_advancement">Career Advancement</option>
                         <option value="professional_development">Professional Development</option>
@@ -1085,8 +1087,10 @@ ob_end_flush();
             </div>
         </form>
     </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+
             const NotificationSystem = {
                 container: null,
                 init: function() {
@@ -1403,4 +1407,3 @@ ob_end_flush();
 </body>
 
 </html>
-
