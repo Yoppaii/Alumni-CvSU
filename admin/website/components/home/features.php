@@ -58,7 +58,7 @@
                                 <div class="feature-content">
                                     <h3><?php echo $room; ?></h3>
                                     <p class="room-description"><?php echo $descriptions[$index]; ?></p>
-                                    <a href="Alumni.php" class="feature-link">Learn More <i class="fas fa-arrow-right"></i></a>
+                                   <!-- <a href="Alumni.php" class="feature-link">Learn More <i class="fas fa-arrow-right"></i></a>  -->
                                 </div>
                             </div>
                         </div>

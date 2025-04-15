@@ -399,7 +399,7 @@ $totalCount = $mysqli->query($countQuery)->fetch_assoc()['count'];
                                 <td>₱<?php echo number_format($application['price'], 2); ?></td>
                                 <td>
                                     <span class="alm-status-badge alm-status-paid">
-                                        <i class="fas fa-dollar-sign"></i> Paid
+                                        <!--<i class="fas fa-dollar-sign"></i>--> Paid
                                     </span>
                                 </td>
                                 <td class="alm-hide-mobile">

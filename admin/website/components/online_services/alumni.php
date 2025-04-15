@@ -13,7 +13,7 @@
                             <div class="ra-membership-info">
                                 <p class="ra-description">Become a member and stay connected with the Cavite State University Alumni Association. Our membership provides exclusive benefits and access to various alumni services.</p>
                                 <p class="ra-cta-text">If you want to enjoy all the benefits of being a part of the Cavite State University Alumni, we encourage you to register now!</p>
-                                <a href="#" class="ra-cta-button">Join Now <i class="fas fa-arrow-right"></i></a>
+                                <a href="Account.php" class="ra-cta-button">Join Now <i class="fas fa-arrow-right"></i></a>
                             </div>
                             
                             <div class="ra-membership-options">

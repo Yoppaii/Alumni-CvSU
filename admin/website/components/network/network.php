@@ -1,45 +1,45 @@
 <div class="campus-grid">
-    <a href="CvSU/main/network/campus-details.php?id=cavite-city" class="campus-item">
+    <a href="https://cvsu.edu.ph/cavite-city-campus/" class="campus-item">
         <img src="asset/images/campuses/Cavite-City.jpg" alt="CAVITE STATE UNIVERSITY - Cavite City">
         <h3>CAVITE STATE UNIVERSITY - Cavite City</h3>
     </a>
 
-    <a href="campus-details?id=carmona" class="campus-item">
+    <a href="https://cvsu.edu.ph/carmona/" class="campus-item">
         <img src="asset/images/campuses/Carmona.jpg" alt="CAVITE STATE UNIVERSITY - Carmona">
         <h3>CAVITE STATE UNIVERSITY - Carmona</h3>
     </a>
 
-    <a href="campus-details?id=silang" class="campus-item">
+    <a href="https://cvsu-silang.edu.ph/" class="campus-item">
         <img src="asset/images/campuses/Silang.jpg" alt="CAVITE STATE UNIVERSITY - Silang">
         <h3>CAVITE STATE UNIVERSITY - Silang</h3>
     </a>
 
-    <a href="campus-details?id=trece" class="campus-item">
+    <a href="https://cvsu.edu.ph/trece-martires-city-campus/" class="campus-item">
         <img src="asset/images/campuses/Trece.jpg" alt="CAVITE STATE UNIVERSITY - Trece Martires City">
         <h3>CAVITE STATE UNIVERSITY - Trece Martires City</h3>
     </a>
 
-    <a href="campus-details?id=gentri" class="campus-item">
+    <a href="https://cvsu.edu.ph/general-trias-campus/" class="campus-item">
         <img src="asset/images/campuses/Gentri.jpg" alt="CAVITE STATE UNIVERSITY - General Trias">
         <h3>CAVITE STATE UNIVERSITY - General Trias</h3>
     </a>
 
-    <a href="campus-details?id=imus" class="campus-item">
+    <a href="https://cvsu-imus.edu.ph/" class="campus-item">
         <img src="asset/images/campuses/Imus.jpg" alt="CAVITE STATE UNIVERSITY - Imus">
         <h3>CAVITE STATE UNIVERSITY - Imus</h3>
     </a>
 
-    <a href="campus-details?id=naic" class="campus-item">
+    <a href="https://cvsu.edu.ph/naic-campus/" class="campus-item">
         <img src="asset/images/campuses/Naic.jpg" alt="CAVITE STATE UNIVERSITY - Naic">
         <h3>CAVITE STATE UNIVERSITY - Naic</h3>
     </a>
 
-    <a href="campus-details?id=ccat" class="campus-item">
+    <a href="https://cvsu.edu.ph/rosario-campus/" class="campus-item">
         <img src="asset/images/campuses/CCAT.jpg" alt="CAVITE STATE UNIVERSITY - CCAT">
         <h3>CAVITE STATE UNIVERSITY - CCAT</h3>
     </a>
 
-    <a href="campus-details?id=tanza" class="campus-item">
+    <a href="https://cvsu.edu.ph/tanza-campus/" class="campus-item">
         <img src="asset/images/campuses/Tanza.jpg" alt="CAVITE STATE UNIVERSITY - Tanza">
         <h3>CAVITE STATE UNIVERSITY - Tanza</h3>
     </a>

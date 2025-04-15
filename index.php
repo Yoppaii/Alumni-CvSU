@@ -15,7 +15,7 @@ if (session_status() === PHP_SESSION_NONE) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alumni Cavite State University</title>
-    <link rel="icon" href="asset/images/res1.png" type="image/x-icon">
+    <link rel="icon" href="asset/images/2.png" type="image/x-icon">
     <link rel="stylesheet" href="asset/css/button-up-css/up_buttonss.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
