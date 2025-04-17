@@ -440,7 +440,7 @@
         <div class="dashboard-row">
             <div class="analytics-card">
                 <div class="analytics-header">
-                    <h2>Total Graduates Per Campus</h2>
+                    <h2>Total Respondents Per Campus</h2>
                     <label class="toggle-report">
                         <input type="checkbox" class="toggle-input report-checkbox" value="totalGraduates" checked>
                         <span class="toggle-label">Include in Report</span>
