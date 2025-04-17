@@ -7,11 +7,12 @@ if (session_status() === PHP_SESSION_NONE) {
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
+
 require 'vendor/autoload.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ob_start();
-    
+
     $response = ['status' => 'error', 'message' => ''];
 
     $email = $_POST['email'];
@@ -35,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $ip_check->bind_param('is', $id, $current_ip);
         $ip_check->execute();
         $ip_check->store_result();
-        
+
         $session_token = bin2hex(random_bytes(32));
 
         $update_stmt = $mysqli->prepare("UPDATE users SET session_token = ? WHERE id = ?");
@@ -59,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $mail->Host = 'smtp.gmail.com';
                 $mail->SMTPAuth = true;
                 $mail->Username = 'roomreservation.csumc@gmail.com';
-                $mail->Password = 'bpqazltzfyacofjd'; 
+                $mail->Password = 'bpqazltzfyacofjd';
                 $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                 $mail->Port = 587;
 
@@ -136,26 +137,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $response['message'] = 'Could not send verification code. Please try again.';
             }
         } else {
-            
+
             $response['status'] = 'success';
             $response['redirect'] = '../../../Alumni-CvSU/Account';
             $response['message'] = 'Login successful!';
         }
-        
+
         $ip_check->close();
     } else {
         $response['message'] = 'Invalid email or password.';
     }
 
     $stmt->close();
-    
+
     ob_clean();
     header('Content-Type: application/json');
     echo json_encode($response);
     exit;
 }
 
-function get_browser_name($user_agent) {
+function get_browser_name($user_agent)
+{
     if (strpos($user_agent, 'Opera') || strpos($user_agent, 'OPR/')) return 'Opera';
     elseif (strpos($user_agent, 'Edge')) return 'Edge';
     elseif (strpos($user_agent, 'Chrome')) return 'Chrome';
@@ -165,7 +167,8 @@ function get_browser_name($user_agent) {
     return 'Unknown';
 }
 
-function get_os($user_agent) {
+function get_os($user_agent)
+{
     $os_platform = "Unknown";
     $os_array = array(
         '/windows nt 10/i'      =>  'Windows 10',
@@ -201,17 +204,21 @@ function get_os($user_agent) {
     return $os_platform;
 }
 
-function is_mobile($user_agent) {
+function is_mobile($user_agent)
+{
     return preg_match("/(android|avantgo|blackberry|bolt|boost|cricket|docomo|fone|hiptop|mini|mobi|palm|phone|pie|tablet|up\.browser|up\.link|webos|wos)/i", $user_agent);
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - CvSU</title>
     <link rel="icon" href="asset/images/res1.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
@@ -270,14 +277,27 @@ function is_mobile($user_agent) {
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         @keyframes pulse {
-            0% { opacity: 0.6; }
-            50% { opacity: 1; }
-            100% { opacity: 0.6; }
+            0% {
+                opacity: 0.6;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0.6;
+            }
         }
 
         body {
@@ -357,6 +377,31 @@ function is_mobile($user_agent) {
             outline: none;
             border-color: var(--login-primary);
             box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+        }
+
+        /* Password field container */
+        .password-container {
+            position: relative;
+        }
+
+        .password-container input {
+            padding-right: 40px;
+            /* Make room for the eye icon */
+        }
+
+        /* Eye icon styles */
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #666;
+            transition: var(--login-transition);
+        }
+
+        .password-toggle:hover {
+            color: var(--login-primary);
         }
 
         .form-footer {
@@ -463,8 +508,15 @@ function is_mobile($user_agent) {
         }
 
         @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
 
         @media (max-width: 480px) {
@@ -488,13 +540,14 @@ function is_mobile($user_agent) {
                 padding: 0 10px;
             }
         }
+
         .login-header img {
             height: 30px;
             width: auto;
             vertical-align: middle;
             margin-left: 5px;
         }
-        
+
         .login-header p {
             color: #666;
             font-size: 0.9rem;
@@ -505,6 +558,7 @@ function is_mobile($user_agent) {
         }
     </style>
 </head>
+
 <body>
     <div id="loadingOverlay">
         <div class="loading-content">
@@ -522,7 +576,6 @@ function is_mobile($user_agent) {
                 <p>Sign in to continue to <img src="asset/images/res1.png" alt="Logo"></p>
             </div>
 
-
             <form>
                 <div class="input-group">
                     <label for="loginEmail">Email address</label>
@@ -531,7 +584,12 @@ function is_mobile($user_agent) {
 
                 <div class="input-group">
                     <label for="loginPassword">Password</label>
-                    <input type="password" id="loginPassword" name="password" required>
+                    <div class="password-container">
+                        <input type="password" id="loginPassword" name="password" required>
+                        <span class="password-toggle" id="passwordToggle">
+                            <i class="fa-solid fa-eye"></i>
+                        </span>
+                    </div>
                 </div>
 
                 <div class="form-footer">
@@ -558,6 +616,22 @@ function is_mobile($user_agent) {
     </div>
 
     <script>
+        // Password toggle functionality
+        document.getElementById('passwordToggle').addEventListener('click', function() {
+            const passwordField = document.getElementById('loginPassword');
+            const icon = this.querySelector('i');
+
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordField.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+
         function showNotification(message, type = 'error') {
             const container = document.getElementById('notificationContainer');
             const notification = document.createElement('div');
@@ -612,39 +686,37 @@ function is_mobile($user_agent) {
             showLoading();
 
             const formData = new FormData(this);
-            
+
             fetch('?Cavite-State-University=login', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'error') {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'error') {
+                        hideLoading();
+                        showNotification(data.message, 'error');
+                    } else if (data.status === 'success') {
+                        showNotification(data.message, 'success');
+                        setTimeout(() => {
+                            window.location.href = data.redirect;
+                        }, 1500);
+                    }
+                })
+                .catch(error => {
                     hideLoading();
-                    showNotification(data.message, 'error');
-                } else if (data.status === 'success') {
-                    showNotification(data.message, 'success');
-                    setTimeout(() => {
-                        window.location.href = data.redirect;
-                    }, 1500);
-                }
-            })
-            .catch(error => {
-                hideLoading();
-                showNotification('An error occurred. Please try again.', 'error');
-                console.error('Error:', error);
-            });
+                    showNotification('An error occurred. Please try again.', 'error');
+                    console.error('Error:', error);
+                });
         });
 
         function saveCredentials(email, password, remember) {
             if (remember) {
-
-                const encryptedPass = btoa(password); 
+                const encryptedPass = btoa(password);
                 localStorage.setItem('rememberedEmail', email);
                 localStorage.setItem('rememberedPass', encryptedPass);
                 localStorage.setItem('rememberedLogin', 'true');
             } else {
-
                 localStorage.removeItem('rememberedEmail');
                 localStorage.removeItem('rememberedPass');
                 localStorage.removeItem('rememberedLogin');
@@ -657,8 +729,7 @@ function is_mobile($user_agent) {
                 const email = localStorage.getItem('rememberedEmail');
                 const encryptedPass = localStorage.getItem('rememberedPass');
                 if (email && encryptedPass) {
-
-                    const password = atob(encryptedPass); 
+                    const password = atob(encryptedPass);
                     document.getElementById('loginEmail').value = email;
                     document.getElementById('loginPassword').value = password;
                     document.querySelector('input[type="checkbox"]').checked = true;
@@ -678,28 +749,28 @@ function is_mobile($user_agent) {
             saveCredentials(email, password, remember);
 
             const formData = new FormData(this);
-            
+
             fetch('?Cavite-State-University=login', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'error') {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'error') {
+                        hideLoading();
+                        showNotification(data.message, 'error');
+                    } else if (data.status === 'success') {
+                        showNotification(data.message, 'success');
+                        setTimeout(() => {
+                            window.location.href = data.redirect;
+                        }, 1500);
+                    }
+                })
+                .catch(error => {
                     hideLoading();
-                    showNotification(data.message, 'error');
-                } else if (data.status === 'success') {
-                    showNotification(data.message, 'success');
-                    setTimeout(() => {
-                        window.location.href = data.redirect;
-                    }, 1500);
-                }
-            })
-            .catch(error => {
-                hideLoading();
-                showNotification('An error occurred. Please try again.', 'error');
-                console.error('Error:', error);
-            });
+                    showNotification('An error occurred. Please try again.', 'error');
+                    console.error('Error:', error);
+                });
         });
 
         function handleLogout() {
@@ -712,4 +783,5 @@ function is_mobile($user_agent) {
         }
     </script>
 </body>
+
 </html>

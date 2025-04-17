@@ -1,262 +1,309 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - CvSU</title>
     <link rel="icon" href="asset/images/res1.png" type="image/x-icon">
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-    @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
-    :root {
-        --login-primary: #006400;
-        --login-secondary: #008000;
-        --login-accent: #90EE90;
-        --login-text-light: #ffffff;
-        --login-text-dark: #333333;
-        --login-gray-light: #f5f5f5;
-        --login-border-color: rgba(0, 0, 0, 0.1);
-        --login-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
-        --login-shadow-md: 0 2px 5px rgba(0, 0, 0, 0.1);
-        --login-transition: all 0.3s ease;
-    }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
 
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: 'Inter', sans-serif;
-    }
+        :root {
+            --login-primary: #006400;
+            --login-secondary: #008000;
+            --login-accent: #90EE90;
+            --login-text-light: #ffffff;
+            --login-text-dark: #333333;
+            --login-gray-light: #f5f5f5;
+            --login-border-color: rgba(0, 0, 0, 0.1);
+            --login-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+            --login-shadow-md: 0 2px 5px rgba(0, 0, 0, 0.1);
+            --login-transition: all 0.3s ease;
+        }
 
-    #loadingOverlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        display: none;
-        justify-content: center;
-        align-items: center;
-        z-index: 2000;
-    }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
 
-    .loading-spinner {
-        width: 50px;
-        height: 50px;
-        border: 4px solid rgba(255, 255, 255, 0.3);
-        border-top: 4px solid var(--login-text-light);
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-    }
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
 
-    .loading-content {
-        text-align: center;
-    }
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid var(--login-text-light);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
 
-    .loading-text {
-        margin-top: 15px;
-        color: var(--login-text-light);
-        font-size: 14px;
-        font-weight: 500;
-        animation: pulse 1.5s ease-in-out infinite;
-    }
+        .loading-content {
+            text-align: center;
+        }
 
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
+        .loading-text {
+            margin-top: 15px;
+            color: var(--login-text-light);
+            font-size: 14px;
+            font-weight: 500;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
 
-    .loading-overlay-show {
-        animation: fadeIn 0.3s ease-in-out forwards;
-    }
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
 
-    .loading-overlay-hide {
-        animation: fadeOut 0.3s ease-in-out forwards;
-    }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
 
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
+        .loading-overlay-show {
+            animation: fadeIn 0.3s ease-in-out forwards;
+        }
 
-    @keyframes fadeOut {
-        from { opacity: 1; }
-        to { opacity: 0; }
-    }
+        .loading-overlay-hide {
+            animation: fadeOut 0.3s ease-in-out forwards;
+        }
 
-    @keyframes pulse {
-        0% { opacity: 0.6; }
-        50% { opacity: 1; }
-        100% { opacity: 0.6; }
-    }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
 
-    body {
-        background: url('asset/images/bahay.jpg') no-repeat center center;
-        background-size: cover;
-        min-height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 20px;
-        position: relative;
-    }
+            to {
+                opacity: 1;
+            }
+        }
 
-    body::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.7);
-        filter: blur(15px);
-        z-index: -1;
-    }
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
 
-    .register-container {
-        width: 100%;
-        max-width: 400px;
-        background: var(--login-text-light);
-        border-radius: 10px;
-        overflow: hidden;
-        box-shadow: var(--login-shadow-md);
-    }
+            to {
+                opacity: 0;
+            }
+        }
 
-    .register-form-container {
-        padding: 40px;
-        background: var(--login-text-light);
-    }
+        @keyframes pulse {
+            0% {
+                opacity: 0.6;
+            }
 
-    .register-header {
-        text-align: center;
-        margin-bottom: 30px;
-    }
+            50% {
+                opacity: 1;
+            }
 
-    .register-header h1 {
-        font-size: 1.75rem;
-        color: var(--login-text-dark);
-        margin-bottom: 8px;
-    }
+            100% {
+                opacity: 0.6;
+            }
+        }
 
-    .register-header p {
-        color: #666;
-        font-size: 0.9rem;
-    }
+        body {
+            background: url('asset/images/bahay.jpg') no-repeat center center;
+            background-size: cover;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+        }
 
-    .input-group {
-        margin-bottom: 15px;
-        position: relative;
-    }
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            filter: blur(15px);
+            z-index: -1;
+        }
 
-    .input-group label {
-        display: block;
-        margin-bottom: 6px;
-        color: var(--login-text-dark);
-        font-size: 0.85rem;
-    }
-
-    .input-group input {
-        width: 100%;
-        padding: 10px 10px 10px 35px;
-        border: 1px solid var(--login-border-color);
-        border-radius: 6px;
-        font-size: 0.9rem;
-        transition: var(--login-transition);
-    }
-
-    .input-group i {
-        position: absolute;
-        left: 12px;
-        top: 33px;
-        color: #666;
-        transition: var(--login-transition);
-    }
-
-    .input-group input:focus {
-        outline: none;
-        border-color: var(--login-primary);
-        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
-    }
-
-    .input-group input:focus + i {
-        color: var(--login-primary);
-    }
-
-    .register-button {
-        width: 100%;
-        padding: 10px;
-        background: var(--login-primary);
-        color: var(--login-text-light);
-        border: none;
-        border-radius: 6px;
-        font-size: 0.95rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: var(--login-transition);
-        margin-top: 15px;
-    }
-
-    .register-button:hover {
-        background: var(--login-secondary);
-    }
-
-    .login-link {
-        text-align: center;
-        margin-top: 15px;
-        color: #666;
-        font-size: 0.85rem;
-    }
-
-    .login-link a {
-        color: var(--login-primary);
-        text-decoration: none;
-        font-weight: 500;
-        transition: var(--login-transition);
-    }
-
-    .login-link a:hover {
-        color: var(--login-secondary);
-    }
-
-    .notification {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 12px 20px;
-        background: var(--login-text-light);
-        border-radius: 6px;
-        box-shadow: var(--login-shadow-sm);
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 0.9rem;
-        animation: slideIn 0.3s ease-out;
-        z-index: 1000;
-    }
-
-    @keyframes slideIn {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-    }
-
-    @media (max-width: 480px) {
         .register-container {
-            max-width: 100%;
+            width: 100%;
+            max-width: 400px;
+            background: var(--login-text-light);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--login-shadow-md);
         }
 
         .register-form-container {
-            padding: 20px;
+            padding: 40px;
+            background: var(--login-text-light);
+        }
+
+        .register-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .register-header h1 {
+            font-size: 1.75rem;
+            color: var(--login-text-dark);
+            margin-bottom: 8px;
+        }
+
+        .register-header p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--login-text-dark);
+            font-size: 0.85rem;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px 35px 10px 35px;
+            border: 1px solid var(--login-border-color);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: var(--login-transition);
+        }
+
+        .input-group .input-icon-left {
+            position: absolute;
+            left: 12px;
+            top: 33px;
+            color: #666;
+            transition: var(--login-transition);
+        }
+
+        /* Password toggle eye icon */
+        .input-group .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 33px;
+            color: #666;
+            cursor: pointer;
+            transition: var(--login-transition);
+        }
+
+        .input-group .password-toggle:hover {
+            color: var(--login-primary);
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--login-primary);
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+        }
+
+        .input-group input:focus+.input-icon-left {
+            color: var(--login-primary);
+        }
+
+        .register-button {
+            width: 100%;
+            padding: 10px;
+            background: var(--login-primary);
+            color: var(--login-text-light);
+            border: none;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--login-transition);
+            margin-top: 15px;
+        }
+
+        .register-button:hover {
+            background: var(--login-secondary);
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 15px;
+            color: #666;
+            font-size: 0.85rem;
+        }
+
+        .login-link a {
+            color: var(--login-primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--login-transition);
+        }
+
+        .login-link a:hover {
+            color: var(--login-secondary);
         }
 
         .notification {
-            left: 20px;
+            position: fixed;
+            top: 20px;
             right: 20px;
-            text-align: center;
-            justify-content: center;
+            padding: 12px 20px;
+            background: var(--login-text-light);
+            border-radius: 6px;
+            box-shadow: var(--login-shadow-sm);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            animation: slideIn 0.3s ease-out;
+            z-index: 1000;
         }
-    }
-            .legal-links {
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .register-container {
+                max-width: 100%;
+            }
+
+            .register-form-container {
+                padding: 20px;
+            }
+
+            .notification {
+                left: 20px;
+                right: 20px;
+                text-align: center;
+                justify-content: center;
+            }
+        }
+
+        .legal-links {
             text-align: center;
             margin-top: 15px;
             padding-top: 15px;
@@ -278,8 +325,15 @@
         }
 
         @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
 
         @media (max-width: 480px) {
@@ -303,8 +357,9 @@
                 padding: 0 10px;
             }
         }
-</style>
+    </style>
 </head>
+
 <body>
     <div id="loadingOverlay">
         <div class="loading-content">
@@ -326,25 +381,27 @@
                 <div class="input-group">
                     <label for="register-username">Username</label>
                     <input type="text" id="register-username" name="username" required>
-                    <i class="fas fa-user"></i>
+                    <i class="fas fa-user input-icon-left"></i>
                 </div>
 
                 <div class="input-group">
                     <label for="register-email">Email address</label>
                     <input type="email" id="register-email" name="email" required>
-                    <i class="fas fa-envelope"></i>
+                    <i class="fas fa-envelope input-icon-left"></i>
                 </div>
 
                 <div class="input-group">
                     <label for="register-password">Password</label>
                     <input type="password" id="register-password" name="password" required>
-                    <i class="fas fa-lock"></i>
+                    <i class="fas fa-lock input-icon-left"></i>
+                    <i class="fas fa-eye password-toggle" id="passwordToggle"></i>
                 </div>
 
                 <div class="input-group">
                     <label for="register-confirmPassword">Confirm Password</label>
                     <input type="password" id="register-confirmPassword" name="confirmPassword" required>
-                    <i class="fas fa-lock"></i>
+                    <i class="fas fa-lock input-icon-left"></i>
+                    <i class="fas fa-eye password-toggle" id="confirmPasswordToggle"></i>
                 </div>
 
                 <button type="submit" class="register-button">Create Account</button>
@@ -363,6 +420,29 @@
     </div>
 
     <script>
+        // Password toggle functionality
+        document.getElementById('passwordToggle').addEventListener('click', function() {
+            const passwordField = document.getElementById('register-password');
+            togglePasswordVisibility(passwordField, this);
+        });
+
+        document.getElementById('confirmPasswordToggle').addEventListener('click', function() {
+            const confirmPasswordField = document.getElementById('register-confirmPassword');
+            togglePasswordVisibility(confirmPasswordField, this);
+        });
+
+        function togglePasswordVisibility(inputField, icon) {
+            if (inputField.type === 'password') {
+                inputField.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                inputField.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
         function showNotification(message, type = 'error') {
             const container = document.getElementById('notificationContainer');
             const notification = document.createElement('div');
@@ -431,36 +511,37 @@
 
         document.getElementById('registerForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            
+
             if (validateForm()) {
                 showLoading();
-                
+
                 const formData = new FormData(this);
-                
+
                 fetch('/Alumni-CvSU/admin/Sending-Code.php', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    hideLoading();
-                    
-                    if (data.status === 'error') {
-                        showNotification(data.message);
-                    } else if (data.status === 'success') {
-                        showNotification('Successfully send an OTP...', 'success');
-                        setTimeout(() => {
-                            window.location.href = '?Cavite-State-University=verify';
-                        }, 1500);
-                    }
-                })
-                .catch(error => {
-                    hideLoading();
-                    showNotification('An error occurred. Please try again.');
-                    console.error('Error:', error);
-                });
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        hideLoading();
+
+                        if (data.status === 'error') {
+                            showNotification(data.message);
+                        } else if (data.status === 'success') {
+                            showNotification('Successfully send an OTP...', 'success');
+                            setTimeout(() => {
+                                window.location.href = '?Cavite-State-University=verify';
+                            }, 1500);
+                        }
+                    })
+                    .catch(error => {
+                        hideLoading();
+                        showNotification('An error occurred. Please try again.');
+                        console.error('Error:', error);
+                    });
             }
         });
     </script>
 </body>
+
 </html>

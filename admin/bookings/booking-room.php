@@ -111,7 +111,7 @@ function fetchPricingRecords($mysqli, $type)
 }
 
 $current_tab = isset($_GET['tab']) ? $_GET['tab'] : 'room';
-$pricing_types = ['room', 'lobby', 'conference', 'board', 'building'];
+$pricing_types = ['room', 'lobby', 'conference', 'board'];
 ?>
 
 <!DOCTYPE html>

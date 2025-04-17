@@ -1,3 +1,19 @@
+<?php
+require_once('main_db.php');
+
+$userExists = false;
+if (isset($_SESSION['user_id'])) {
+    // Using your mysqli connection style
+    $query = "SELECT user_id FROM personal_info WHERE user_id = ?";
+    $stmt = $mysqli->prepare($query);
+    $stmt->bind_param("s", $_SESSION['user_id']);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $userExists = ($result->num_rows > 0);
+    $stmt->close();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -125,7 +141,11 @@
     <section class="ats-hero">
         <h2>Welcome to Alumni Statistics</h2>
         <p>You can view alumni data by querying the database for relevant metrics. This includes details like graduation year, employment status, and field of expertise. These insights help in understanding alumni trends and achievements.</p>
-        <a href="Account?section=Alumni-Tracer-Form" class="cta-btn" id="scroll-btn">Take the Alumni Tracer Survey</a>
+        <?php if ($userExists): ?>
+            <a href="#services" class="cta-btn" id="scroll-btn">View Alumni Tracer</a>
+        <?php else: ?>
+            <a href="Account?section=Alumni-Tracer-Form" class="cta-btn" id="scroll-btn">Take the Alumni Tracer Survey</a>
+        <?php endif; ?>
     </section>
 
 
@@ -133,20 +153,20 @@
 
 
         <script>
-            // document.getElementById('scroll-btn').addEventListener('click', function(event) {
-            //     event.preventDefault(); // Prevent the default anchor behavior
+            document.getElementById('scroll-btn').addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent the default anchor behavior
 
-            //     const targetId = this.getAttribute('href'); // Get the target section ID
-            //     const targetElement = document.querySelector(targetId); // Select the target element
+                const targetElement = document.getElementById('services'); // Select the target element
 
-            //     // Scroll to the target element smoothly
-            //     targetElement.scrollIntoView({
-            //         behavior: 'smooth' // Enable smooth scrolling
-            //     });
-            // });
+                // Scroll to the target element smoothly
+                targetElement.scrollIntoView({
+                    behavior: 'smooth' // Enable smooth scrolling
+                });
+            });
         </script>
 
         <?php include('components/alumni_tracer/alumni-track-tracer.php'); ?>
+    </section>
 
 </body>
 

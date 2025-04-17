@@ -1,12 +1,13 @@
 <?php
 session_start();
-if(isset($_SESSION['admin_id'])) {
+if (isset($_SESSION['admin_id'])) {
     header("Location: ../../dashboard.php");
     exit();
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,7 +16,7 @@ if(isset($_SESSION['admin_id'])) {
     <style>
         :root {
             --primary-color: #006400;
-            --primary-hover: #008000; 
+            --primary-hover: #008000;
             --primary-light: rgba(144, 238, 144, 0.2);
             --secondary-color: #64748b;
             --text-primary: #1e293b;
@@ -121,6 +122,17 @@ if(isset($_SESSION['admin_id'])) {
 
         .password-field {
             position: relative;
+            display: flex;
+        }
+
+        .password-input {
+            width: 100%;
+            padding: 0.625rem 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius-md);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: var(--transition);
         }
 
         .password-toggle {
@@ -133,6 +145,7 @@ if(isset($_SESSION['admin_id'])) {
             color: var(--text-secondary);
             cursor: pointer;
             padding: 0.25rem;
+            z-index: 2;
         }
 
         .password-toggle:hover {
@@ -141,7 +154,7 @@ if(isset($_SESSION['admin_id'])) {
 
         .form-footer {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end;
             align-items: center;
             margin-bottom: 1.5rem;
         }
@@ -241,6 +254,7 @@ if(isset($_SESSION['admin_id'])) {
                 transform: translateX(100%);
                 opacity: 0;
             }
+
             to {
                 transform: translateX(0);
                 opacity: 1;
@@ -263,6 +277,7 @@ if(isset($_SESSION['admin_id'])) {
         }
     </style>
 </head>
+
 <body>
 
     <div id="notification" class="notification"></div>
@@ -272,13 +287,14 @@ if(isset($_SESSION['admin_id'])) {
     </button>
 
     <div class="login-container">
-        <div class="logo-section">
-            <img src="/Alumni-CvSU/asset/images/2.png" alt="Logo">
-            <h2>Welcome Back</h2>
-            <p>Please sign in to continue</p>
-        </div>
-
         <div class="login-form-container">
+
+            <div class="logo-section">
+                <img src="/Alumni-CvSU/asset/images/2.png" alt="Logo">
+                <h2>Welcome Back</h2>
+                <p>Please sign in to continue</p>
+            </div>
+
             <form id="loginForm" method="post">
                 <div class="form-group">
                     <label for="email">Email Address</label>
@@ -289,8 +305,8 @@ if(isset($_SESSION['admin_id'])) {
                 <div class="form-group">
                     <label for="password">Password</label>
                     <div class="password-field">
-                        <input type="password" id="password" name="password" required placeholder="Enter your password">
-                        <button type="button" class="password-toggle" onclick="togglePassword()">
+                        <input type="password" id="password" name="password" required placeholder="Enter your password" class="password-input">
+                        <button type="button" class="password-toggle" aria-label="Toggle password visibility">
                             <i class="fas fa-eye"></i>
                         </button>
                     </div>
@@ -298,19 +314,19 @@ if(isset($_SESSION['admin_id'])) {
                 </div>
 
                 <div class="form-footer">
-                    <div class="remember-me">
+                    <!-- <div class="remember-me">
                         <input type="checkbox" id="remember" name="remember">
                         <label for="remember">Remember me</label>
-                    </div>
+                    </div> -->
                     <a href="#" class="forgot-password">Forgot password?</a>
                 </div>
 
                 <button type="submit" class="submit-btn">Sign In</button>
             </form>
 
-            <div class="signup-link">
+            <!-- <div class="signup-link">
                 Don't have an account? <a href="#">Sign up</a>
-            </div>
+            </div> -->
         </div>
     </div>
 
@@ -335,7 +351,12 @@ if(isset($_SESSION['admin_id'])) {
         function togglePassword() {
             const passwordInput = document.getElementById('password');
             const toggleBtn = document.querySelector('.password-toggle i');
-            
+
+            // Store the current selection and focus state
+            const isFocused = document.activeElement === passwordInput;
+            const selectionStart = passwordInput.selectionStart;
+            const selectionEnd = passwordInput.selectionEnd;
+
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
                 toggleBtn.className = 'fas fa-eye-slash';
@@ -343,7 +364,16 @@ if(isset($_SESSION['admin_id'])) {
                 passwordInput.type = 'password';
                 toggleBtn.className = 'fas fa-eye';
             }
+
+            // Restore focus and selection if it was focused before
+            if (isFocused) {
+                passwordInput.focus();
+                passwordInput.setSelectionRange(selectionStart, selectionEnd);
+            }
         }
+
+        // Add event listener to the password toggle button
+        document.querySelector('.password-toggle').addEventListener('click', togglePassword);
 
         function showNotification(message, type) {
             const notification = document.getElementById('notification');
@@ -358,7 +388,7 @@ if(isset($_SESSION['admin_id'])) {
 
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            
+
             const formData = new FormData(this);
 
             this.querySelectorAll('.form-group').forEach(group => {
@@ -377,24 +407,25 @@ if(isset($_SESSION['admin_id'])) {
             }
 
             fetch('admin-function/process_login.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showNotification(data.message, 'success');
-                    setTimeout(() => {
-                        window.location.href = '../../Dashboard?section=Dashboard';
-                    }, 1500);
-                } else {
-                    showNotification(data.message, 'error');
-                }
-            })
-            .catch(error => {
-                showNotification('An error occurred. Please try again.', 'error');
-            });
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification(data.message, 'success');
+                        setTimeout(() => {
+                            window.location.href = '../../Dashboard?section=Dashboard';
+                        }, 1500);
+                    } else {
+                        showNotification(data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    showNotification('An error occurred. Please try again.', 'error');
+                });
         });
     </script>
 </body>
+
 </html>

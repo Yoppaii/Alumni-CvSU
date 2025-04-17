@@ -122,8 +122,6 @@
     <h2>Our Objectives</h2>
 </div>
 
-
-
 <div class="organization-container">
     <div class="content-wrapper">
         <div class="text">

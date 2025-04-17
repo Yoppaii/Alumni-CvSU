@@ -30,7 +30,6 @@ $roomData = getRoomData($mysqli, 'room_price');
 $boardData = getRoomData($mysqli, 'board_pricing');
 $conferenceData = getRoomData($mysqli, 'conference_pricing');
 $lobbyData = getRoomData($mysqli, 'lobby_pricing');
-$buildingData = getRoomData($mysqli, 'building_pricing');
 
 $book_rooms = [
     ['id' => 1, 'name' => 'Room 1', 'max_occupancy' => $roomData['max_occupancy'], 'price' => $roomData['price']],
@@ -44,7 +43,6 @@ $book_rooms = [
     ['id' => 9, 'name' => 'Board Room', 'max_occupancy' => $boardData['max_occupancy'], 'price' => $boardData['price']],
     ['id' => 10, 'name' => 'Conference Room', 'max_occupancy' => $conferenceData['max_occupancy'], 'price' => $conferenceData['price']],
     ['id' => 11, 'name' => 'Lobby', 'max_occupancy' => $lobbyData['max_occupancy'], 'price' => $lobbyData['price']],
-    ['id' => 12, 'name' => 'Building', 'max_occupancy' => $buildingData['max_occupancy'], 'price' => $buildingData['price']],
 ];
 
 $mysqli->close();
@@ -1751,7 +1749,7 @@ $mysqli->close();
                         if (data.success) {
                             NotificationSystem.show(`Booking confirmed! Reference: ${data.reference_number}`, 'success');
                             setTimeout(() => {
-                                window.location.href = '?section=view-all-bookings&tab=pending';
+                                window.location.href = '?section=booking_history';
                             }, 1500);
                         } else {
                             hideLoading();

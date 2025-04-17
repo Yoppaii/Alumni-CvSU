@@ -138,7 +138,6 @@ $pricing_table = match ($room_name) {
     'Lobby' => 'lobby_pricing',
     'Conference Room' => 'conference_pricing',
     'Board Room' => 'board_pricing',
-    'Building' => 'building_pricing',
     default => 'room_price'
 };
 
