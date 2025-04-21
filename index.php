@@ -316,7 +316,7 @@ if (session_status() === PHP_SESSION_NONE) {
     }
 
     .cvsu-login-btn:hover {
-        background-color:rgb(196, 196, 196);
+        background-color: rgb(196, 196, 196);
     }
 
     .cvsu-register-btn {
@@ -331,7 +331,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 
     .cvsu-register-btn:hover {
-        background-color:rgb(172, 162, 34);
+        background-color: rgb(172, 162, 34);
 
 
     }
@@ -566,6 +566,9 @@ if (session_status() === PHP_SESSION_NONE) {
                 break;
             case 'events':
                 include 'admin/website/Event.php';
+                break;
+            case 'events-detail':
+                include 'admin/website/event-details.php';
                 break;
             case 'announcement':
                 include 'admin/website/announcement_details.php';

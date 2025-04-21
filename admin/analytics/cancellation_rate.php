@@ -20,7 +20,7 @@ $query = "SELECT
             (SUM(CASE WHEN b.status IN ('cancelled', 'no_show') THEN 1 ELSE 0 END) * 100 / COUNT(*)) AS rate
           FROM bookings b
           LEFT JOIN user u ON b.user_id = u.user_id
-          WHERE 1=1 
+          WHERE b.is_archived = 0
           $yearCondition
           $monthCondition
           $guestTypeCondition

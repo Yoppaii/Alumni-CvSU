@@ -4,7 +4,7 @@ if (!isset($_SESSION)) {
 }
 
 require 'main_db.php';
- 
+
 $amenityIcons = [
     'Free Wi-Fi' => 'wifi',
     'TV' => 'tv',
@@ -511,7 +511,6 @@ $pricingJson = json_encode($occupancies);
                                     <span><?php echo htmlspecialchars($amenity); ?></span>
                                 </div>
                             <?php endforeach; ?>
-
                         </div>
                     </div>
 
@@ -520,53 +519,76 @@ $pricingJson = json_encode($occupancies);
                             <label class="section-label" style="margin-bottom: 8px;">Room Details</label>
 
                             <?php if ($maxOccupancy && !empty($occupancies)): ?>
-                                <p class="room-details-price-display">
-                                    👥 Max Capacity: <span id="max-capacity-count"><?php echo $maxOccupancy; ?></span> <?php echo $maxOccupancy === 1 ? 'Guest' : 'Guests'; ?>
-                                </p>
+                                <?php
+                                // Check if the room is a standard room (1-8) or a special room
+                                $isStandardRoom = ($room_id >= 1 && $room_id <= 8);
 
-                                <p id="room-details-price-display"
-                                    class="room-details-price-display"
-                                    data-price-options='<?php echo htmlspecialchars($pricingJson, ENT_QUOTES, 'UTF-8'); ?>'
-                                    data-max-guests="<?php echo $maxOccupancy; ?>"
-                                    data-room-id="<?php echo $room_id; ?>">
-                                    💰 Base Price: ₱<span id="base-price-display"><?php echo !empty($occupancies) ? number_format($occupancies[0]['price']) : '0'; ?></span> per day
-                                </p>
+                                if ($isStandardRoom):
+                                ?>
+                                    <p class="room-details-price-display">
+                                        👥 Max Capacity: <span id="max-capacity-count"><?php echo $maxOccupancy; ?></span> <?php echo $maxOccupancy === 1 ? 'Guest' : 'Guests'; ?>
+                                    </p>
 
-                                <!-- Guest Selection -->
-                                <div class="selection-section">
-                                    <label class="section-label">Number of Guests:</label>
-                                    <div class="counter-container">
-                                        <button type="button" id="guest-decrease" class="counter-btn">−</button>
-                                        <span id="guest-count" class="counter-display">1</span>
-                                        <button type="button" id="guest-increase" class="counter-btn">+</button>
+                                    <p id="room-details-price-display"
+                                        class="room-details-price-display"
+                                        data-price-options='<?php echo htmlspecialchars($pricingJson, ENT_QUOTES, 'UTF-8'); ?>'
+                                        data-max-guests="<?php echo $maxOccupancy; ?>"
+                                        data-room-id="<?php echo $room_id; ?>">
+                                        💰 Base Price: ₱<span id="base-price-display"><?php echo !empty($occupancies) ? number_format($occupancies[0]['price']) : '0'; ?></span> per day
+                                    </p>
+
+                                    <!-- Guest Selection -->
+                                    <div class="selection-section">
+                                        <label class="section-label">Number of Guests:</label>
+                                        <div class="counter-container">
+                                            <button type="button" id="guest-decrease" class="counter-btn">−</button>
+                                            <span id="guest-count" class="counter-display">1</span>
+                                            <button type="button" id="guest-increase" class="counter-btn">+</button>
+                                        </div>
                                     </div>
-                                </div>
-                                <!-- Mattress Selection -->
-                                <div class="selection-section">
-                                    <label class="section-label">
-                                        Add Mattress <small style="color: #6b7280;">(₱500)</small>:
-                                    </label>
-                                    <div class="counter-container">
-                                        <button type="button" id="mattress-decrease" class="counter-btn">−</button>
-                                        <span id="mattress-count" class="counter-display">0</span>
-                                        <button type="button" id="mattress-increase" class="counter-btn">+</button>
+                                    <!-- Mattress Selection -->
+                                    <div class="selection-section">
+                                        <label class="section-label">
+                                            Add Mattress <small style="color: #6b7280;">(₱500)</small>:
+                                        </label>
+                                        <div class="counter-container">
+                                            <button type="button" id="mattress-decrease" class="counter-btn">−</button>
+                                            <span id="mattress-count" class="counter-display">0</span>
+                                            <button type="button" id="mattress-increase" class="counter-btn">+</button>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <p class="info-note room-details-price-display">🛏️ Each extra mattress adds 2 guest slots.</p>
+                                    <p class="info-note room-details-price-display">🛏️ Each extra mattress adds 2 guest slots.</p>
 
-                                <!-- Total Price Display -->
-                                <p id="room-details-total-display" class="room-details-price-display">
-                                    🧾 Total: ₱<span id="total-price">0</span> per day
-                                </p>
+                                    <!-- Total Price Display -->
+                                    <p id="room-details-total-display" class="room-details-price-display">
+                                        🧾 Total: ₱<span id="total-price">0</span> per day
+                                    </p>
+                                <?php else: ?>
+                                    <!-- For special rooms (Board Room, Conference Room, Lobby) -->
+                                    <p class="room-details-price-display">
+                                        👥 Max Capacity: <span id="max-capacity-count"><?php echo $maxOccupancy; ?></span> <?php echo $maxOccupancy === 1 ? 'Guest' : 'Guests'; ?>
+                                    </p>
+                                    <p id="room-details-price-display"
+                                        class="room-details-price-display"
+                                        data-price-options='<?php echo htmlspecialchars($pricingJson, ENT_QUOTES, 'UTF-8'); ?>'
+                                        data-room-id="<?php echo $room_id; ?>">
+                                        💰 Price: ₱<span id="base-price-display"><?php echo !empty($occupancies) ? number_format($occupancies[0]['price']) : '0'; ?></span> per day
+                                    </p>
+
+                                    <p class="room-details-price-display">
+                                        <i class="fas fa-info-circle"></i> This is a special purpose room with fixed pricing.
+                                    </p>
+                                <?php endif; ?>
                             <?php else: ?>
                                 <p style="color: red;">Room details not available.</p>
                             <?php endif; ?>
                         </div>
 
-                        <button id="room-details-book-button" class="room-details-button" disabled>Book This Room</button>
+                        <button id="room-details-book-button" class="room-details-button" <?php echo (!$maxOccupancy || empty($occupancies)) ? 'disabled' : ''; ?>>Book This Room</button>
                         <a href="?section=Room-Reservation" class="room-details-back">Back to Room Selection</a>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -623,20 +645,12 @@ $pricingJson = json_encode($occupancies);
             const basePriceDisplay = document.getElementById('base-price-display');
             const totalPriceSpan = document.getElementById('total-price');
             const bookButton = document.getElementById('room-details-book-button');
-            const maxCapacitySpan = document.getElementById('max-capacity-count');
 
-            const mattressCountSpan = document.getElementById('mattress-count');
-            const mattressIncrease = document.getElementById('mattress-increase');
-            const mattressDecrease = document.getElementById('mattress-decrease');
+            if (!priceDisplay || !bookButton) return;
 
-            const guestCountSpan = document.getElementById('guest-count');
-            const guestIncrease = document.getElementById('guest-increase');
-            const guestDecrease = document.getElementById('guest-decrease');
-
-            if (!priceDisplay || !bookButton || !totalPriceSpan || !maxCapacitySpan) return;
-
-            // Get room_id from data attribute that we'll add to the price display element
-            const room_id = priceDisplay.dataset.roomId || 0;
+            // Get room_id from data attribute
+            const room_id = parseInt(priceDisplay.dataset.roomId, 10) || 0;
+            const isStandardRoom = (room_id >= 1 && room_id <= 8);
 
             // Get pricing options from data attribute
             let priceOptions = [];
@@ -646,121 +660,160 @@ $pricingJson = json_encode($occupancies);
                 console.error('Error parsing price options:', e);
             }
 
-            // Get the base max guests from the data attribute
-            // This is now set differently per room (2 for most rooms, 3 for room #3)
-            const baseMaxGuests = parseInt(priceDisplay.dataset.maxGuests, 10);
-            const mattressPrice = 500;
-            const maxMattresses = 1;
+            // For standard rooms (1-8), set up the guest and mattress functionality
+            if (isStandardRoom) {
+                const maxCapacitySpan = document.getElementById('max-capacity-count');
+                const mattressCountSpan = document.getElementById('mattress-count');
+                const mattressIncrease = document.getElementById('mattress-increase');
+                const mattressDecrease = document.getElementById('mattress-decrease');
+                const guestCountSpan = document.getElementById('guest-count');
+                const guestIncrease = document.getElementById('guest-increase');
+                const guestDecrease = document.getElementById('guest-decrease');
 
-            let mattressCount = 0;
-            let guestCount = 1;
-            let basePrice = getBasePrice(guestCount);
+                if (!maxCapacitySpan || !totalPriceSpan) return;
 
-            // Function to get the base price for a given guest count
-            function getBasePrice(guests) {
-                // Find the appropriate price tier
-                let price = 0;
+                // Get the base max guests from the data attribute
+                const baseMaxGuests = parseInt(priceDisplay.dataset.maxGuests, 10);
+                const mattressPrice = 500;
+                const maxMattresses = 1;
 
-                // Sort price options by occupancy (ascending)
-                const sortedOptions = [...priceOptions].sort((a, b) => a.occupancy - b.occupancy);
+                let mattressCount = 0;
+                let guestCount = 1;
+                let basePrice = getBasePrice(guestCount);
 
-                // Find the appropriate price tier
-                for (const option of sortedOptions) {
-                    if (guests <= option.occupancy) {
-                        price = parseInt(option.price, 10);
-                        break;
+                // Function to get the base price for a given guest count
+                function getBasePrice(guests) {
+                    // Find the appropriate price tier
+                    let price = 0;
+
+                    // Sort price options by occupancy (ascending)
+                    const sortedOptions = [...priceOptions].sort((a, b) => a.occupancy - b.occupancy);
+
+                    // Find the appropriate price tier
+                    for (const option of sortedOptions) {
+                        if (guests <= option.occupancy) {
+                            price = parseInt(option.price, 10);
+                            break;
+                        }
                     }
+
+                    // If guest count is higher than any tier, use the highest tier's price
+                    if (price === 0 && sortedOptions.length > 0) {
+                        price = parseInt(sortedOptions[sortedOptions.length - 1].price, 10);
+                    }
+
+                    return price;
                 }
 
-                // If guest count is higher than any tier, use the highest tier's price
-                if (price === 0 && sortedOptions.length > 0) {
-                    price = parseInt(sortedOptions[sortedOptions.length - 1].price, 10);
-                }
+                // Calculate the current maximum guests based on base limit and mattresses
+                const getCurrentMaxGuests = () => baseMaxGuests + mattressCount * 2;
 
-                return price;
-            }
+                const updateDisplay = () => {
+                    // Update base price based on current guest count
+                    basePrice = getBasePrice(guestCount);
+                    basePriceDisplay.textContent = basePrice.toLocaleString();
 
-            // Calculate the current maximum guests based on base limit and mattresses
-            const getCurrentMaxGuests = () => baseMaxGuests + mattressCount * 2;
+                    const total = basePrice + mattressCount * mattressPrice;
+                    totalPriceSpan.textContent = total.toLocaleString();
+                    maxCapacitySpan.textContent = getCurrentMaxGuests();
 
-            const updateDisplay = () => {
-                // Update base price based on current guest count
-                basePrice = getBasePrice(guestCount);
-                basePriceDisplay.textContent = basePrice.toLocaleString();
+                    // Store values in session for booking process
+                    sessionStorage.setItem('selectedTotalPrice', total);
+                    sessionStorage.setItem('selectedBasePrice', basePrice);
+                    sessionStorage.setItem('selectedMattresses', mattressCount);
+                    sessionStorage.setItem('selectedGuests', guestCount);
 
-                const total = basePrice + mattressCount * mattressPrice;
-                totalPriceSpan.textContent = total.toLocaleString();
-                maxCapacitySpan.textContent = getCurrentMaxGuests();
+                    // Disable mattress increase if max is reached
+                    mattressIncrease.disabled = mattressCount >= maxMattresses;
+                    mattressDecrease.disabled = mattressCount <= 0;
 
-                sessionStorage.setItem('selectedTotalPrice', total);
-                sessionStorage.setItem('selectedBasePrice', basePrice);
-                sessionStorage.setItem('selectedMattresses', mattressCount);
-                sessionStorage.setItem('selectedGuests', guestCount);
+                    // Disable guest increase if max capacity is reached
+                    guestIncrease.disabled = guestCount >= getCurrentMaxGuests();
+                    guestDecrease.disabled = guestCount <= 1;
+                };
 
-                // Disable mattress increase if max is reached
-                mattressIncrease.disabled = mattressCount >= maxMattresses;
-                mattressDecrease.disabled = mattressCount <= 0;
-
-                // Disable guest increase if max capacity is reached
-                guestIncrease.disabled = guestCount >= getCurrentMaxGuests();
-                guestDecrease.disabled = guestCount <= 1;
-            };
-
-            const updateGuestCount = (newCount) => {
-                const maxGuests = getCurrentMaxGuests();
-                guestCount = Math.max(1, Math.min(newCount, maxGuests));
-                guestCountSpan.textContent = guestCount;
-                updateDisplay();
-            };
-
-            if (priceOptions.length > 0) {
-                bookButton.disabled = false;
-                updateDisplay();
-            } else {
-                priceDisplay.style.color = 'red';
-                priceDisplay.textContent = '⚠️ Error: Price not available';
-                bookButton.disabled = true;
-            }
-
-            mattressIncrease.addEventListener('click', () => {
-                if (mattressCount < maxMattresses) {
-                    mattressCount++;
-                    mattressCountSpan.textContent = mattressCount;
+                const updateGuestCount = (newCount) => {
+                    const maxGuests = getCurrentMaxGuests();
+                    guestCount = Math.max(1, Math.min(newCount, maxGuests));
+                    guestCountSpan.textContent = guestCount;
                     updateDisplay();
+                };
+
+                if (priceOptions.length > 0) {
+                    bookButton.disabled = false;
+                    updateDisplay();
+                } else {
+                    priceDisplay.style.color = 'red';
+                    priceDisplay.textContent = '⚠️ Error: Price not available';
+                    bookButton.disabled = true;
                 }
-            });
 
-            mattressDecrease.addEventListener('click', () => {
-                if (mattressCount > 0) {
-                    mattressCount--;
-                    mattressCountSpan.textContent = mattressCount;
-
-                    const newMax = getCurrentMaxGuests();
-                    if (guestCount > newMax) {
-                        updateGuestCount(newMax);
-                    } else {
+                mattressIncrease.addEventListener('click', () => {
+                    if (mattressCount < maxMattresses) {
+                        mattressCount++;
+                        mattressCountSpan.textContent = mattressCount;
                         updateDisplay();
                     }
-                }
-            });
+                });
 
-            guestIncrease.addEventListener('click', () => {
-                if (guestCount < getCurrentMaxGuests()) {
-                    updateGuestCount(guestCount + 1);
-                }
-            });
+                mattressDecrease.addEventListener('click', () => {
+                    if (mattressCount > 0) {
+                        mattressCount--;
+                        mattressCountSpan.textContent = mattressCount;
 
-            guestDecrease.addEventListener('click', () => {
-                if (guestCount > 1) {
-                    updateGuestCount(guestCount - 1);
-                }
-            });
+                        const newMax = getCurrentMaxGuests();
+                        if (guestCount > newMax) {
+                            updateGuestCount(newMax);
+                        } else {
+                            updateDisplay();
+                        }
+                    }
+                });
 
-            bookButton.addEventListener('click', () => {
-                const total = basePrice + mattressCount * mattressPrice;
-                const url = `?section=Room-Reservation&select_room=${room_id}&guests=${guestCount}&price=${basePrice}&mattresses=${mattressCount}&total=${total}`;
-                window.location.href = url;
-            });
+                guestIncrease.addEventListener('click', () => {
+                    if (guestCount < getCurrentMaxGuests()) {
+                        updateGuestCount(guestCount + 1);
+                    }
+                });
+
+                guestDecrease.addEventListener('click', () => {
+                    if (guestCount > 1) {
+                        updateGuestCount(guestCount - 1);
+                    }
+                });
+
+                bookButton.addEventListener('click', () => {
+                    const total = basePrice + mattressCount * mattressPrice;
+                    const url = `?section=Room-Reservation&select_room=${room_id}&guests=${guestCount}&price=${basePrice}&mattresses=${mattressCount}&total=${total}`;
+                    window.location.href = url;
+                });
+
+            } else {
+                // For special rooms (Board Room, Conference Room, Lobby)
+                // Simplified booking with fixed price
+                if (priceOptions.length > 0) {
+                    const basePrice = parseInt(priceOptions[0].price, 10);
+
+                    // Store fixed values in session
+                    sessionStorage.setItem('selectedTotalPrice', basePrice);
+                    sessionStorage.setItem('selectedBasePrice', basePrice);
+                    sessionStorage.setItem('selectedMattresses', 0);
+                    sessionStorage.setItem('selectedGuests', 1); // Default to 1 even though not relevant
+
+                    bookButton.disabled = false;
+                    console.log('room_id:', room_id);
+                    console.log('basePrice:', basePrice);
+
+                    bookButton.addEventListener('click', () => {
+                        const url = `?section=Room-Reservation&select_room=${room_id}&price=${basePrice}&total=${basePrice}`;
+                        window.location.href = url;
+                    });
+                } else {
+                    priceDisplay.style.color = 'red';
+                    priceDisplay.textContent = '⚠️ Error: Price not available';
+                    bookButton.disabled = true;
+                }
+            }
         });
     </script>
 </body>

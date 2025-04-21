@@ -614,7 +614,7 @@ if (isset($_SESSION['user_id'])) {
             checkDetailsBtn.disabled = true;
 
             await showLoading(2000);
-
+ 
             const formData = new FormData();
             formData.append('alumni_id', alumniId);
             formData.append('last_name', lastName);

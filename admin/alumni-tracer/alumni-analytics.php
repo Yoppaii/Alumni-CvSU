@@ -47,16 +47,31 @@
         }
 
         /* Dashboard Header */
+        .dashboard-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            margin-bottom: 20px;
+
+        }
+
         .dashboard-header {
+            padding: 24px;
+            border-bottom: 1px solid #e5e7eb;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 24px;
         }
+
 
         .dashboard-title {
             font-size: 24px;
-            font-weight: 700;
+            color: #111827;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         /* Analytics Dashboard */
@@ -375,6 +390,12 @@
 
         /* Responsive Adjustments */
         @media (max-width: 768px) {
+
+            .dashboard-header,
+            .dashboard-content {
+                padding: 16px;
+            }
+
             .filters-container {
                 flex-direction: column;
             }

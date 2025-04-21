@@ -4,6 +4,25 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+
+// Add this room name mapping array at the top with other arrays
+$room_names = [
+    '9' => 'Board Room',
+    '10' => 'Conference Room',
+    '11' => 'Lobby'
+];
+
+// Update the room display in the tables
+function getRoomDisplay($room_number)
+{
+    global $room_names;
+    if (isset($room_names[$room_number])) {
+        return $room_names[$room_number];
+    } else {
+        return "Room " . $room_number;
+    }
+}
+
 $status_icons = [
     'pending' => '<i class="fas fa-clock"></i>',
     'confirmed' => '<i class="fas fa-check"></i>',
@@ -79,7 +98,7 @@ $history_result = $history_stmt->get_result();
                                 <?php $status = strtolower($booking['status']); ?>
                                 <tr data-user-id="<?php echo htmlspecialchars($booking['user_id']); ?>">
                                     <td data-label="Reference No."><?php echo htmlspecialchars($booking['reference_number']); ?></td>
-                                    <td data-label="Room">Room <?php echo htmlspecialchars($booking['room_number']); ?></td>
+                                    <td data-label="Room"><?php echo getRoomDisplay($booking['room_number']); ?></td>
                                     <td data-label="Occupancy"><?php echo htmlspecialchars($booking['occupancy']); ?> Person</td>
                                     <td data-label="Matress Fee"><?php echo number_format($booking['mattress_fee'], 2); ?></td>
                                     <td data-label="Price"><?php echo number_format($booking['price'], 2); ?></td>
@@ -185,7 +204,7 @@ $history_result = $history_stmt->get_result();
                                     <th>Room</th>
                                     <th>Occupancy</th>
                                     <th>Mattress Fee</th>
-                                    <th>Total Price</th>
+                                    <th>Price</th>
                                     <th>Check In</th>
                                     <th>Check Out</th>
                                     <th>Status</th>
@@ -198,7 +217,7 @@ $history_result = $history_stmt->get_result();
                                     <?php $status = strtolower($booking['status']); ?>
                                     <tr data-user-id="<?php echo htmlspecialchars($booking['user_id']); ?>">
                                         <td data-label="Reference No."><?php echo htmlspecialchars($booking['reference_number']); ?></td>
-                                        <td data-label="Room">Room <?php echo htmlspecialchars($booking['room_number']); ?></td>
+                                        <td data-label="Room"><?php echo getRoomDisplay($booking['room_number']); ?></td>
                                         <td data-label="Occupancy"><?php echo htmlspecialchars($booking['occupancy']); ?> Person</td>
                                         <td data-label="Mattress Fee"><?php echo number_format($booking['mattress_fee'], 2); ?></td>
                                         <td data-label="Price"><?php echo number_format($booking['price'], 2); ?></td>
@@ -606,11 +625,14 @@ $history_result = $history_stmt->get_result();
                     const parsedRoomPrice = parseFloat(price.replace(/[₱,]/g, '')) || 0;
                     const parsedMattressFee = parseFloat(mattressFee.replace(/[₱,]/g, '')) || 0;
 
-                    // Adjust room price by subtracting mattress fee since it's already included
-                    const adjustedRoomPrice = parsedRoomPrice - parsedMattressFee;
-                    const totalAmount = (adjustedRoomPrice + parsedMattressFee).toFixed(2);
+                    // Check if this is a special room (9, 10, or 11)
+                    const isSpecialRoom = room === 'Board Room' || room === 'Conference Room' || room === 'Lobby';
 
-                    // First row - Room price (adjusted)
+                    // For special rooms, we don't subtract mattress fee since there's no mattress
+                    const adjustedRoomPrice = isSpecialRoom ? parsedRoomPrice : (parsedRoomPrice - parsedMattressFee);
+                    const totalAmount = parsedRoomPrice.toFixed(2);
+
+                    // First row - Room price
                     xPos = leftMargin;
                     const roomContent = [
                         `${room} Accommodation`,
@@ -624,8 +646,8 @@ $history_result = $history_stmt->get_result();
                         xPos += columnWidths[i];
                     });
 
-                    // Only add mattress row if there's a mattress fee
-                    if (parsedMattressFee > 0) {
+                    // Only add mattress row if there's a mattress fee AND it's not a special room
+                    if (parsedMattressFee > 0 && !isSpecialRoom) {
                         yPos += 8;
                         xPos = leftMargin;
                         const mattressContent = [
@@ -647,19 +669,33 @@ $history_result = $history_stmt->get_result();
                     doc.line(leftMargin, yPos, pageWidth - leftMargin, yPos);
                     yPos += 10;
 
-                    // Summary totals
-                    [
-                        ['Room Price:', adjustedRoomPrice.toFixed(2)], // Use adjusted room price here
-                        ['Mattress Fee:', parsedMattressFee.toFixed(2)],
-                        ['Total:', totalAmount]
-                    ].forEach(([label, value]) => {
-                        doc.setFont('helvetica', 'bold');
-                        doc.text(label, pageWidth - 80, yPos);
-                        doc.text(value.toString(), pageWidth - leftMargin, yPos, {
-                            align: 'right'
+                    // Summary totals - Adjust for special rooms
+                    if (isSpecialRoom) {
+                        [
+                            ['Room Price:', parsedRoomPrice.toFixed(2)],
+                            ['Total:', totalAmount]
+                        ].forEach(([label, value]) => {
+                            doc.setFont('helvetica', 'bold');
+                            doc.text(label, pageWidth - 80, yPos);
+                            doc.text(value.toString(), pageWidth - leftMargin, yPos, {
+                                align: 'right'
+                            });
+                            yPos += 8;
                         });
-                        yPos += 8;
-                    });
+                    } else {
+                        [
+                            ['Room Price:', adjustedRoomPrice.toFixed(2)],
+                            ['Mattress Fee:', parsedMattressFee.toFixed(2)],
+                            ['Total:', totalAmount]
+                        ].forEach(([label, value]) => {
+                            doc.setFont('helvetica', 'bold');
+                            doc.text(label, pageWidth - 80, yPos);
+                            doc.text(value.toString(), pageWidth - leftMargin, yPos, {
+                                align: 'right'
+                            });
+                            yPos += 8;
+                        });
+                    }
 
                     yPos += 15;
                     doc.setFontSize(11);
@@ -702,7 +738,6 @@ $history_result = $history_stmt->get_result();
                     NotificationSystem.show('Error generating receipt', 'error');
                 }
             };
-
             // const tableHeaders = document.querySelectorAll('.booking-table thead tr');
             // tableHeaders.forEach(header => {
             //     const th = document.createElement('th');

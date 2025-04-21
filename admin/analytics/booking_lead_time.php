@@ -19,7 +19,8 @@ $query = "SELECT
           FROM bookings b
           LEFT JOIN user u 
             ON b.user_id = u.user_id
-          WHERE b.status = 'completed' 
+          WHERE b.status = 'completed'
+            AND b.is_archived = 0
           $yearCondition
           $monthCondition
           $guestTypeCondition
@@ -28,12 +29,12 @@ $query = "SELECT
 $result = $mysqli->query($query);
 
 if (!$result) {
-    die(json_encode(["error" => "SQL Error: " . $mysqli->error])); // Debug SQL errors
+  die(json_encode(["error" => "SQL Error: " . $mysqli->error])); // Debug SQL errors
 }
 
 $data = [];
 while ($row = $result->fetch_assoc()) {
-    $data[] = $row['lead_time'];
+  $data[] = $row['lead_time'];
 }
 
 header('Content-Type: application/json');

@@ -2,7 +2,8 @@
     <div class="container">
         <h2 class="features-title">
             <i class="fas fa-bed"></i>
-                Available Rooms</h2>
+            Available Rooms
+        </h2>
 
         <div class="slider-wrapper">
             <div class="swiper slider">
@@ -58,7 +59,7 @@
                                 <div class="feature-content">
                                     <h3><?php echo $room; ?></h3>
                                     <p class="room-description"><?php echo $descriptions[$index]; ?></p>
-                                   <!-- <a href="Alumni.php" class="feature-link">Learn More <i class="fas fa-arrow-right"></i></a>  -->
+                                    <!-- <a href="Alumni.php" class="feature-link">Learn More <i class="fas fa-arrow-right"></i></a>  -->
                                 </div>
                             </div>
                         </div>
@@ -79,18 +80,18 @@
         padding: 60px 0;
         background-color: #f8f9fa;
     }
-    
+
     .features-title {
-    color: var(--cvsu-primary-green);
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid var(--cvsu-light-green);
+        color: var(--cvsu-primary-green);
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--cvsu-light-green);
     }
-    
+
     .features-title:after {
         content: '';
         display: block;
@@ -99,13 +100,13 @@
         background-color: #006400;
         margin: 15px auto 0;
     }
-    
+
     .slider-wrapper {
         position: relative;
         padding: 0 10px;
         margin-bottom: 30px;
     }
-    
+
     .feature-card {
         background: white;
         border-radius: 8px;
@@ -119,48 +120,48 @@
         transform: translateY(20px);
         animation: fadeInUp 0.8s forwards;
     }
-    
+
     @keyframes fadeInUp {
         to {
             opacity: 1;
             transform: translateY(0);
         }
     }
-    
+
     .swiper-slide-active .feature-card {
         animation-delay: 0.2s;
     }
-    
+
     .swiper-slide-next .feature-card {
         animation-delay: 0.4s;
     }
-    
-    .swiper-slide-next + .swiper-slide .feature-card {
+
+    .swiper-slide-next+.swiper-slide .feature-card {
         animation-delay: 0.6s;
     }
-    
+
     .feature-card:hover {
         transform: translateY(-10px);
         box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
     }
-    
+
     .image-wrapper {
         position: relative;
         overflow: hidden;
         height: 200px;
     }
-    
+
     .feature-image {
         width: 100%;
         height: 100%;
         object-fit: cover;
         transition: transform 0.5s ease;
     }
-    
+
     .feature-card:hover .feature-image {
         transform: scale(1.1);
     }
-    
+
     .overlay {
         position: absolute;
         top: 0;
@@ -174,23 +175,23 @@
         opacity: 0;
         transition: opacity 0.3s ease;
     }
-    
+
     .overlay i {
         color: white;
         font-size: 24px;
     }
-    
+
     .feature-card:hover .overlay {
         opacity: 1;
     }
-    
+
     .feature-content {
         padding: 20px;
         flex: 1;
         display: flex;
         flex-direction: column;
     }
-    
+
     .feature-content h3 {
         margin-top: 0;
         margin-bottom: 15px;
@@ -198,7 +199,7 @@
         font-size: 20px;
         font-weight: 600;
     }
-    
+
     .room-description {
         color: #666;
         line-height: 1.6;
@@ -210,7 +211,7 @@
         opacity: 1 !important;
         visibility: visible !important;
     }
-    
+
     .feature-link {
         color: #006400;
         text-decoration: none;
@@ -220,71 +221,71 @@
         margin-top: auto;
         transition: color 0.3s ease;
     }
-    
+
     .feature-link i {
         margin-left: 8px;
         transition: transform 0.3s ease;
     }
-    
+
     .feature-link:hover {
         color: #008000;
     }
-    
+
     .feature-link:hover i {
         transform: translateX(5px);
     }
-    
 
 
 
-    
-    .swiper-button-prev i, 
+
+
+    .swiper-button-prev i,
     .swiper-button-next i {
         font-size: 16px;
     }
-    
+
     .swiper-pagination {
         position: relative;
         margin-top: 20px;
     }
-    
+
     .swiper-pagination-bullet {
         width: 10px;
         height: 10px;
         background: #ccc;
         opacity: 1;
     }
-    
+
     .swiper-pagination-bullet-active {
         background: #006400;
     }
-    
+
     /* Ensure responsive behavior */
     @media (max-width: 991px) {
         .feature-content h3 {
             font-size: 18px;
         }
-        
+
         .room-description {
             font-size: 14px;
         }
     }
-    
+
     @media (max-width: 767px) {
         .image-wrapper {
             height: 180px;
         }
-        
+
         .feature-content {
             padding: 15px;
         }
     }
-    
+
     @media (max-width: 480px) {
         .features-title {
             font-size: 26px;
         }
-        
+
         .feature-card {
             max-width: 320px;
             margin: 0 auto;
@@ -335,7 +336,7 @@
                         card.style.opacity = '0';
                         card.style.transform = 'translateY(20px)';
                     });
-                    
+
                     // Delay to ensure DOM is ready
                     setTimeout(() => {
                         // Trigger animations for visible slides
@@ -355,7 +356,7 @@
                 }
             }
         });
-        
+
         // Add custom animation method to Swiper
         roomSlider.animateSlides = function() {
             // Get visible slides
@@ -364,12 +365,12 @@
                 document.querySelector('.swiper-slide-next'),
                 document.querySelector('.swiper-slide-next + .swiper-slide')
             ].filter(slide => slide !== null);
-            
+
             // Animate each visible slide with staggered delay
             visibleSlides.forEach((slide, index) => {
                 const card = slide.querySelector('.feature-card');
                 if (!card) return;
-                
+
                 setTimeout(() => {
                     card.style.animation = 'none';
                     void card.offsetWidth; // Trigger reflow
@@ -377,7 +378,7 @@
                 }, index * 50);
             });
         };
-        
+
         // Ensure paragraphs remain visible
         const ensureParagraphsVisible = () => {
             document.querySelectorAll('.room-description').forEach(paragraph => {
@@ -388,19 +389,15 @@
                 paragraph.style.overflow = 'visible';
             });
         };
-        
+
         // Call it initially
         ensureParagraphsVisible();
-        
+
         // Also call after any potential slider events that might affect visibility
         roomSlider.on('slideChange', ensureParagraphsVisible);
         roomSlider.on('resize', ensureParagraphsVisible);
-        
+
         // Set an interval to periodically check and ensure descriptions stay visible
         setInterval(ensureParagraphsVisible, 2000);
     });
 </script>
-
-
-
-

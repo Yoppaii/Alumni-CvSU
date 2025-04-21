@@ -1,3 +1,24 @@
+<?php
+require_once('main_db.php');
+
+// Add error reporting
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+// Debug database connection
+if ($mysqli->connect_error) {
+    die("Connection failed: " . $mysqli->connect_error);
+}
+
+$sql = "SELECT `id`, `username`, `email`, `password`, `created_at`, `session_token`, `two_factor_auth`
+        FROM `users` WHERE `is_archived` = 1 ORDER BY created_at DESC";
+$result = $mysqli->query($sql);
+
+// Debug SQL query execution
+if (!$result) {
+    die("Query failed: " . $mysqli->error);
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,28 +26,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Management</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <style>
     :root {
         --primary-color: #10b981;
         --primary-dark: #059669;
         --secondary-color: #64748b;
-        --secondary-hover: #4b5563;
-        --border-color: #e2e8f0;
+        --secondary-hover: #475569;
         --danger-color: #ef4444;
         --danger-hover: #dc2626;
-        --success-color: #059669;
+        --success-color: #10b981;
+        --success-hover: #059669;
         --warning-color: #f59e0b;
-        --text-dark: #1e293b;
-        --text-light: #64748b;
-        --bg-light: #f8fafc;
-        --white: #ffffff;
         --text-primary: #1e293b;
         --text-secondary: #64748b;
         --bg-primary: #ffffff;
         --radius-md: 0.375rem;
-        --radius-lg: 0.5rem;
+        --radius-lg: 0.75rem;
     }
 
     .umain-container {
@@ -143,8 +159,8 @@
         color: #dc2626;
     }
 
-    .usr-delete-btn {
-        background-color: #ef4444;
+    .usr-restore-btn {
+        background-color: var(--primary-color);
         color: white;
         border: none;
         padding: 0.5rem 1rem;
@@ -154,8 +170,8 @@
         transition: background-color 0.2s;
     }
 
-    .usr-delete-btn:hover {
-        background-color: #dc2626;
+    .usr-restore-btn:hover {
+        background-color: var(--primary-dark);
     }
 
     .usr-reactivate-btn {
@@ -170,6 +186,149 @@
     }
 
     .usr-reactivate-btn:hover {
+        background-color: #059669;
+    }
+
+    /* Generic confirm dialog styles */
+    /* Updated Confirm dialog styles */
+    .confirm-dialog {
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(4px);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .confirm-dialog.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .confirm-content {
+        background: var(--white);
+        border-radius: 0.75rem;
+        width: 100%;
+        max-width: 500px;
+        margin: auto;
+        overflow: hidden;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        transform: translateY(-20px);
+        transition: transform 0.3s ease;
+    }
+
+    .confirm-dialog.active .confirm-content {
+        transform: translateY(0);
+    }
+
+    .confirm-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.25rem 1.5rem;
+        background-color: var(--bg-light);
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .confirm-header h2 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin: 0;
+    }
+
+    .confirm-close {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 2rem;
+        height: 2rem;
+        font-size: 1.5rem;
+        color: var(--text-light);
+        cursor: pointer;
+        background: none;
+        border: none;
+        border-radius: 9999px;
+        transition: all 0.2s ease;
+        padding: 0;
+        line-height: 1;
+    }
+
+    .confirm-close:hover {
+        color: var(--text-dark);
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    .confirm-body {
+        padding: 1.5rem;
+        color: var(--text-dark);
+    }
+
+    .confirm-body p {
+        margin-top: 0;
+        margin-bottom: 1rem;
+        line-height: 1.5;
+    }
+
+    .confirm-body p:last-child {
+        margin-bottom: 0;
+    }
+
+    .confirm-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+        padding: 1.25rem 1.5rem;
+        background-color: var(--bg-light);
+        border-top: 1px solid var(--border-color);
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border-radius: 0.375rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .btn-secondary {
+        background-color: #e2e8f0;
+        color: var(--text-dark);
+    }
+
+    .btn-secondary:hover {
+        background-color: #cbd5e1;
+    }
+
+    .btn-danger {
+        background-color: var(--danger-color);
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background-color: #dc2626;
+    }
+
+    .btn-success {
+        background-color: var(--success-color);
+        color: white;
+    }
+
+    .btn-success:hover {
         background-color: #059669;
     }
 
@@ -318,7 +477,6 @@
         background-color: #fecaca;
     }
 
-    /* Modal styles based on AL-modal */
     .AL-modal-overlay {
         position: fixed;
         top: 0;
@@ -349,7 +507,7 @@
         max-width: 400px;
         transform: translateY(-20px);
         transition: all 0.3s ease;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
     .AL-modal-overlay.active .AL-modal {
@@ -363,13 +521,14 @@
     }
 
     .AL-modal-icon {
-        width: 24px;
-        height: 24px;
+        width: 32px;
+        height: 32px;
         margin-right: 0.75rem;
         display: flex;
         align-items: center;
         justify-content: center;
         border-radius: 50%;
+        font-size: 1rem;
     }
 
     .AL-modal-icon.warning {
@@ -382,20 +541,22 @@
         color: white;
     }
 
-    .AL-modal-icon.info {
-        background-color: #3b82f6;
+    .AL-modal-icon.success {
+        background-color: var(--success-color);
         color: white;
     }
 
     .AL-modal-title {
-        font-size: 1.125rem;
+        font-size: 1.25rem;
         font-weight: 600;
         color: var(--text-primary);
+        margin: 0;
     }
 
     .AL-modal-content {
         color: var(--text-secondary);
         margin-bottom: 1.5rem;
+        line-height: 1.5;
     }
 
     .AL-modal-actions {
@@ -411,6 +572,7 @@
         cursor: pointer;
         transition: all 0.2s;
         border: none;
+        font-size: 0.875rem;
     }
 
     .AL-modal-btn-secondary {
@@ -423,8 +585,8 @@
         color: white;
     }
 
-    .AL-modal-btn-primary {
-        background-color: var(--primary-color);
+    .AL-modal-btn-success {
+        background-color: var(--success-color);
         color: white;
     }
 
@@ -436,40 +598,30 @@
         background-color: var(--danger-hover);
     }
 
-    .AL-modal-btn-primary:hover {
-        background-color: var(--primary-dark);
+    .AL-modal-btn-success:hover {
+        background-color: var(--success-hover);
+    }
+
+    /* Dark theme support */
+    [data-theme="dark"] .AL-modal {
+        background-color: #1e293b;
+    }
+
+    [data-theme="dark"] .AL-modal-title {
+        color: #f1f5f9;
+    }
+
+    [data-theme="dark"] .AL-modal-content {
+        color: #cbd5e1;
     }
 </style>
 
 <body>
-    <?php
-    require_once('main_db.php');
-
-    // Add error reporting
-    error_reporting(E_ALL);
-    ini_set('display_errors', 1);
-
-    // Debug database connection
-    if ($mysqli->connect_error) {
-        die("Connection failed: " . $mysqli->connect_error);
-    }
-
-    $sql = "SELECT `id`, `username`, `email`, `password`, `created_at`, `session_token`, `two_factor_auth`, `is_active` 
-            FROM `users` WHERE `is_archived` = 0 ORDER BY created_at DESC";
-    $result = $mysqli->query($sql);
-
-    // Debug SQL query execution
-    if (!$result) {
-        die("Query failed: " . $mysqli->error);
-    }
-    ?>
-
     <!-- Notification Container -->
     <div id="notificationContainer"></div>
-
     <div class="umain-container">
         <div class="usr-header">
-            <h1 class="usr-title">User Management</h1>
+            <h1 class="usr-title">User Records</h1>
             <input type="text" class="usr-search" id="userSearch" placeholder="Search users...">
         </div>
         <table class="usr-table">
@@ -480,7 +632,6 @@
                     <th>Email</th>
                     <th>Created At</th>
                     <th>2FA Status</th>
-                    <th>Status</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -507,14 +658,9 @@
                                     <span class="usr-2fa-disabled">Disabled</span>
                                 <?php endif; ?>
                             </td>
+
                             <td>
-                                <button class="status-btn <?php echo $row['is_active'] ? 'status-active' : 'status-inactive'; ?>"
-                                    onclick="confirmToggleStatus(<?php echo $row['id']; ?>, <?php echo $row['is_active'] ? 'true' : 'false'; ?>, '<?php echo htmlspecialchars($row['username']); ?>')">
-                                    <?php echo $row['is_active'] ? 'Active' : 'Inactive'; ?>
-                                </button>
-                            </td>
-                            <td>
-                                <button class="usr-delete-btn" onclick="confirmDeleteUser(<?php echo $row['id']; ?>, '<?php echo htmlspecialchars($row['username']); ?>')">Delete</button>
+                                <button class="usr-restore-btn" onclick="userAction(<?php echo $row['id']; ?>, '<?php echo htmlspecialchars($row['username']); ?>')">Actions</button>
                             </td>
                         </tr>
                     <?php endwhile; ?>
@@ -529,26 +675,59 @@
         </table>
     </div>
 
-    <!-- New Confirmation Modal using AL-modal styling -->
-    <div class="AL-modal-overlay" id="confirmModal">
+    <!-- Modal HTML Structure -->
+    <div class="AL-modal-overlay" id="userActionModal">
         <div class="AL-modal">
             <div class="AL-modal-header">
-                <div class="AL-modal-icon" id="confirmModalIcon">
+                <div class="AL-modal-icon" id="modalIcon">
                     <i class="fas fa-exclamation-triangle"></i>
                 </div>
-                <h3 class="AL-modal-title" id="confirmModalTitle">Confirm Action</h3>
+                <h3 class="AL-modal-title" id="modalTitle">User Action</h3>
             </div>
-            <div class="AL-modal-content" id="confirmModalMessage">
-                Are you sure you want to proceed with this action?
+            <div class="AL-modal-content" id="modalContent">
+                Are you sure you want to perform this action?
             </div>
             <div class="AL-modal-actions">
-                <button class="AL-modal-btn AL-modal-btn-secondary" id="cancelActionBtn">Cancel</button>
-                <button class="AL-modal-btn AL-modal-btn-danger" id="confirmActionBtn">Confirm</button>
+                <button class="AL-modal-btn AL-modal-btn-secondary" data-action="cancel">Cancel</button>
+                <button class="AL-modal-btn AL-modal-btn-success" id="restoreBtn" data-action="restore">Restore</button>
+                <button class="AL-modal-btn AL-modal-btn-danger" id="deleteBtn" data-action="delete">Delete Permanently</button>
             </div>
         </div>
     </div>
 
     <script>
+        // Add permanent delete confirmation modal HTML to the document body
+        document.body.insertAdjacentHTML('beforeend', `
+    <div id="almPermanentDeleteModal" class="AL-modal-overlay">
+        <div class="AL-modal">
+            <div class="AL-modal-header">
+                <div class="AL-modal-icon danger">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h2 class="AL-modal-title">Permanent Delete</h2>
+            </div>
+            <div class="AL-modal-content">
+                <p style="color: red; font-weight: bold;">
+                    Are you absolutely sure you want to permanently delete this user? 
+                    This action CANNOT be undone.
+                </p>
+                <p style="margin-top: 10px;">
+                    Please type "DELETE" to confirm:
+                </p>
+                <input type="text" id="deleteConfirmInput" 
+                       style="width: 100%; margin-top: 10px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                <div class="AL-modal-buttons" style="margin-top: 15px; display: flex; justify-content: flex-end; gap: 10px;">
+                    <button id="almPermanentDeleteCancelBtn" class="AL-modal-btn AL-modal-btn-secondary">
+                        Cancel
+                    </button>
+                    <button id="almPermanentDeleteConfirmBtn" class="AL-modal-btn AL-modal-btn-danger" disabled>
+                        Permanently Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+`);
         // Search functionality
         document.getElementById('userSearch').addEventListener('input', function() {
             const searchTerm = this.value.toLowerCase();
@@ -563,174 +742,96 @@
             });
         });
 
-        // Modal functionality using the AL-modal approach
-        const confirmationModal = {
-            modal: document.getElementById('confirmModal'),
-            title: document.getElementById('confirmModalTitle'),
-            icon: document.getElementById('confirmModalIcon'),
-            message: document.getElementById('confirmModalMessage'),
-            confirmBtn: document.getElementById('confirmActionBtn'),
-            cancelBtn: document.getElementById('cancelActionBtn'),
-            currentAction: null,
-            currentParams: null,
+        function showUserActionModal(options) {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('userActionModal');
+                const modalIcon = document.getElementById('modalIcon');
+                const modalTitle = document.getElementById('modalTitle');
+                const modalContent = document.getElementById('modalContent');
+                const restoreBtn = document.getElementById('restoreBtn');
+                const deleteBtn = document.getElementById('deleteBtn');
+                const cancelBtn = modal.querySelector('[data-action="cancel"]');
 
-            show(options) {
-                // Set modal content based on options
-                this.title.textContent = options.title || 'Confirm Action';
-                this.message.innerHTML = options.message || 'Are you sure you want to proceed with this action?';
-
-                // Update icon
-                this.icon.className = 'AL-modal-icon';
-                if (options.icon) {
-                    const iconElement = this.icon.querySelector('i');
-                    iconElement.className = options.icon;
-
-                    // Set icon background color based on type
-                    if (options.confirmColor === '#ef4444' || options.confirmColor === 'var(--danger-color)') {
-                        this.icon.classList.add('danger');
-                    } else if (options.confirmColor === '#22c55e' || options.confirmColor === 'var(--primary-color)') {
-                        this.icon.classList.add('success');
-                    } else {
-                        this.icon.classList.add('warning');
-                    }
+                // Set modal content based on primary action
+                if (options.action === 'restore') {
+                    modalIcon.className = 'AL-modal-icon success';
+                    modalIcon.innerHTML = '<i class="fas fa-undo"></i>';
+                    modalTitle.textContent = 'Restore User';
+                    modalContent.innerHTML = `
+                    <p>Are you sure you want to restore user <strong>${options.username}</strong>?</p>
+                    <p>Restored users will appear in the main user list.</p>
+                    <br>
+                    <p><strong>Warning:</strong> You can also permanently delete this user. This action cannot be undone.</p>
+                `;
+                } else if (options.action === 'delete') {
+                    modalIcon.className = 'AL-modal-icon danger';
+                    modalIcon.innerHTML = '<i class="fas fa-trash-alt"></i>';
+                    modalTitle.textContent = 'Delete User Permanently';
+                    modalContent.innerHTML = `
+                    <p><strong>Warning:</strong> You are about to permanently delete user <strong>${options.username}</strong>.</p>
+                    <p>This action cannot be undone and all user data will be completely removed from the system.</p>
+                    <p>Are you absolutely sure you want to proceed?</p>
+                `;
+                    // Hide restore button for delete-focused action
+                    restoreBtn.style.display = 'none';
                 }
-
-                // Set confirm button text and color
-                this.confirmBtn.textContent = options.confirmText || 'Confirm';
-                if (options.confirmColor) {
-                    this.confirmBtn.style.backgroundColor = options.confirmColor;
-                } else {
-                    this.confirmBtn.style.backgroundColor = ''; // Reset to default
-                }
-
-                // Store the action to be executed when confirmed
-                this.currentAction = options.action;
-                this.currentParams = options.params;
 
                 // Show the modal
-                this.modal.classList.add('active');
+                modal.classList.add('active');
 
-                // Set up event listeners
-                this.setupEventListeners();
-            },
+                // Handle button clicks
+                const cleanup = () => {
+                    modal.classList.remove('active');
+                    restoreBtn.style.display = ''; // Reset display
+                    restoreBtn.onclick = null;
+                    deleteBtn.onclick = null;
+                    cancelBtn.onclick = null;
+                    modal.onclick = null;
+                };
 
-            hide() {
-                this.modal.classList.remove('active');
-                this.removeEventListeners();
-            },
+                restoreBtn.onclick = () => {
+                    cleanup();
+                    resolve('restore');
+                };
 
-            setupEventListeners() {
-                this.confirmBtn.addEventListener('click', this.handleConfirm);
-                this.cancelBtn.addEventListener('click', this.handleCancel);
-                this.modal.addEventListener('click', this.handleOutsideClick);
-            },
+                deleteBtn.onclick = () => {
+                    // Show a double confirmation for delete
+                    cleanup();
+                    resolve('delete');
+                };
 
-            removeEventListeners() {
-                this.confirmBtn.removeEventListener('click', this.handleConfirm);
-                this.cancelBtn.removeEventListener('click', this.handleCancel);
-                this.modal.removeEventListener('click', this.handleOutsideClick);
-            },
+                cancelBtn.onclick = () => {
+                    cleanup();
+                    resolve('cancel');
+                };
 
-            handleConfirm: function() {
-                const action = confirmationModal.currentAction;
-                const params = confirmationModal.currentParams;
-
-                confirmationModal.hide();
-
-                if (action && typeof action === 'function') {
-                    action(params);
-                }
-            },
-
-            handleCancel: function() {
-                confirmationModal.hide();
-            },
-
-            handleOutsideClick: function(e) {
-                if (e.target === confirmationModal.modal) {
-                    confirmationModal.hide();
-                }
-            }
-        };
-
-        // Bind the handlers properly for the modal
-        confirmationModal.handleConfirm = confirmationModal.handleConfirm.bind(confirmationModal);
-        confirmationModal.handleCancel = confirmationModal.handleCancel.bind(confirmationModal);
-        confirmationModal.handleOutsideClick = confirmationModal.handleOutsideClick.bind(confirmationModal);
-
-        function confirmDeleteUser(userId, username) {
-            confirmationModal.show({
-                title: 'Delete User',
-                icon: 'fas fa-trash',
-                message: `Are you sure you want to delete user <strong>${username}</strong>?`,
-                confirmText: 'Delete',
-                confirmColor: '#ef4444',
-                action: archiveUser,
-                params: userId
-            });
-        }
-
-        function confirmToggleStatus(userId, isCurrentlyActive, username) {
-            const newStatus = isCurrentlyActive ? 'inactive' : 'active';
-
-            confirmationModal.show({
-                title: `Change User Status`,
-                icon: isCurrentlyActive ? 'fas fa-user-slash' : 'fas fa-user-check',
-                message: `Are you sure you want to mark <strong>${username}</strong> as ${newStatus}?`,
-                confirmText: `Mark as ${newStatus}`,
-                confirmColor: isCurrentlyActive ? '#ef4444' : '#22c55e',
-                action: toggleStatus,
-                params: {
-                    userId,
-                    isCurrentlyActive
-                }
-            });
-        }
-
-        // Toggle user status function
-        function toggleStatus(params) {
-            const {
-                userId,
-                isCurrentlyActive
-            } = params;
-            const newStatus = isCurrentlyActive ? 'inactive' : 'active';
-
-            // Send AJAX request to update status
-            fetch('/Alumni-CvSU/admin/users/update_user_status.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: `userId=${userId}&isActive=${!isCurrentlyActive}`
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Update the button in the UI
-                        const statusBtn = document.querySelector(`tr[data-user-id="${userId}"] .status-btn`);
-                        statusBtn.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
-                        statusBtn.classList.remove(isCurrentlyActive ? 'status-active' : 'status-inactive');
-                        statusBtn.classList.add(isCurrentlyActive ? 'status-inactive' : 'status-active');
-                        statusBtn.onclick = function() {
-                            confirmToggleStatus(userId, !isCurrentlyActive,
-                                document.querySelector(`tr[data-user-id="${userId}"]`).cells[1].textContent);
-                        };
-
-                        // Show success notification
-                        showNotification(`User status updated to ${newStatus}.`, 'success');
-                    } else {
-                        showNotification('Failed to update user status.', 'error');
+                // Close on clicking overlay
+                modal.onclick = (e) => {
+                    if (e.target === modal) {
+                        cleanup();
+                        resolve('cancel');
                     }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showNotification('An error occurred while updating user status.', 'error');
-                });
+                };
+            });
         }
+        // Update the userAction function to work with the new modal system
+        async function userAction(userId, username, initialAction = 'restore') {
+            const action = await showUserActionModal({
+                action: initialAction,
+                username: username,
+                userId: userId
+            });
 
-        // Archive user function
-        function archiveUser(userId) {
-            fetch('/Alumni-CvSU/admin/users/archive_user.php', {
+            if (action === 'restore') {
+                restoreUser(userId);
+            } else if (action === 'delete') {
+                // Now calls our new deleteUserPermanently function with modal confirmation
+                deleteUserPermanently(userId);
+            }
+        }
+        // Function to restore a user
+        function restoreUser(userId) {
+            fetch('/Alumni-CvSU/admin/archives/restore_user.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -738,7 +839,6 @@
                     body: `userId=${userId}`
                 })
                 .then(response => {
-                    // Add error checking for the response
                     if (!response.ok) {
                         throw new Error(`HTTP error! Status: ${response.status}`);
                     }
@@ -756,7 +856,81 @@
                         }
 
                         // Show success notification
-                        showNotification('User has been deleted successfully.', 'success');
+                        showNotification('User has been restored successfully.', 'success');
+                    } else {
+                        showNotification(`Failed to restore user: ${data.message}`, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('An error occurred while restoring the user: ' + error.message, 'error');
+                });
+        }
+
+        // Modify the deleteUserPermanently function to use the new modal
+        function deleteUserPermanently(userId) {
+            const modal = document.getElementById('almPermanentDeleteModal');
+            const confirmInput = document.getElementById('deleteConfirmInput');
+            const confirmBtn = document.getElementById('almPermanentDeleteConfirmBtn');
+            const cancelBtn = document.getElementById('almPermanentDeleteCancelBtn');
+
+            // Reset the input field and button state
+            confirmInput.value = '';
+            confirmBtn.disabled = true;
+
+            // Show the modal
+            modal.classList.add('active');
+
+            // Handle the input field to enable/disable the confirm button
+            confirmInput.addEventListener('input', function() {
+                confirmBtn.disabled = this.value !== 'DELETE';
+            });
+
+            // Handle button clicks
+            confirmBtn.onclick = function() {
+                if (confirmInput.value === 'DELETE') {
+                    modal.classList.remove('active');
+                    performDeleteUser(userId);
+                }
+            };
+
+            cancelBtn.onclick = function() {
+                modal.classList.remove('active');
+            };
+
+            // Close on clicking overlay
+            modal.onclick = function(e) {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            };
+        }
+
+        // Function that performs the actual delete operation
+        function performDeleteUser(userId) {
+            fetch('/Alumni-CvSU/admin/archives/delete_user_permanent.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `userId=${encodeURIComponent(userId)}`
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        const userRow = document.querySelector(`tr[data-user-id="${userId}"]`);
+                        if (userRow) {
+                            userRow.style.animation = 'slideOut 0.3s ease-out forwards';
+                            setTimeout(() => {
+                                userRow.remove();
+                            }, 300);
+                        }
+                        showNotification('User has been permanently deleted.', 'success');
                     } else {
                         showNotification(`Failed to delete user: ${data.message}`, 'error');
                     }
@@ -774,11 +948,11 @@
             notification.className = `notification ${type}`;
 
             notification.innerHTML = `
-                <div>
-                    <strong>${type.charAt(0).toUpperCase() + type.slice(1)}:</strong> ${message}
-                </div>
-                <button type="button" class="notification-close" onclick="this.parentElement.remove()">&times;</button>
-            `;
+        <div>
+            <strong>${type.charAt(0).toUpperCase() + type.slice(1)}:</strong> ${message}
+        </div>
+        <button type="button" class="notification-close" onclick="this.parentElement.remove()">&times;</button>
+    `;
 
             container.appendChild(notification);
 
@@ -795,6 +969,9 @@
             }, 5000);
         }
     </script>
+
+
+
 </body>
 
 </html>

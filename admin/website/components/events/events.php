@@ -1,16 +1,268 @@
+<?php
+
+require_once 'main_db.php'; // Include the database connection file
+// Check if ID is provided
+if (!isset($_GET['id']) || empty($_GET['id'])) {
+    // Redirect to events page if no ID provided
+    header('Location: events.php');
+    exit;
+}
+
+$eventId = intval($_GET['id']);
+
+
+// Check connection
+if ($mysqli->connect_error) {
+    die("Connection failed: " . $mysqli->connect_error);
+}
+
+// Query to fetch specific event data
+$query = "SELECT `id`, `day`, `month`, `title`, `venue`, `description`, `created_at` 
+          FROM `events` 
+          WHERE `id` = ?";
+
+$stmt = $mysqli->prepare($query);
+$stmt->bind_param("i", $eventId);
+$stmt->execute();
+$result = $stmt->get_result();
+
+// Check if event exists
+if ($result && $result->num_rows > 0) {
+    $event = $result->fetch_assoc();
+} else {
+    // Redirect if event not found
+    header('Location: events.php');
+    exit;
+}
+
+// Close the database connection
+$mysqli->close();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CvSU Alumni Affairs Events</title>
+    
 </head>
+
+<style>
+    /* HTML classes need to be updated to match these CSS selectors */
+
+    .ev-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    #Events {
+        color: var(--cvsu-primary-green);
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--cvsu-light-green);
+    }
+
+    /* Filters Section */
+    .ev-filters {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .ev-year-select {
+        padding: 10px 20px;
+        border: 2px solid #006400;
+        border-radius: 6px;
+        font-size: 16px;
+        color: #006400;
+        background-color: white;
+        cursor: pointer;
+        outline: none;
+    }
+
+    .ev-year-select:focus {
+        box-shadow: 0 0 0 2px rgba(0, 100, 0, 0.1);
+    }
+
+    .ev-filter-buttons {
+        display: flex;
+        gap: 15px;
+    }
+
+    .ev-filter-btn {
+        padding: 10px 25px;
+        border: none;
+        border-radius: 6px;
+        background-color: #f0f0f0;
+        color: #333;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .ev-filter-btn:hover {
+        background-color: #e0e0e0;
+    }
+
+    .ev-filter-btn.active {
+        background-color: #006400;
+        color: white;
+    }
+
+    /* Events Grid */
+    .ev-events-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 25px;
+        padding: 20px 0;
+    }
+
+    .ev-event-card {
+        display: flex;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .ev-event-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .ev-event-date {
+        background-color: #006400;
+        color: white;
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-width: 80px;
+    }
+
+    .ev-event-date .ev-day {
+        font-size: 24px;
+        font-weight: bold;
+        line-height: 1;
+    }
+
+    .ev-event-date .ev-month {
+        font-size: 14px;
+        text-transform: uppercase;
+        margin-top: 5px;
+    }
+
+    .ev-event-info {
+        padding: 15px;
+        flex-grow: 1;
+    }
+
+    .ev-event-title {
+        color: #006400;
+        font-size: 18px;
+        margin: 0 0 10px 0;
+        line-height: 1.4;
+    }
+
+    .ev-event-venue {
+        color: #666;
+        font-size: 14px;
+        margin-bottom: 15px;
+    }
+
+    .ev-view-details {
+        display: inline-block;
+        color: #006400;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+        padding: 5px 0;
+        position: relative;
+    }
+
+    .ev-view-details::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background-color: #006400;
+        transition: width 0.3s ease;
+    }
+
+    .ev-view-details:hover::after {
+        width: 100%;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .ev-filters {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .ev-filter-buttons {
+            justify-content: center;
+        }
+
+        .ev-year-select {
+            width: 100%;
+        }
+
+        .ev-events-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .ev-page-title {
+            font-size: 2em;
+        }
+
+        .ev-filter-buttons {
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .ev-filter-btn {
+            flex: 1;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .ev-event-card {
+            flex-direction: column;
+        }
+
+        .ev-event-date {
+            flex-direction: row;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px;
+        }
+    }
+</style>
+
 <body>
     <div class="ev-container">
         <h2 id="Events">
-                <i class="fas fa-calendar-alt"></i>
-                CvSU OAA Events
-            </h2>
+            <i class="fas fa-calendar-alt"></i>
+            CvSU OAA Events
+        </h2>
         <div class="ev-filters">
             <select class="ev-year-select" id="yearSelect">
                 <option value="2024">2024</option>
@@ -29,8 +281,7 @@
     </div>
 
     <script>
-        const events = [
-            {
+        const events = [{
                 day: '15',
                 month: 'Sep',
                 title: 'CvSU Alumni Homecoming 2024',
@@ -97,211 +348,5 @@
         renderEvents();
     </script>
 </body>
+
 </html>
-<style>
-    /* HTML classes need to be updated to match these CSS selectors */
-
-.ev-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-#Events {
-    color: var(--cvsu-primary-green);
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid var(--cvsu-light-green);
-}
-
-/* Filters Section */
-.ev-filters {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-    flex-wrap: wrap;
-    gap: 20px;
-}
-
-.ev-year-select {
-    padding: 10px 20px;
-    border: 2px solid #006400;
-    border-radius: 6px;
-    font-size: 16px;
-    color: #006400;
-    background-color: white;
-    cursor: pointer;
-    outline: none;
-}
-
-.ev-year-select:focus {
-    box-shadow: 0 0 0 2px rgba(0, 100, 0, 0.1);
-}
-
-.ev-filter-buttons {
-    display: flex;
-    gap: 15px;
-}
-
-.ev-filter-btn {
-    padding: 10px 25px;
-    border: none;
-    border-radius: 6px;
-    background-color: #f0f0f0;
-    color: #333;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.ev-filter-btn:hover {
-    background-color: #e0e0e0;
-}
-
-.ev-filter-btn.active {
-    background-color: #006400;
-    color: white;
-}
-
-/* Events Grid */
-.ev-events-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 25px;
-    padding: 20px 0;
-}
-
-.ev-event-card {
-    display: flex;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.ev-event-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-}
-
-.ev-event-date {
-    background-color: #006400;
-    color: white;
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-width: 80px;
-}
-
-.ev-event-date .ev-day {
-    font-size: 24px;
-    font-weight: bold;
-    line-height: 1;
-}
-
-.ev-event-date .ev-month {
-    font-size: 14px;
-    text-transform: uppercase;
-    margin-top: 5px;
-}
-
-.ev-event-info {
-    padding: 15px;
-    flex-grow: 1;
-}
-
-.ev-event-title {
-    color: #006400;
-    font-size: 18px;
-    margin: 0 0 10px 0;
-    line-height: 1.4;
-}
-
-.ev-event-venue {
-    color: #666;
-    font-size: 14px;
-    margin-bottom: 15px;
-}
-
-.ev-view-details {
-    display: inline-block;
-    color: #006400;
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 600;
-    padding: 5px 0;
-    position: relative;
-}
-
-.ev-view-details::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background-color: #006400;
-    transition: width 0.3s ease;
-}
-
-.ev-view-details:hover::after {
-    width: 100%;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .ev-filters {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .ev-filter-buttons {
-        justify-content: center;
-    }
-
-    .ev-year-select {
-        width: 100%;
-    }
-
-    .ev-events-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-}
-
-@media (max-width: 480px) {
-    .ev-page-title {
-        font-size: 2em;
-    }
-
-    .ev-filter-buttons {
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-
-    .ev-filter-btn {
-        flex: 1;
-        min-width: 100px;
-        text-align: center;
-    }
-
-    .ev-event-card {
-        flex-direction: column;
-    }
-
-    .ev-event-date {
-        flex-direction: row;
-        justify-content: center;
-        gap: 10px;
-        padding: 10px;
-    }
-}
-</style>

@@ -31,6 +31,15 @@ $today = date('Y-m-d');
             /* Darker gray for text */
         }
 
+        .dashboard-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            margin-bottom: 20px;
+
+        }
+
         /* Report Controls */
         .report-controls {
             display: flex;
@@ -147,15 +156,21 @@ $today = date('Y-m-d');
         }
 
         .dashboard-header {
+            padding: 24px;
+            border-bottom: 1px solid #e5e7eb;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 24px;
         }
+
 
         .dashboard-title {
             font-size: 24px;
-            font-weight: 700;
+            color: #111827;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         /* Button Reusability */
@@ -193,6 +208,12 @@ $today = date('Y-m-d');
 
         /* Mobile Responsiveness */
         @media (max-width: 768px) {
+
+            .dashboard-header,
+            .dashboard-content {
+                padding: 16px;
+            }
+
             .charts-container {
                 grid-template-columns: 1fr;
             }
@@ -746,6 +767,22 @@ $today = date('Y-m-d');
 
 
             function populateRooms() {
+                // Define room name mapping (same as in PHP)
+                const roomNames = {
+                    '9': 'Board Room',
+                    '10': 'Conference Room',
+                    '11': 'Lobby'
+                };
+
+                // Function to get room display name
+                function getRoomDisplay(roomNumber) {
+                    if (roomNames[roomNumber]) {
+                        return roomNames[roomNumber];
+                    } else {
+                        return "Room " + roomNumber;
+                    }
+                }
+
                 fetch('/Alumni-CvSU/admin/analytics/get_room_number.php')
                     .then(response => response.json())
                     .then(data => {
@@ -754,7 +791,7 @@ $today = date('Y-m-d');
                         data.forEach(room => {
                             let option = document.createElement("option");
                             option.value = room.room_number;
-                            option.text = `Room ${room.room_number}`;
+                            option.text = getRoomDisplay(room.room_number);
                             roomFilter.appendChild(option);
                         });
                     })

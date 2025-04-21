@@ -1,47 +1,49 @@
 <?php
 require_once 'main_db.php';
-function handleFileUpload($file) {
+function handleFileUpload($file)
+{
     $upload_dir = dirname(dirname(__DIR__)) . '/asset/uploads';
-    
+
     if (!file_exists($upload_dir)) {
         mkdir($upload_dir, 0777, true);
     }
-    
+
     $file_extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
     $allowed_extensions = array('jpg', 'jpeg', 'png', 'gif');
-    
+
     if (!in_array($file_extension, $allowed_extensions)) {
         return array(
             'success' => false,
             'message' => 'Invalid file type. Only JPG, JPEG, PNG & GIF files are allowed.'
         );
     }
-    
+
     $unique_filename = time() . '_' . uniqid() . '.' . $file_extension;
     $target_file = $upload_dir . '/' . $unique_filename;
-    
+
     if (move_uploaded_file($file['tmp_name'], $target_file)) {
         return array(
             'success' => true,
-            'filename' => $unique_filename 
+            'filename' => $unique_filename
         );
     }
-    
+
     return array(
         'success' => false,
         'message' => 'Error uploading file.'
     );
 }
-function handleAddNews($mysqli) {
+function handleAddNews($mysqli)
+{
     $category = $mysqli->real_escape_string($_POST['news_category']);
     $title = $mysqli->real_escape_string($_POST['news_title']);
     $description = $mysqli->real_escape_string($_POST['news_description']);
     $date = $mysqli->real_escape_string($_POST['news_date']);
-    
+
     $image_path = '';
     if (isset($_FILES['news_image']) && $_FILES['news_image']['error'] === 0) {
         $upload_result = handleFileUpload($_FILES['news_image']);
-        
+
         if (!$upload_result['success']) {
             echo "<script>
                 window.onload = function() {
@@ -50,16 +52,16 @@ function handleAddNews($mysqli) {
             </script>";
             return;
         }
-        
+
         $image_path = $upload_result['filename'];
     }
-    
+
     $query = "INSERT INTO news (category, title, description, date, image_path) 
               VALUES (?, ?, ?, ?, ?)";
-    
+
     $stmt = $mysqli->prepare($query);
     $stmt->bind_param("sssss", $category, $title, $description, $date, $image_path);
-    
+
     if ($stmt->execute()) {
         echo "<script>
             window.onload = function() {
@@ -79,7 +81,8 @@ function handleAddNews($mysqli) {
     $stmt->close();
 }
 
-function handleEditNews($mysqli) {
+function handleEditNews($mysqli)
+{
     $id = $mysqli->real_escape_string($_POST['news_id']);
     $category = $mysqli->real_escape_string($_POST['news_category']);
     $title = $mysqli->real_escape_string($_POST['news_title']);
@@ -92,12 +95,12 @@ function handleEditNews($mysqli) {
     $result = $stmt->get_result();
     $current_image = $result->fetch_assoc()['image_path'];
     $stmt->close();
-    
+
     $image_path = $current_image;
-    
+
     if (isset($_FILES['news_image']) && $_FILES['news_image']['error'] === 0) {
         $upload_result = handleFileUpload($_FILES['news_image']);
-        
+
         if ($upload_result['success']) {
             if ($current_image && file_exists('../uploads/' . $current_image)) {
                 unlink('../uploads/' . $current_image);
@@ -112,14 +115,14 @@ function handleEditNews($mysqli) {
             return;
         }
     }
-    
+
     $query = "UPDATE news 
               SET category = ?, title = ?, description = ?, date = ?, image_path = ? 
               WHERE id = ?";
-    
+
     $stmt = $mysqli->prepare($query);
     $stmt->bind_param("sssssi", $category, $title, $description, $date, $image_path, $id);
-    
+
     if ($stmt->execute()) {
         echo "<script>
             window.onload = function() {
@@ -138,7 +141,8 @@ function handleEditNews($mysqli) {
     }
     $stmt->close();
 }
-function handleDeleteNews($mysqli) {
+function handleDeleteNews($mysqli)
+{
     $id = $mysqli->real_escape_string($_POST['news_id']);
 
     $stmt = $mysqli->prepare("SELECT image_path FROM news WHERE id = ?");
@@ -159,7 +163,7 @@ function handleDeleteNews($mysqli) {
     $query = "DELETE FROM news WHERE id = ?";
     $stmt = $mysqli->prepare($query);
     $stmt->bind_param("i", $id);
-    
+
     if ($stmt->execute()) {
         echo "<script>
             window.onload = function() {
@@ -200,6 +204,7 @@ $result = $mysqli->query($query);
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -207,10 +212,9 @@ $result = $mysqli->query($query);
     <style>
         .NEWS-container {
             display: flex;
-            gap: 2rem;
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 1rem;
+            gap: 1rem;
+            width: 100%;
+            margin: auto;
         }
 
         .NEWS-form-section {
@@ -432,9 +436,20 @@ $result = $mysqli->query($query);
             border-radius: 50%;
         }
 
-        .NEWS-modal-icon.success { background-color: var(--success-color); color: white; }
-        .NEWS-modal-icon.error { background-color: var(--danger-color); color: white; }
-        .NEWS-modal-icon.warning { background-color: var(--warning-color); color: white; }
+        .NEWS-modal-icon.success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .NEWS-modal-icon.error {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .NEWS-modal-icon.warning {
+            background-color: var(--warning-color);
+            color: white;
+        }
 
         .NEWS-modal-title {
             font-size: 1.125rem;
@@ -496,6 +511,7 @@ $result = $mysqli->query($query);
             .NEWS-container {
                 flex-direction: column;
             }
+
             .NEWS-recent-section {
                 width: 100%;
                 min-width: 0;
@@ -575,11 +591,17 @@ $result = $mysqli->query($query);
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="NEWS-container">
         <div class="NEWS-form-section">
@@ -588,7 +610,7 @@ $result = $mysqli->query($query);
                 <form method="POST" action="" id="NEWS-form" enctype="multipart/form-data">
                     <input type="hidden" name="action" value="add">
                     <input type="hidden" name="news_id" id="edit_id">
-                    
+
                     <div class="NEWS-group">
                         <label class="NEWS-label">Category</label>
                         <select name="news_category" id="news_category" class="NEWS-select" required>
@@ -654,8 +676,8 @@ $result = $mysqli->query($query);
                             </div>
                         </div>
                         <?php if ($row['image_path']): ?>
-                            <img src="asset/uploads/<?php echo htmlspecialchars($row['image_path']); ?>" 
-                                alt="<?php echo htmlspecialchars($row['title']); ?>" 
+                            <img src="asset/uploads/<?php echo htmlspecialchars($row['image_path']); ?>"
+                                alt="<?php echo htmlspecialchars($row['title']); ?>"
                                 class="NEWS-image">
                         <?php endif; ?>
                         <h4 class="text-lg font-semibold"><?php echo htmlspecialchars($row['title']); ?></h4>
@@ -799,7 +821,9 @@ $result = $mysqli->query($query);
             document.getElementById('news_date').value = date;
             document.getElementById('news_image').required = false;
             document.getElementById('NEWS-submit-btn').textContent = 'Update News';
-            document.querySelector('.NEWS-form').scrollIntoView({ behavior: 'smooth' });
+            document.querySelector('.NEWS-form').scrollIntoView({
+                behavior: 'smooth'
+            });
         }
 
         function resetForm() {
@@ -814,10 +838,10 @@ $result = $mysqli->query($query);
             const form = document.getElementById('NEWS-form');
             const resetBtn = document.getElementById('NEWS-reset-btn');
             const loadingOverlay = document.getElementById('loadingOverlay');
-            
+
             form.addEventListener('submit', async function(e) {
                 e.preventDefault();
-                
+
                 const title = form.querySelector('[name="news_title"]').value;
                 const category = form.querySelector('[name="news_category"]').value;
                 const description = form.querySelector('[name="news_description"]').value;
@@ -863,4 +887,5 @@ $result = $mysqli->query($query);
         });
     </script>
 </body>
+
 </html>

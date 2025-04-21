@@ -24,128 +24,141 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $operating_system = get_os($user_agent);
     $device_type = is_mobile($user_agent) ? 'Mobile Device' : 'Desktop Computer';
 
-    $stmt = $mysqli->prepare('SELECT id, username, email, password, two_factor_auth FROM users WHERE email = ?');
+    $stmt = $mysqli->prepare('SELECT id, username, email, password, two_factor_auth, is_active, is_archived FROM users WHERE email = ?');
     $stmt->bind_param('s', $email);
     $stmt->execute();
     $stmt->store_result();
-    $stmt->bind_result($id, $username, $dbEmail, $hashed_password, $two_factor_auth);
+    $stmt->bind_result($id, $username, $dbEmail, $hashed_password, $two_factor_auth, $is_active, $is_archived);
 
-    if ($stmt->fetch() && password_verify($password, $hashed_password)) {
+    if ($stmt->fetch()) {
+        // Check if the user is active
+        if ($is_active == 0) {
+            $response['status'] = 'error';
+            $response['message'] = 'Your account has been deactivated. Please contact an administrator for assistance.';
+        } else if ($is_archived == 1) {
+            $response['status'] = 'error';
+            $response['message'] = 'Your account has been deleted. Please contact an administrator for assistance.';
+        } else if (password_verify($password, $hashed_password)) {
 
-        $ip_check = $mysqli->prepare('SELECT id FROM device_history WHERE user_id = ? AND ip_address = ? AND last_active >= DATE_SUB(NOW(), INTERVAL 30 DAY)');
-        $ip_check->bind_param('is', $id, $current_ip);
-        $ip_check->execute();
-        $ip_check->store_result();
+            $ip_check = $mysqli->prepare('SELECT id FROM device_history WHERE user_id = ? AND ip_address = ? AND last_active >= DATE_SUB(NOW(), INTERVAL 30 DAY)');
+            $ip_check->bind_param('is', $id, $current_ip);
+            $ip_check->execute();
+            $ip_check->store_result();
 
-        $session_token = bin2hex(random_bytes(32));
+            $session_token = bin2hex(random_bytes(32));
 
-        $update_stmt = $mysqli->prepare("UPDATE users SET session_token = ? WHERE id = ?");
-        $update_stmt->bind_param("si", $session_token, $id);
-        $update_stmt->execute();
-        $update_stmt->close();
+            $update_stmt = $mysqli->prepare("UPDATE users SET session_token = ? WHERE id = ?");
+            $update_stmt->bind_param("si", $session_token, $id);
+            $update_stmt->execute();
+            $update_stmt->close();
 
-        $_SESSION['session_token'] = $session_token;
-        $_SESSION['user_id'] = $id;
-        $_SESSION['user_email'] = $dbEmail;
-        $_SESSION['username'] = $username;
+            $_SESSION['session_token'] = $session_token;
+            $_SESSION['user_id'] = $id;
+            $_SESSION['user_email'] = $dbEmail;
+            $_SESSION['username'] = $username;
 
-        if ($two_factor_auth == 1 && $ip_check->num_rows == 0) {
-            $otp = sprintf("%06d", random_int(0, 999999));
-            $_SESSION['otp'] = $otp;
-            $_SESSION['otp_time'] = time();
+            if ($two_factor_auth == 1 && $ip_check->num_rows == 0) {
+                $otp = sprintf("%06d", random_int(0, 999999));
+                $_SESSION['otp'] = $otp;
+                $_SESSION['otp_time'] = time();
 
-            $mail = new PHPMailer(true);
-            try {
-                $mail->isSMTP();
-                $mail->Host = 'smtp.gmail.com';
-                $mail->SMTPAuth = true;
-                $mail->Username = 'roomreservation.csumc@gmail.com';
-                $mail->Password = 'bpqazltzfyacofjd';
-                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                $mail->Port = 587;
+                $mail = new PHPMailer(true);
+                try {
+                    $mail->isSMTP();
+                    $mail->Host = 'smtp.gmail.com';
+                    $mail->SMTPAuth = true;
+                    $mail->Username = 'roomreservation.csumc@gmail.com';
+                    $mail->Password = 'bpqazltzfyacofjd';
+                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                    $mail->Port = 587;
 
-                $mail->setFrom('roomreservation.csumc@gmail.com', 'Alumni CvSU');
-                $mail->addAddress($dbEmail);
+                    $mail->setFrom('roomreservation.csumc@gmail.com', 'Alumni CvSU');
+                    $mail->addAddress($dbEmail);
 
-                $mail->isHTML(true);
-                $mail->Subject = 'Two-Factor Authentication Code - New Login Attempt';
+                    $mail->isHTML(true);
+                    $mail->Subject = 'Two-Factor Authentication Code - New Login Attempt';
 
-                $login_time = date('F j, Y \a\t g:i a');
+                    $login_time = date('F j, Y \a\t g:i a');
 
-                $message = '<!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="UTF-8">
-                    <title>Two-Factor Authentication</title>
-                </head>
-                <body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif;">
-                    <div style="max-width: 600px; margin: 20px auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
-                        <div style="background: #006400; color: white; padding: 20px; text-align: center;">
-                            <h2 style="margin: 0;">Two-Factor Authentication Code</h2>
-                        </div>
-                        
-                        <div style="padding: 20px;">
-                            <div style="background: #e8f0fe; padding: 20px; border-radius: 8px;">
-                                <h2 style="text-align: center; color: #006400; margin-top: 0;">Hello, ' . htmlspecialchars($username) . '!</h2>
-                                <p style="text-align: center;">A login attempt was detected from a new location. Here is your verification code to complete the login process:</p>
-                                
-                                <div style="font-size: 32px; letter-spacing: 5px; background: white; padding: 15px; margin: 20px 0; border-radius: 4px; font-weight: bold; color: #006400; text-align: center;">
-                                    ' . $otp . '
-                                </div>
-                                
-                                <p style="text-align: center;"><strong>This code will expire in 10 minutes.</strong></p>
-
-                                <div style="background: #f8f9fa; padding: 15px; margin: 15px 0; border-radius: 4px;">
-                                    <h3 style="color: #006400; margin-top: 0;">Login Details:</h3>
-                                    <ul style="list-style: none; padding: 0; margin: 0;">
-                                        <li style="margin-bottom: 10px;"><strong>Time:</strong> ' . $login_time . '</li>
-                                        <li style="margin-bottom: 10px;"><strong>IP Address:</strong> ' . $current_ip . '</li>
-                                        <li style="margin-bottom: 10px;"><strong>Device:</strong> ' . $device_type . '</li>
-                                        <li style="margin-bottom: 10px;"><strong>Browser:</strong> ' . $browser . '</li>
-                                        <li style="margin-bottom: 10px;"><strong>Operating System:</strong> ' . $operating_system . '</li>
-                                    </ul>
-                                </div>
-                                
-                                <div style="background: #fff3cd; border: 1px solid #ffeeba; color: #856404; padding: 10px; border-radius: 4px; margin: 15px 0;">
-                                    <strong>Security Notice:</strong> If you did not attempt this login, please:
-                                    <ol style="margin: 10px 0 0 20px;">
-                                        <li>Do not share this code with anyone</li>
-                                        <li>Change your password immediately</li>
-                                        <li>Contact our support team</li>
-                                    </ol>
+                    $message = '<!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>Two-Factor Authentication</title>
+                    </head>
+                    <body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif;">
+                        <div style="max-width: 600px; margin: 20px auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+                            <div style="background: #006400; color: white; padding: 20px; text-align: center;">
+                                <h2 style="margin: 0;">Two-Factor Authentication Code</h2>
+                            </div>
+                            
+                            <div style="padding: 20px;">
+                                <div style="background: #e8f0fe; padding: 20px; border-radius: 8px;">
+                                    <h2 style="text-align: center; color: #006400; margin-top: 0;">Hello, ' . htmlspecialchars($username) . '!</h2>
+                                    <p style="text-align: center;">A login attempt was detected from a new location. Here is your verification code to complete the login process:</p>
+                                    
+                                    <div style="font-size: 32px; letter-spacing: 5px; background: white; padding: 15px; margin: 20px 0; border-radius: 4px; font-weight: bold; color: #006400; text-align: center;">
+                                        ' . $otp . '
+                                    </div>
+                                    
+                                    <p style="text-align: center;"><strong>This code will expire in 10 minutes.</strong></p>
+    
+                                    <div style="background: #f8f9fa; padding: 15px; margin: 15px 0; border-radius: 4px;">
+                                        <h3 style="color: #006400; margin-top: 0;">Login Details:</h3>
+                                        <ul style="list-style: none; padding: 0; margin: 0;">
+                                            <li style="margin-bottom: 10px;"><strong>Time:</strong> ' . $login_time . '</li>
+                                            <li style="margin-bottom: 10px;"><strong>IP Address:</strong> ' . $current_ip . '</li>
+                                            <li style="margin-bottom: 10px;"><strong>Device:</strong> ' . $device_type . '</li>
+                                            <li style="margin-bottom: 10px;"><strong>Browser:</strong> ' . $browser . '</li>
+                                            <li style="margin-bottom: 10px;"><strong>Operating System:</strong> ' . $operating_system . '</li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div style="background: #fff3cd; border: 1px solid #ffeeba; color: #856404; padding: 10px; border-radius: 4px; margin: 15px 0;">
+                                        <strong>Security Notice:</strong> If you did not attempt this login, please:
+                                        <ol style="margin: 10px 0 0 20px;">
+                                            <li>Do not share this code with anyone</li>
+                                            <li>Change your password immediately</li>
+                                            <li>Contact our support team</li>
+                                        </ol>
+                                    </div>
                                 </div>
                             </div>
+                            
+                            <div style="background: #f8f9fa; padding: 15px; text-align: center; font-size: 12px; color: #666;">
+                                <p style="margin: 5px 0;">This is an automated message, please do not reply to this email.</p>
+                                <p style="margin: 5px 0;">CvSU Alumni Portal - Security Notice</p>
+                                <p style="margin: 5px 0;">Time sent: ' . date('Y-m-d H:i:s') . '</p>
+                            </div>
                         </div>
-                        
-                        <div style="background: #f8f9fa; padding: 15px; text-align: center; font-size: 12px; color: #666;">
-                            <p style="margin: 5px 0;">This is an automated message, please do not reply to this email.</p>
-                            <p style="margin: 5px 0;">CvSU Alumni Portal - Security Notice</p>
-                            <p style="margin: 5px 0;">Time sent: ' . date('Y-m-d H:i:s') . '</p>
-                        </div>
-                    </div>
-                </body>
-                </html>';
+                    </body>
+                    </html>';
 
-                $mail->Body = $message;
-                $mail->send();
+                    $mail->Body = $message;
+                    $mail->send();
+
+                    $response['status'] = 'success';
+                    $response['redirect'] = '?Cavite-State-University=verify-step';
+                    $response['message'] = 'Please verify your identity. Check your email for the verification code.';
+                } catch (Exception $e) {
+                    $response['status'] = 'error';
+                    $response['message'] = 'Could not send verification code. Please try again.';
+                }
+            } else {
 
                 $response['status'] = 'success';
-                $response['redirect'] = '?Cavite-State-University=verify-step';
-                $response['message'] = 'Please verify your identity. Check your email for the verification code.';
-            } catch (Exception $e) {
-                $response['status'] = 'error';
-                $response['message'] = 'Could not send verification code. Please try again.';
+                $response['redirect'] = '../../../Alumni-CvSU/Account';
+                $response['message'] = 'Login successful!';
             }
+
+            $ip_check->close();
         } else {
-
-            $response['status'] = 'success';
-            $response['redirect'] = '../../../Alumni-CvSU/Account';
-            $response['message'] = 'Login successful!';
+            $response['message'] = 'Invalid email or password.';
         }
-
-        $ip_check->close();
     } else {
-        $response['message'] = 'Invalid email or password.';
+        // No user found with the provided email
+        $response['status'] = 'error';
+        $response['message'] = 'No account exists with this email address. Please check your email or register for an account.';
     }
 
     $stmt->close();

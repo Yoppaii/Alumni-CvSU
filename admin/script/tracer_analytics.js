@@ -897,14 +897,9 @@ function fetchTotalGraduates(campus, course, employmentStatus, fromYear, toYear)
                                         label: function (tooltipItem) {
                                             const count = tooltipItem.raw;
                                             const percentage = totalGraduates > 0 ? ((count / totalGraduates) * 100).toFixed(1) : 0;
-                                            return `Graduates: ${count} (${percentage}%)`;
+                                            return `Respondents: ${count} (${percentage}%)`;
                                         }
                                     }
-                                },
-                                title: {
-                                    display: true,
-                                    text: 'Total Graduates Per Campus',
-                                    font: { size: 16 }
                                 }
                             }
                         }

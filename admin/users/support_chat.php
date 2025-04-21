@@ -2,14 +2,17 @@
 // support_chat.php
 require_once 'main_db.php';
 
-class SupportChat {
+class SupportChat
+{
     private $mysqli;
-    
-    public function __construct($mysqli) {
+
+    public function __construct($mysqli)
+    {
         $this->mysqli = $mysqli;
     }
 
-    public function getActiveChats($admin_id = null) {
+    public function getActiveChats($admin_id = null)
+    {
         $query = "SELECT 
                     sc.id as chat_id,
                     u.name as user_name,
@@ -32,12 +35,12 @@ class SupportChat {
                  JOIN users u ON sc.user_id = u.id
                  WHERE sc.status = 'active'
                  ORDER BY sc.updated_at DESC";
-                 
+
         $stmt = $this->mysqli->prepare($query);
         $stmt->bind_param('i', $admin_id);
         $stmt->execute();
         $result = $stmt->get_result();
-        
+
         $chats = [];
         while ($row = $result->fetch_assoc()) {
             $chats[] = [
@@ -48,11 +51,12 @@ class SupportChat {
                 'unread_count' => $row['unread_count']
             ];
         }
-        
+
         return $chats;
     }
-    
-    public function getMessages($chat_id) {
+
+    public function getMessages($chat_id)
+    {
         $chat_id = (int)$chat_id;
         $query = "SELECT 
                     sm.*,
@@ -64,12 +68,12 @@ class SupportChat {
                  JOIN users u ON sm.sender_id = u.id
                  WHERE sm.chat_id = ?
                  ORDER BY sm.created_at ASC";
-                 
+
         $stmt = $this->mysqli->prepare($query);
         $stmt->bind_param('i', $chat_id);
         $stmt->execute();
         $result = $stmt->get_result();
-        
+
         $messages = [];
         while ($row = $result->fetch_assoc()) {
             $messages[] = [
@@ -81,7 +85,7 @@ class SupportChat {
                 'is_admin' => ($row['sender_id'] == $row['admin_id'])
             ];
         }
-        
+
         return $messages;
     }
 }
@@ -95,7 +99,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'get_messages') {
         foreach ($messages as $message) {
             $messageClass = $message['is_admin'] ? 'message outgoing' : 'message';
             $time = date('g:i A', strtotime($message['created_at']));
-            
+
             $output .= sprintf(
                 '<div class="%s">
                     <div class="message-bubble">%s</div>
@@ -106,9 +110,8 @@ if (isset($_GET['action']) && $_GET['action'] == 'get_messages') {
                 $time
             );
         }
-        
+
         echo $output;
         exit;
     }
 }
-?>

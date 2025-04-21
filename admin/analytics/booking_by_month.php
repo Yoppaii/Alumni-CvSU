@@ -19,7 +19,8 @@ $query = "SELECT
           FROM bookings b
           LEFT JOIN user u 
             ON b.user_id = u.user_id
-          WHERE b.status = 'completed' 
+          WHERE b.status = 'completed'
+            AND b.is_archived = 0
           $yearCondition
           $guestTypeCondition
           $roomNumberCondition

@@ -86,7 +86,12 @@ if (isset($_GET['section']) && $_GET['section'] === 'Room-Reservation') {
     }
 }
 
-$sql = "SELECT id, user_id, first_name, last_name, middle_name, position, address, telephone, phone_number, second_address, accompanying_persons, user_status, verified, alumni_id_card_no FROM user WHERE user_id = ?";
+$sql = "SELECT u.id, u.user_id, u.first_name, u.last_name, u.middle_name, u.position, 
+        u.address, u.telephone, u.phone_number, u.second_address, u.accompanying_persons, 
+        u.user_status, u.verified, u.alumni_id_card_no, a.is_archived 
+        FROM user u 
+        LEFT JOIN alumni a ON u.alumni_id_card_no = a.alumni_id_card_no 
+        WHERE u.user_id = ?";
 $stmt = $mysqli->prepare($sql);
 $stmt->bind_param("i", $_SESSION['user_id']);
 $stmt->execute();
@@ -95,7 +100,18 @@ $user = $result->fetch_assoc();
 
 if ($user) {
     $verified = $user['verified'];
-    $userStatus = $user['user_status'];
+
+    // Check if alumni_id_card_no exists in alumni table and if it's archived
+    if ($user['alumni_id_card_no'] && $user['is_archived'] === NULL) {
+        // alumni_id_card_no doesn't exist in alumni table
+        $userStatus = 'Guest';
+    } else if ($user['alumni_id_card_no'] && $user['is_archived'] == 1) {
+        // alumni_id_card_no exists but is archived
+        $userStatus = 'Guest';
+    } else {
+        // Use the status from database
+        $userStatus = $user['user_status'];
+    }
 } else {
     $verified = 0;
     $userStatus = 'Guest';
@@ -745,7 +761,7 @@ $_SESSION['has_booking'] = $hasBooking;
                         <li><a href="?section=security-settings"><i class="fas fa-user-shield"></i> Security</a></li>
                         <li><a href="?section=notification-settings"><i class="fas fa-bell"></i> Notification</a></li>
                         <li><a href="?section=privacy-settings"><i class="fas fa-shield-alt"></i> Privacy</a></li>
-                       <!--  <li><a href="?section=support-settings"><i class="fas fa-phone"></i> Support</a></li>-->
+                        <!--  <li><a href="?section=support-settings"><i class="fas fa-phone"></i> Support</a></li>-->
                     </ul>
                 </li>
                 <li class="nav-item"><a href="user/logout" class="nav-link"><i class="fas fa-sign-out-alt"></i> Log Out</a></li>

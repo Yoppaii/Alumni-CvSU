@@ -321,8 +321,6 @@ function fetchJobSearchMethods(campus, course, employmentStatus, fromYear, toYea
                 totalAlumni += datasetMap[method]; // Sum correctly
             });
 
-            console.log("Total Alumni:", totalAlumni);
-            console.log("Dataset Map:", datasetMap);
 
             // Define colors and create gradients
             const colors = ["#4CAF50", "#FFC107", "#FF5733", "#36A2EB", "#9C27B0"];
@@ -756,57 +754,92 @@ function fetchTotalGraduates(campus, course, employmentStatus, fromYear, toYear)
     loader.className = "chart-loading";
     chartContainer.appendChild(loader);
 
-    // First, fetch the list of available campuses
-    fetch('/Alumni-CvSU/admin/website/ajax/get_campus_list.php')
+    // Debug the filter parameters
+    console.log("Filter parameters:", {
+        campus, course, employmentStatus, fromYear, toYear
+    });
+
+    // First, fetch the raw data directly
+    const params = new URLSearchParams({
+        campus: campus,
+        course: course,
+        employmentStatus: employmentStatus,
+        fromYear: fromYear || '',
+        toYear: toYear || ''
+    });
+
+    fetch(`/Alumni-CvSU/admin/website/ajax/total_graduates.php?${params.toString()}`)
         .then(response => {
             if (!response.ok) {
-                throw new Error("Failed to fetch campus list");
+                throw new Error("Network response was not ok");
             }
             return response.json();
         })
-        .then(availableCampuses => {
-            // Proceed with graduates data fetch
-            const params = new URLSearchParams({
-                campus: campus,
-                course: course,
-                employmentStatus: employmentStatus,
-                fromYear: fromYear || '',
-                toYear: toYear || ''
-            });
+        .then(data => {
+            // Log the raw data
+            console.log("Raw graduates data:", data);
 
-            return fetch(`/Alumni-CvSU/admin/website/ajax/total_graduates.php?${params.toString()}`)
+            // Then fetch the campus list
+            return fetch('/Alumni-CvSU/admin/website/ajax/get_campus_list.php')
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error("Network response was not ok");
+                        throw new Error("Failed to fetch campus list");
                     }
                     return response.json();
                 })
-                .then(data => {
-                    // Use the campus list we fetched
-                    let campusLabels = availableCampuses;
+                .then(availableCampuses => {
+                    // Log the available campuses
+                    console.log("Available campuses:", availableCampuses);
 
-                    // If no campuses found, use a default empty array
-                    if (!Array.isArray(campusLabels) || campusLabels.length === 0) {
-                        console.warn("No campuses found in the system");
-                        campusLabels = [];
+                    let campusLabels = [...availableCampuses]; // Create a copy
+
+                    // Make sure Silang campus is included if it exists in the data but not in the campus list
+                    const dataContainsSilang = data.some(item =>
+                        item.campus.toLowerCase().includes('silang'));
+                    const listContainsSilang = campusLabels.some(campus =>
+                        campus.toLowerCase().includes('silang'));
+
+                    if (dataContainsSilang && !listContainsSilang) {
+                        const silangEntry = data.find(item =>
+                            item.campus.toLowerCase().includes('silang'));
+                        if (silangEntry) {
+                            campusLabels.push(silangEntry.campus);
+                            console.log("Added missing Silang campus:", silangEntry.campus);
+                        }
                     }
+
+                    // Sort the campus labels alphabetically for consistency
+                    campusLabels.sort();
 
                     // Initialize graduates data with zeros for all campuses
                     let graduatesData = Array(campusLabels.length).fill(0);
 
                     // Update with actual data if available
                     if (Array.isArray(data) && data.length > 0) {
-                        // Map campus data to the corresponding positions
                         data.forEach(item => {
-                            const index = campusLabels.indexOf(item.campus);
+                            // Try to find an exact match first
+                            let index = campusLabels.indexOf(item.campus);
+
+                            // If not found, try a case-insensitive match
+                            if (index === -1) {
+                                index = campusLabels.findIndex(campus =>
+                                    campus.toLowerCase() === item.campus.toLowerCase());
+                            }
+
+                            // If still not found, try a partial match
+                            if (index === -1) {
+                                index = campusLabels.findIndex(campus =>
+                                    campus.toLowerCase().includes(item.campus.toLowerCase()) ||
+                                    item.campus.toLowerCase().includes(campus.toLowerCase()));
+                            }
+
                             if (index !== -1) {
                                 graduatesData[index] = parseInt(item.total_graduates);
+                                console.log(`Matched campus "${item.campus}" to "${campusLabels[index]}" with ${item.total_graduates} graduates`);
+                            } else {
+                                console.warn(`Could not match campus "${item.campus}" to any label`);
                             }
                         });
-
-                        console.log("Graduate data loaded successfully.");
-                    } else {
-                        console.warn("No graduate data available for the selected filters.");
                     }
 
                     // Calculate total graduates
@@ -817,19 +850,17 @@ function fetchTotalGraduates(campus, course, employmentStatus, fromYear, toYear)
                         window.totalGraduatesChart.destroy();
                     }
 
-                    // Generate colors dynamically based on the number of campuses
+                    // Rest of the chart creation code remains mostly the same
                     const baseColors = [
                         "#4CAF50", "#FFC107", "#FF5733", "#36A2EB",
                         "#9C27B0", "#F44336", "#3F51B5", "#FF9800", "#009688"
                     ];
 
-                    // Ensure we have enough colors by cycling through the base colors if needed
                     const colors = [];
                     for (let i = 0; i < campusLabels.length; i++) {
                         colors.push(baseColors[i % baseColors.length]);
                     }
 
-                    // Create gradient backgrounds
                     const gradients = colors.map((color) => {
                         const gradient = ctx.createLinearGradient(0, 0, 0, 300);
                         gradient.addColorStop(0, color);
@@ -837,7 +868,6 @@ function fetchTotalGraduates(campus, course, employmentStatus, fromYear, toYear)
                         return gradient;
                     });
 
-                    // Create the Chart with a single dataset
                     window.totalGraduatesChart = new Chart(ctx, {
                         type: "bar",
                         data: {
@@ -868,7 +898,6 @@ function fetchTotalGraduates(campus, course, employmentStatus, fromYear, toYear)
                                     title: { display: true, text: "Campus" },
                                     ticks: {
                                         callback: function (value, index) {
-                                            // Shorten campus names for display if needed
                                             const campusName = campusLabels[index];
                                             if (campusName && campusName.includes("Cavite State University - ")) {
                                                 return campusName.replace("Cavite State University - ", "");
@@ -891,7 +920,6 @@ function fetchTotalGraduates(campus, course, employmentStatus, fromYear, toYear)
                                     cornerRadius: 8,
                                     callbacks: {
                                         title: function (tooltipItems) {
-                                            // Show full campus name in tooltip
                                             return campusLabels[tooltipItems[0].dataIndex];
                                         },
                                         label: function (tooltipItem) {
@@ -901,7 +929,6 @@ function fetchTotalGraduates(campus, course, employmentStatus, fromYear, toYear)
                                         }
                                     }
                                 },
-
                             }
                         }
                     });
@@ -909,7 +936,6 @@ function fetchTotalGraduates(campus, course, employmentStatus, fromYear, toYear)
         })
         .catch(error => {
             console.error("Error:", error.message);
-            loader.remove();
             showErrorMessage("totalGraduatesChart", "Failed to load data: " + error.message);
         })
         .finally(() => {
@@ -942,8 +968,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Initial load with default filters
-    fetchTotalGraduates('', '', '', '', '');
+
 });
 
 document.getElementById("campusFilter").addEventListener("change", updateChart);

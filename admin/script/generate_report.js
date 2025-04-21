@@ -227,7 +227,7 @@ document.getElementById("printReport").addEventListener("click", async function 
                 const noShow = data.cancellationData.no_show ? parseInt(data.cancellationData.no_show) : 0;
                 const successful = data.cancellationData.successful ? parseInt(data.cancellationData.successful) : 0;
 
-
+                cancelled_noShow = cancelled + noShow;
                 // Manually calculate the total instead of using the API's total
                 const totalBookings = successful + cancelled + noShow;
 
@@ -241,7 +241,7 @@ document.getElementById("printReport").addEventListener("click", async function 
                 });
                 summaryItems.push({
                     label: "Cancellations / No Shows:",
-                    value: cancelled.toLocaleString()
+                    value: cancelled_noShow.toLocaleString()
                 });
                 summaryItems.push({
                     label: "Successful:",

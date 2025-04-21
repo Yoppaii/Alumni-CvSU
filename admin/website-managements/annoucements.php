@@ -5,11 +5,11 @@ if (isset($_POST['delete_id'])) {
     $deleteQuery = "DELETE FROM announcements WHERE id = ?";
     $stmt = $mysqli->prepare($deleteQuery);
     $stmt->bind_param("i", $id);
-    
+
     if ($stmt->execute()) {
         echo "<script>
             window.onload = function() {
-                showANNotification('success', 'Announcement deleted successfully!', 'Success');
+                showNotification('Announcement deleted successfully!','success');
                 setTimeout(function() {
                     window.location.href = '?section=Latest-Announcements';
                 }, 1500);
@@ -18,7 +18,7 @@ if (isset($_POST['delete_id'])) {
     } else {
         echo "<script>
             window.onload = function() {
-                showANNotification('error', 'Error deleting announcement!', 'Error');
+                showNotification('Error deleting announcement!','error');
             }
         </script>";
     }
@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['delete_id'])) {
     $badge = $mysqli->real_escape_string($_POST['badge']);
     $title = $mysqli->real_escape_string($_POST['title']);
     $content = $mysqli->real_escape_string($_POST['content']);
-    
+
     if (isset($_POST['edit_id']) && !empty($_POST['edit_id'])) {
         $id = $mysqli->real_escape_string($_POST['edit_id']);
         $query = "UPDATE announcements SET badge=?, title=?, content=? WHERE id=?";
@@ -40,12 +40,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['delete_id'])) {
         $stmt = $mysqli->prepare($query);
         $stmt->bind_param("sss", $badge, $title, $content);
     }
-    
+
     if ($stmt->execute()) {
         $action = isset($_POST['edit_id']) ? 'updated' : 'posted';
         echo "<script>
             window.onload = function() {
-                showANNotification('success', 'Announcement {$action} successfully!', 'Success');
+                showNotification('Announcement {$action} successfully!', 'success');
                 setTimeout(function() {
                     window.location.href = '?section=Latest-Announcements';
                 }, 1500);
@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['delete_id'])) {
     } else {
         echo "<script>
             window.onload = function() {
-                showANNotification('error', 'Error saving announcement!', 'Error');
+                showNotification('Error saving announcement!', 'error');
             }
         </script>";
     }
@@ -64,6 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['delete_id'])) {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -71,10 +72,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['delete_id'])) {
     <style>
         .AN-container {
             display: flex;
-            gap: 2rem;
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 1rem;
+            gap: 1rem;
+            width: 100%;
+            margin: auto;
         }
 
         .AN-form-section {
@@ -142,10 +142,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['delete_id'])) {
             font-weight: 500;
         }
 
-        .AN-badge-new { background-color: #10b981; color: white; }
-        .AN-badge-event { background-color: #f59e0b; color: white; }
-        .AN-badge-update { background-color: #3b82f6; color: white; }
-        .AN-badge-academic { background-color: #8b5cf6; color: white; }
+        .AN-badge-new {
+            background-color: #10b981;
+            color: white;
+        }
+
+        .AN-badge-event {
+            background-color: #f59e0b;
+            color: white;
+        }
+
+        .AN-badge-update {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        .AN-badge-academic {
+            background-color: #8b5cf6;
+            color: white;
+        }
 
         .AN-submit {
             background-color: var(--primary-color);
@@ -277,9 +292,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['delete_id'])) {
             border-radius: 50%;
         }
 
-        .AN-modal-icon.success { background-color: var(--success-color); color: white; }
-        .AN-modal-icon.error { background-color: var(--danger-color); color: white; }
-        .AN-modal-icon.warning { background-color: var(--warning-color); color: white; }
+        .AN-modal-icon.success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .AN-modal-icon.error {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .AN-modal-icon.warning {
+            background-color: var(--warning-color);
+            color: white;
+        }
 
         .AN-modal-title {
             font-size: 1.125rem;
@@ -395,8 +421,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['delete_id'])) {
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         [data-theme="dark"] .AN-select,
@@ -421,313 +452,423 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['delete_id'])) {
             .AN-container {
                 flex-direction: column;
             }
+
             .AN-recent-section {
                 width: 100%;
                 min-width: 0;
             }
         }
+
+        /* Notification styles */
+        #notificationContainer {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .notification {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            margin-bottom: 10px;
+            animation: slideIn 0.3s ease-out forwards;
+            min-width: 300px;
+            max-width: 400px;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        .notification.error {
+            border-left: 4px solid #ef4444;
+        }
+
+        .notification.success {
+            border-left: 4px solid #10b981;
+        }
+
+        .notification.warning {
+            border-left: 4px solid #f59e0b;
+        }
+
+        .notification.info {
+            border-left: 4px solid #3b82f6;
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px;
+            color: #64748b;
+        }
+
+        .notification-close:hover {
+            color: #1e293b;
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+                height: auto;
+                padding-top: 12px;
+                /* match your row padding */
+                padding-bottom: 12px;
+            }
+
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+                height: 0;
+                padding-top: 0;
+                padding-bottom: 0;
+                margin: 0;
+                border: 0;
+            }
+        }
+
+        .slide-out {
+            animation: slideOut 0.3s ease-out forwards;
+        }
     </style>
 </head>
+
 <body>
+    <div id="notificationContainer" style="position: fixed; top: 10px; right: 10px; z-index: 9999;"></div>
 
-<div class="AN-container">
-    <div class="AN-form-section">
-        <div class="AN-form">
-            <h2 class="mb-4 text-xl font-semibold">Post New Announcement</h2>
-            <form method="POST" action="" id="AN-form">
-                <input type="hidden" name="edit_id" id="edit_id">
-                <div class="AN-group">
-                    <label class="AN-label">Badge Type</label>
-                    <select name="badge" class="AN-select" required>
-                        <option value="">Select Badge</option>
-                        <option value="New">New</option>
-                        <option value="Event">Event</option>
-                        <option value="Update">Update</option>
-                        <option value="Academic">Academic</option>
-                    </select>
-                </div>
+    <div class="AN-container">
+        <div class="AN-form-section">
+            <div class="AN-form">
+                <h2 class="mb-4 text-xl font-semibold">Post New Announcement</h2>
+                <form method="POST" action="" id="AN-form">
+                    <input type="hidden" name="edit_id" id="edit_id">
+                    <div class="AN-group">
+                        <label class="AN-label">Badge Type</label>
+                        <select name="badge" class="AN-select" required>
+                            <option value="">Select Badge</option>
+                            <option value="New">New</option>
+                            <option value="Event">Event</option>
+                            <option value="Update">Update</option>
+                            <option value="Academic">Academic</option>
+                        </select>
+                    </div>
 
-                <div class="AN-group">
-                    <label class="AN-label">Title</label>
-                    <input type="text" name="title" class="AN-input" required placeholder="Enter announcement title">
-                </div>
+                    <div class="AN-group">
+                        <label class="AN-label">Title</label>
+                        <input type="text" name="title" class="AN-input" required placeholder="Enter announcement title">
+                    </div>
 
-                <div class="AN-group">
-                    <label class="AN-label">Content</label>
-                    <textarea name="content" class="AN-textarea" required placeholder="Enter announcement content"></textarea>
-                </div>
+                    <div class="AN-group">
+                        <label class="AN-label">Content</label>
+                        <textarea name="content" class="AN-textarea" required placeholder="Enter announcement content"></textarea>
+                    </div>
 
-                <div class="AN-button-group">
-                    <button type="submit" class="AN-submit" id="AN-submit-btn">Post Announcement</button>
-                    <button type="button" class="AN-submit" id="AN-reset-btn" style="background-color: var(--secondary-color); margin-left: 0.5rem;">Cancel</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div class="AN-recent-section">
-        <div class="AN-recent-container">
-            <h3 class="mb-4 text-xl font-semibold">Recent Announcements</h3>
-            <?php
-            $query = "SELECT * FROM announcements WHERE status = 1 ORDER BY created_at DESC LIMIT 5";
-            $result = $mysqli->query($query);
-
-            if ($result->num_rows > 0) {
-                while ($row = $result->fetch_assoc()) {
-                    $badgeClass = 'AN-badge-' . strtolower($row['badge']);
-                    echo '<div class="AN-announcement-item">';
-                    echo '<div class="AN-announcement-header">';
-                    echo '<div class="AN-badge-container">';
-                    echo '<span class="AN-badge ' . $badgeClass . '">' . htmlspecialchars($row['badge']) . '</span>';
-                    echo '</div>';
-                    echo '<div class="AN-actions">';
-                    echo '<button onclick="editAnnouncement(' . $row['id'] . ', \'' . htmlspecialchars($row['badge'], ENT_QUOTES) . '\', \'' . htmlspecialchars($row['title'], ENT_QUOTES) . '\', \'' . htmlspecialchars($row['content'], ENT_QUOTES) . '\')" class="AN-btn AN-btn-edit" title="Edit">';
-                    echo '<i class="fas fa-edit"></i>';
-                    echo '</button>';
-                    echo '<button onclick="deleteAnnouncement(' . $row['id'] . ')" class="AN-btn AN-btn-delete" title="Delete">';
-                    echo '<i class="fas fa-trash"></i>';
-                    echo '</button>';
-                    echo '</div>';
-                    echo '</div>';
-                    echo '<h4 class="text-lg font-semibold">' . htmlspecialchars($row['title']) . '</h4>';
-                    echo '<p class="mt-2">' . nl2br(htmlspecialchars($row['content'])) . '</p>';
-                    echo '<div class="text-sm text-gray-500 mt-2">';
-                    echo date('F j, Y g:i A', strtotime($row['created_at']) + 8 * 3600); // UTC+8 for Asia time
-                    echo '</div>';
-                    echo '</div>';
-                }
-            } else {
-                echo '<p>No announcements yet.</p>';
-            }
-            ?>
-        </div>
-    </div>
-</div>
-<div id="loadingOverlay" class="loading-overlay">
-    <div class="loading-content">
-        <div class="loading-spinner"></div>
-        <p class="loading-text">Processing your request...</p>
-    </div>
-</div>
-<div class="AN-modal-overlay" id="AN-modal-overlay">
-    <div class="AN-modal">
-        <div class="AN-modal-header">
-            <div class="AN-modal-icon">
-                <i class="fas fa-exclamation-triangle"></i>
+                    <div class="AN-button-group">
+                        <button type="submit" class="AN-submit" id="AN-submit-btn">Post Announcement</button>
+                        <button type="button" class="AN-submit" id="AN-reset-btn" style="background-color: var(--secondary-color); margin-left: 0.5rem;">Cancel</button>
+                    </div>
+                </form>
             </div>
-            <h3 class="AN-modal-title"></h3>
         </div>
-        <div class="AN-modal-content"></div>
-        <div class="AN-modal-actions">
-            <button class="AN-modal-btn AN-modal-btn-secondary" data-action="cancel">Cancel</button>
-            <button class="AN-modal-btn AN-modal-btn-danger" data-action="confirm">Delete</button>
+
+        <div class="AN-recent-section">
+            <div class="AN-recent-container">
+                <h3 class="mb-4 text-xl font-semibold">Recent Announcements</h3>
+                <?php
+                $query = "SELECT * FROM announcements WHERE status = 1 ORDER BY created_at DESC LIMIT 5";
+                $result = $mysqli->query($query);
+
+                if ($result->num_rows > 0) {
+                    while ($row = $result->fetch_assoc()) {
+                        $badgeClass = 'AN-badge-' . strtolower($row['badge']);
+                        echo '<div class="AN-announcement-item">';
+                        echo '<div class="AN-announcement-header">';
+                        echo '<div class="AN-badge-container">';
+                        echo '<span class="AN-badge ' . $badgeClass . '">' . htmlspecialchars($row['badge']) . '</span>';
+                        echo '</div>';
+                        echo '<div class="AN-actions">';
+                        echo '<button onclick="editAnnouncement(' . $row['id'] . ', \'' . htmlspecialchars($row['badge'], ENT_QUOTES) . '\', \'' . htmlspecialchars($row['title'], ENT_QUOTES) . '\', \'' . htmlspecialchars($row['content'], ENT_QUOTES) . '\')" class="AN-btn AN-btn-edit" title="Edit">';
+                        echo '<i class="fas fa-edit"></i>';
+                        echo '</button>';
+                        echo '<button onclick="deleteAnnouncement(' . $row['id'] . ')" class="AN-btn AN-btn-delete" title="Delete">';
+                        echo '<i class="fas fa-trash"></i>';
+                        echo '</button>';
+                        echo '</div>';
+                        echo '</div>';
+                        echo '<h4 class="text-lg font-semibold">' . htmlspecialchars($row['title']) . '</h4>';
+                        echo '<p class="mt-2">' . nl2br(htmlspecialchars($row['content'])) . '</p>';
+                        echo '<div class="text-sm text-gray-500 mt-2">';
+                        echo date('F j, Y g:i A', strtotime($row['created_at']) + 8 * 3600); // UTC+8 for Asia time
+                        echo '</div>';
+                        echo '</div>';
+                    }
+                } else {
+                    echo '<p>No announcements yet.</p>';
+                }
+                ?>
+            </div>
         </div>
     </div>
-</div>
-
-<script>
-    function showLoading() {
-        document.getElementById('loadingOverlay').style.display = 'flex';
-    }
-
-    function hideLoading() {
-        document.getElementById('loadingOverlay').style.display = 'none';
-    }
-
-    function showANModal(options) {
-        return new Promise((resolve) => {
-            const modal = document.getElementById('AN-modal-overlay');
-            const iconEl = modal.querySelector('.AN-modal-icon');
-            const titleEl = modal.querySelector('.AN-modal-title');
-            const contentEl = modal.querySelector('.AN-modal-content');
-            const confirmBtn = modal.querySelector('[data-action="confirm"]');
-            const cancelBtn = modal.querySelector('[data-action="cancel"]');
-
-            iconEl.className = `AN-modal-icon ${options.type || 'warning'}`;
-            iconEl.innerHTML = `<i class="fas fa-${options.icon || 'exclamation-triangle'}"></i>`;
-            titleEl.textContent = options.title || '';
-            contentEl.textContent = options.message || '';
-
-            confirmBtn.textContent = options.confirmText || 'Confirm';
-            confirmBtn.className = `AN-modal-btn ${options.confirmClass || 'AN-modal-btn-danger'}`;
-            cancelBtn.textContent = options.cancelText || 'Cancel';
-
-            modal.classList.add('active');
-
-            const cleanup = () => {
-                modal.classList.remove('active');
-                confirmBtn.onclick = null;
-                cancelBtn.onclick = null;
-                modal.onclick = null;
-            };
-
-            confirmBtn.onclick = () => {
-                cleanup();
-                resolve(true);
-            };
-
-            cancelBtn.onclick = () => {
-                cleanup();
-                resolve(false);
-            };
-
-            modal.onclick = (e) => {
-                if (e.target === modal) {
-                    cleanup();
-                    resolve(false);
-                }
-            };
-
-            const handleEscape = (e) => {
-                if (e.key === 'Escape') {
-                    cleanup();
-                    resolve(false);
-                    document.removeEventListener('keydown', handleEscape);
-                }
-            };
-            document.addEventListener('keydown', handleEscape);
-        });
-    }
-
-    function showANNotification(type, message, title = '') {
-        const icons = {
-            success: 'check-circle',
-            error: 'exclamation-circle',
-            warning: 'exclamation-triangle',
-            info: 'info-circle'
-        };
-
-        const toast = document.createElement('div');
-        toast.className = 'AN-toast';
-        toast.innerHTML = `
-            <div class="AN-toast-icon">
-                <i class="fas fa-${icons[type]}" style="color: var(--${type === 'error' ? 'danger' : type}-color)"></i>
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">Processing your request...</p>
+        </div>
+    </div>
+    <div class="AN-modal-overlay" id="AN-modal-overlay">
+        <div class="AN-modal">
+            <div class="AN-modal-header">
+                <div class="AN-modal-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3 class="AN-modal-title"></h3>
             </div>
-            <div class="AN-toast-content">
-                ${title ? `<div class="AN-toast-title">${title}</div>` : ''}
-                <div class="AN-toast-message">${message}</div>
+            <div class="AN-modal-content"></div>
+            <div class="AN-modal-actions">
+                <button class="AN-modal-btn AN-modal-btn-secondary" data-action="cancel">Cancel</button>
+                <button class="AN-modal-btn AN-modal-btn-danger" data-action="confirm">Delete</button>
             </div>
-        `;
+        </div>
+    </div>
 
-        document.body.appendChild(toast);
-        requestAnimationFrame(() => toast.classList.add('show'));
-
-        setTimeout(() => {
-            toast.classList.remove('show');
-            setTimeout(() => document.body.removeChild(toast), 300);
-        }, 3000);
-    }
-
-    async function deleteAnnouncement(id) {
-        const confirmed = await showANModal({
-            type: 'warning',
-            icon: 'trash',
-            title: 'Delete Announcement',
-            message: 'Are you sure you want to delete this announcement? This action cannot be undone.',
-            confirmText: 'Delete',
-            confirmClass: 'AN-modal-btn-danger',
-            cancelText: 'Cancel'
-        });
-
-        if (confirmed) {
-            showLoading();
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.innerHTML = `<input type="hidden" name="delete_id" value="${id}">`;
-            document.body.appendChild(form);
-            form.submit();
+    <script>
+        function showLoading() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
         }
-    }
 
-    function editAnnouncement(id, badge, title, content) {
-        document.getElementById('edit_id').value = id;
-        document.querySelector('[name="badge"]').value = badge;
-        document.querySelector('[name="title"]').value = title;
-        document.querySelector('[name="content"]').value = content;
-        document.getElementById('AN-submit-btn').textContent = 'Update Announcement';
-        document.querySelector('.AN-form').scrollIntoView({ behavior: 'smooth' });
-    }
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
 
-    function resetForm() {
-        document.getElementById('AN-form').reset();
-        document.getElementById('edit_id').value = '';
-        document.getElementById('AN-submit-btn').textContent = 'Post Announcement';
-    }
+        function showANModal(options) {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('AN-modal-overlay');
+                const iconEl = modal.querySelector('.AN-modal-icon');
+                const titleEl = modal.querySelector('.AN-modal-title');
+                const contentEl = modal.querySelector('.AN-modal-content');
+                const confirmBtn = modal.querySelector('[data-action="confirm"]');
+                const cancelBtn = modal.querySelector('[data-action="cancel"]');
 
-    function initializeForm() {
-        const form = document.getElementById('AN-form');
-        const resetBtn = document.getElementById('AN-reset-btn');
-        
-        form.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const badge = form.querySelector('[name="badge"]').value;
-            const title = form.querySelector('[name="title"]').value;
-            const content = form.querySelector('[name="content"]').value;
+                iconEl.className = `AN-modal-icon ${options.type || 'warning'}`;
+                iconEl.innerHTML = `<i class="fas fa-${options.icon || 'exclamation-triangle'}"></i>`;
+                titleEl.textContent = options.title || '';
+                contentEl.textContent = options.message || '';
 
-            if (!badge || !title || !content) {
-                showANNotification('error', 'Please fill in all fields', 'Validation Error');
+                confirmBtn.textContent = options.confirmText || 'Confirm';
+                confirmBtn.className = `AN-modal-btn ${options.confirmClass || 'AN-modal-btn-danger'}`;
+                cancelBtn.textContent = options.cancelText || 'Cancel';
+
+                modal.classList.add('active');
+
+                const cleanup = () => {
+                    modal.classList.remove('active');
+                    confirmBtn.onclick = null;
+                    cancelBtn.onclick = null;
+                    modal.onclick = null;
+                };
+
+                confirmBtn.onclick = () => {
+                    cleanup();
+                    resolve(true);
+                };
+
+                cancelBtn.onclick = () => {
+                    cleanup();
+                    resolve(false);
+                };
+
+                modal.onclick = (e) => {
+                    if (e.target === modal) {
+                        cleanup();
+                        resolve(false);
+                    }
+                };
+
+                const handleEscape = (e) => {
+                    if (e.key === 'Escape') {
+                        cleanup();
+                        resolve(false);
+                        document.removeEventListener('keydown', handleEscape);
+                    }
+                };
+                document.addEventListener('keydown', handleEscape);
+            });
+        }
+
+        function showNotification(message, type = 'info') {
+            const container = document.getElementById('notificationContainer');
+            if (!container) {
+                console.warn('Notification container not found');
                 return;
             }
 
-            const editId = document.getElementById('edit_id').value;
-            if (editId) {
-                const confirmed = await showANModal({
-                    type: 'warning',
-                    icon: 'edit',
-                    title: 'Update Announcement',
-                    message: 'Are you sure you want to update this announcement?',
-                    confirmText: 'Update',
-                    confirmClass: 'AN-modal-btn-primary',
-                    cancelText: 'Cancel'
-                });
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
 
-                if (!confirmed) {
+            notification.innerHTML = `
+        <div>
+            <strong>${type.charAt(0).toUpperCase() + type.slice(1)}:</strong> ${message}
+        </div>
+        <button type="button" class="notification-close" onclick="this.parentElement.remove()">&times;</button>
+    `;
+
+            container.appendChild(notification);
+
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.style.animation = 'slideOut 0.3s ease-out forwards';
+                    setTimeout(() => {
+                        if (notification.parentElement) {
+                            notification.remove();
+                        }
+                    }, 300);
+                }
+            }, 5000);
+        }
+
+        async function deleteAnnouncement(id) {
+            const confirmed = await showANModal({
+                type: 'warning',
+                icon: 'trash',
+                title: 'Delete Announcement',
+                message: 'Are you sure you want to delete this announcement? This action cannot be undone.',
+                confirmText: 'Delete',
+                confirmClass: 'AN-modal-btn-danger',
+                cancelText: 'Cancel'
+            });
+
+            if (confirmed) {
+                showLoading();
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.innerHTML = `<input type="hidden" name="delete_id" value="${id}">`;
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
+        function editAnnouncement(id, badge, title, content) {
+            document.getElementById('edit_id').value = id;
+            document.querySelector('[name="badge"]').value = badge;
+            document.querySelector('[name="title"]').value = title;
+            document.querySelector('[name="content"]').value = content;
+            document.getElementById('AN-submit-btn').textContent = 'Update Announcement';
+            document.querySelector('.AN-form').scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+
+        function resetForm() {
+            document.getElementById('AN-form').reset();
+            document.getElementById('edit_id').value = '';
+            document.getElementById('AN-submit-btn').textContent = 'Post Announcement';
+        }
+
+        function initializeForm() {
+            const form = document.getElementById('AN-form');
+            const resetBtn = document.getElementById('AN-reset-btn');
+
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const badge = form.querySelector('[name="badge"]').value;
+                const title = form.querySelector('[name="title"]').value;
+                const content = form.querySelector('[name="content"]').value;
+
+                if (!badge || !title || !content) {
+                    showNotification('Please fill in all fields', 'error');
                     return;
                 }
-            }
-            
-            showLoading();
-            form.submit();
-        });
 
-        resetBtn.addEventListener('click', function() {
-            resetForm();
-            showANNotification('success', 'Form has been reset', 'Success');
-        });
+                const editId = document.getElementById('edit_id').value;
+                if (editId) {
+                    const confirmed = await showANModal({
+                        type: 'warning',
+                        icon: 'edit',
+                        title: 'Update Announcement',
+                        message: 'Are you sure you want to update this announcement?',
+                        confirmText: 'Update',
+                        confirmClass: 'AN-modal-btn-primary',
+                        cancelText: 'Cancel'
+                    });
 
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && document.getElementById('edit_id').value) {
-                resetForm();
-            }
-        });
-    }
+                    if (!confirmed) {
+                        return;
+                    }
+                }
 
-    function initializeSearch() {
-        const searchInput = document.getElementById('announcement-search');
-        if (!searchInput) return;
-
-        searchInput.addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
-            const announcements = document.querySelectorAll('.AN-announcement-item');
-
-            announcements.forEach(item => {
-                const title = item.querySelector('h4').textContent.toLowerCase();
-                const content = item.querySelector('p').textContent.toLowerCase();
-                const badge = item.querySelector('.AN-badge').textContent.toLowerCase();
-
-                const matches = title.includes(searchTerm) || 
-                            content.includes(searchTerm) || 
-                            badge.includes(searchTerm);
-
-                item.style.display = matches ? '' : 'none';
+                showLoading();
+                form.submit();
             });
-        });
-    }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        if (!document.getElementById('loadingOverlay')) {
-            const loadingHTML = `
+            resetBtn.addEventListener('click', function() {
+                resetForm();
+                showNotification('Form has been reset', 'success');
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && document.getElementById('edit_id').value) {
+                    resetForm();
+                }
+            });
+        }
+
+        function initializeSearch() {
+            const searchInput = document.getElementById('announcement-search');
+            if (!searchInput) return;
+
+            searchInput.addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                const announcements = document.querySelectorAll('.AN-announcement-item');
+
+                announcements.forEach(item => {
+                    const title = item.querySelector('h4').textContent.toLowerCase();
+                    const content = item.querySelector('p').textContent.toLowerCase();
+                    const badge = item.querySelector('.AN-badge').textContent.toLowerCase();
+
+                    const matches = title.includes(searchTerm) ||
+                        content.includes(searchTerm) ||
+                        badge.includes(searchTerm);
+
+                    item.style.display = matches ? '' : 'none';
+                });
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!document.getElementById('loadingOverlay')) {
+                const loadingHTML = `
                 <div id="loadingOverlay" class="loading-overlay">
                     <div class="loading-content">
                         <div class="loading-spinner"></div>
@@ -735,23 +876,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['delete_id'])) {
                     </div>
                 </div>
             `;
-            document.body.insertAdjacentHTML('beforeend', loadingHTML);
-        }
+                document.body.insertAdjacentHTML('beforeend', loadingHTML);
+            }
 
-        initializeForm();
-        initializeSearch();
-        const urlParams = new URLSearchParams(window.location.search);
-        const message = urlParams.get('message');
-        const status = urlParams.get('status');
-        
-        if (message) {
-            showANNotification(
-                status === 'error' ? 'error' : 'success',
-                decodeURIComponent(message),
-                status === 'error' ? 'Error' : 'Success'
-            );
-        }
-    });
-</script>
+            initializeForm();
+            initializeSearch();
+            const urlParams = new URLSearchParams(window.location.search);
+            const message = urlParams.get('message');
+            const status = urlParams.get('status');
+
+
+        });
+    </script>
 </body>
+
 </html>

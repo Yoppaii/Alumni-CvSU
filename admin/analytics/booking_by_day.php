@@ -33,7 +33,7 @@ $query = "WITH weekdays AS (
             AND b.status = 'completed'
         LEFT JOIN user u 
             ON b.user_id = u.user_id
-        WHERE 1=1
+        WHERE b.is_archived = 0
         $yearCondition
         $monthCondition
         $guestTypeCondition

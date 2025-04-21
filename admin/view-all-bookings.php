@@ -2,10 +2,9 @@
 include 'main_db.php';
 $today = date('Y-m-d');
 
-$current_tab = isset($_GET['tab']) ? $_GET['tab'] : 'all';
+$current_tab = isset($_GET['tab']) ? $_GET['tab'] : 'pending';
 
 $tabs = [
-    'all' => 'All Bookings',
     'pending' => 'Pending',
     'confirmed' => 'Confirmed',
     'checked_in' => 'Checked In',
@@ -14,20 +13,12 @@ $tabs = [
     'completed' => 'Completed',
 ];
 
-// $baseQuery = "SELECT b.*, u.id as user_id FROM bookings b LEFT JOIN users u ON b.user_id = u.id";
-// if ($current_tab !== 'all') {
-//     $baseQuery .= " WHERE b.status = '$current_tab'";
-// }
-// $baseQuery .= " ORDER BY b.created_at DESC LIMIT 20";
-// $bookingsResult = $mysqli->query($baseQuery);
-
-
 $booking_type = isset($_GET['booking_type']) ? $_GET['booking_type'] : 'all';
 
 $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 25;
 $limit = in_array($limit, [5, 25, 50, 100, 500]) ? $limit : 25;
 
-$bookingsQuery = "SELECT * FROM bookings";
+$bookingsQuery = "SELECT * FROM bookings WHERE is_archived = 0";
 $conditions = [];
 
 if ($current_tab !== 'all') {
@@ -39,13 +30,30 @@ if ($booking_type !== 'all') {
 }
 
 if (!empty($conditions)) {
-    $bookingsQuery .= " WHERE " . implode(" AND ", $conditions);
+    $bookingsQuery .= " AND " . implode(" AND ", $conditions);
 }
 
-$bookingsQuery .= " ORDER BY created_at DESC LIMIT $limit";
+
+$bookingsQuery .= " ORDER BY room_number, arrival_date DESC LIMIT $limit";
+
 $bookingsResult = $mysqli->query($bookingsQuery);
 
+$room_names = [
+    '9' => 'Board Room',
+    '10' => 'Conference Room',
+    '11' => 'Lobby'
+];
 
+// Update the room display in the tables
+function getRoomDisplay($room_number)
+{
+    global $room_names;
+    if (isset($room_names[$room_number])) {
+        return $room_names[$room_number];
+    } else {
+        return "Room " . $room_number;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -477,6 +485,177 @@ $bookingsResult = $mysqli->query($bookingsQuery);
             z-index: 9999 !important;
         }
     </style>
+
+    <style>
+        .AL-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .AL-modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .AL-modal {
+            background: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            width: 90%;
+            max-width: 400px;
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .AL-modal-overlay.active .AL-modal {
+            transform: translateY(0);
+        }
+
+        .AL-modal-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .AL-modal-icon {
+            width: 32px;
+            height: 32px;
+            margin-right: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 1rem;
+        }
+
+        .AL-modal-icon.warning {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .AL-modal-icon.danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .AL-modal-icon.success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .AL-modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .AL-modal-content {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .AL-modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+
+        .AL-modal-btn {
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-md);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            font-size: 0.875rem;
+        }
+
+        .AL-modal-btn-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .AL-modal-btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .AL-modal-btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .AL-modal-btn-secondary:hover {
+            background-color: var(--secondary-hover);
+        }
+
+        .AL-modal-btn-danger:hover {
+            background-color: var(--danger-hover);
+        }
+
+        .AL-modal-btn-success:hover {
+            background-color: var(--success-hover);
+        }
+
+        /* Dark theme support */
+        [data-theme="dark"] .AL-modal {
+            background-color: #1e293b;
+        }
+
+        [data-theme="dark"] .AL-modal-title {
+            color: #f1f5f9;
+        }
+
+        [data-theme="dark"] .AL-modal-content {
+            color: #cbd5e1;
+        }
+
+        .alm-action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+                height: auto;
+                padding-top: 12px;
+                /* adjust to your row padding */
+                padding-bottom: 12px;
+            }
+
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+                height: 0;
+                padding-top: 0;
+                padding-bottom: 0;
+                margin: 0;
+                border: 0;
+            }
+        }
+
+        .slide-out {
+            animation: slideOut 0.3s ease-out forwards;
+        }
+    </style>
 </head>
 
 <body>
@@ -527,7 +706,7 @@ $bookingsResult = $mysqli->query($bookingsQuery);
         <div class="alm-booking-tabs">
             <?php foreach ($tabs as $tab_id => $tab_name): ?>
                 <?php
-                $countQuery = "SELECT COUNT(*) as count FROM bookings";
+                $countQuery = "SELECT COUNT(*) as count FROM bookings WHERE is_archived = 0";
                 $countConditions = [];
 
                 if ($tab_id !== 'all') {
@@ -539,7 +718,7 @@ $bookingsResult = $mysqli->query($bookingsQuery);
                 }
 
                 if (!empty($countConditions)) {
-                    $countQuery .= " WHERE " . implode(" AND ", $countConditions);
+                    $countQuery .= " AND " . implode(" AND ", $countConditions);
                 }
 
                 $countResult = $mysqli->query($countQuery);
@@ -547,7 +726,7 @@ $bookingsResult = $mysqli->query($bookingsQuery);
                 ?>
                 <a href="?section=view-all-bookings&tab=<?php echo $tab_id; ?>" class="alm-booking-tab <?php echo ($current_tab === $tab_id) ? 'active' : ''; ?>">
                     <i class="<?php echo match ($tab_id) {
-                                    'all' => 'fas fa-list',
+                                    // 'all' => 'fas fa-list',
                                     'pending' => 'fas fa-clock',
                                     'confirmed' => 'fas fa-check',
                                     'checked_in' => 'fas fa-door-open',
@@ -572,9 +751,9 @@ $bookingsResult = $mysqli->query($bookingsQuery);
                         <th class="alm-hide-mobile"><i class="fas fa-sign-out-alt"></i> Check Out</th>
                         <th class="alm-hide-mobile"><i class="fas fa-tags"></i> Price</th>
                         <th><i class="fas fa-info-circle"></i> Status</th>
-                        <?php if ($current_tab !== 'all'): ?>
-                            <th class="alm-hide-mobile"><i class="fas fa-cog"></i> Action</th>
-                        <?php endif; ?>
+                        <!-- <?php if ($current_tab !== 'all'): ?> -->
+                        <th class="alm-hide-mobile"><i class="fas fa-cog"></i> Action</th>
+                        <!-- <?php endif; ?> -->
                     </tr>
                 </thead>
                 <tbody>
@@ -592,7 +771,8 @@ $bookingsResult = $mysqli->query($bookingsQuery);
                                 default => ''
                             };
                             ?>
-                            <tr data-user-id="<?php echo htmlspecialchars($booking['user_id']); ?>"
+                            <tr data-booking-id="<?php echo $booking['id']; ?>"
+                                data-user-id="<?php echo htmlspecialchars($booking['user_id']); ?>"
                                 data-reference-number="<?php echo htmlspecialchars($booking['reference_number']); ?>"
                                 data-occupancy="<?php echo htmlspecialchars($booking['occupancy']); ?>"
                                 data-price-per-day="<?php echo htmlspecialchars($booking['price_per_day']); ?>"
@@ -603,7 +783,7 @@ $bookingsResult = $mysqli->query($bookingsQuery);
                                     <?php echo htmlspecialchars($booking['reference_number']); ?>
                                 </td>
                                 <td>
-                                    <i class="fas fa-bed"></i> Room <?php echo htmlspecialchars($booking['room_number']); ?><br>
+                                    <i class="fas fa-bed"></i> <?php echo getRoomDisplay(htmlspecialchars($booking['room_number'])); ?><br>
                                     <small><i class="fas fa-users"></i> Occupancy: <?php echo htmlspecialchars($booking['occupancy']); ?></small>
                                 </td>
                                 <td class="alm-hide-mobile">
@@ -646,11 +826,10 @@ $bookingsResult = $mysqli->query($bookingsQuery);
                                                         </option>
                                                     <?php endforeach; ?>
                                                 </select>
-
                                             <?php endif; ?>
 
-                                            <button class="alm-delete-btn" onclick="deleteBooking('<?php echo $booking['id']; ?>', event)">
-                                                <i class="fas fa-trash-alt"></i> Delete
+                                            <button class="alm-action-btn alm-delete-btn" onclick="archiveBooking('<?php echo $booking['id']; ?>', event)">
+                                                <i class="fas fa-trash"></i> Delete
                                             </button>
                                         </div>
                                     </td>
@@ -758,48 +937,50 @@ $bookingsResult = $mysqli->query($bookingsQuery);
         </div>
     </div>
 
-    <div id="almStatusConfirmModal" class="alm-booking-modal">
-        <div class="alm-modal-content" style="max-width: 400px;">
-            <div class="alm-modal-header">
-                <h2><i class="fas fa-question-circle"></i> Confirm Status Change</h2>
-                <span class="alm-modal-close">&times;</span>
+    <div id="almStatusConfirmModal" class="AL-modal-overlay">
+        <div class="AL-modal" role="dialog" aria-modal="true" aria-labelledby="AL-modal-title" aria-describedby="AL-modal-desc">
+            <div class="AL-modal-header">
+                <div class="AL-modal-icon warning">
+                    <i class="fas fa-question-circle"></i>
+                </div>
+                <h2 id="AL-modal-title" class="AL-modal-title">Confirm Status Change</h2>
             </div>
 
-            <div class="alm-modal-body">
-                <p id="almStatusConfirmMessage" class="text-center mb-4">
-                    Are you sure you want to change the status?
-                </p>
-                <div class="alm-button-group">
-                    <button id="almStatusConfirmBtn" class="alm-btn alm-btn-primary">
-                        <i class="fas fa-check"></i> Confirm
-                    </button>
-                    <button id="almStatusCancelBtn" class="alm-btn alm-btn-secondary">
-                        <i class="fas fa-times"></i> Cancel
-                    </button>
-                </div>
+            <div id="AL-modal-desc" class="AL-modal-content text-center mb-4">
+                Are you sure you want to change the status?
+            </div>
+
+            <div class="AL-modal-actions">
+                <button id="almStatusCancelBtn" class="AL-modal-btn AL-modal-btn-secondary">
+                    Cancel
+                </button>
+                <button id="almStatusConfirmBtn" class="AL-modal-btn AL-modal-btn-success">
+                    Confirm
+                </button>
             </div>
         </div>
     </div>
 
-    <div id="almDeleteConfirmModal" class="alm-booking-modal">
-        <div class="alm-modal-content" style="max-width: 400px;">
-            <div class="alm-modal-header">
-                <h2><i class="fas fa-exclamation-triangle"></i> Confirm Delete</h2>
-                <span class="alm-modal-close">&times;</span>
+    <div id="almArchiveConfirmModal" class="AL-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="AL-archive-modal-title" aria-describedby="AL-archive-modal-desc">
+        <div class="AL-modal" style="max-width: 400px;">
+            <div class="AL-modal-header">
+                <div class="AL-modal-icon danger">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h2 id="AL-archive-modal-title" class="AL-modal-title">Confirm Delete</h2>
             </div>
 
-            <div class="alm-modal-body">
-                <p id="almDeleteConfirmMessage" class="text-center mb-4">
-                    Are you sure you want to delete this booking? This action cannot be undone.
-                </p>
-                <div class="alm-button-group">
-                    <button id="almDeleteConfirmBtn" class="alm-btn alm-btn-primary" style="background-color: #ef4444;">
-                        <i class="fas fa-trash-alt"></i> Delete
-                    </button>
-                    <button id="almDeleteCancelBtn" class="alm-btn alm-btn-secondary">
-                        <i class="fas fa-times"></i> Cancel
-                    </button>
-                </div>
+            <div id="AL-archive-modal-desc" class="AL-modal-content text-center mb-4">
+                Are you sure you want to delete this booking? It will be removed from the active listings.
+            </div>
+
+            <div class="AL-modal-actions">
+                <button id="almArchiveCancelBtn" class="AL-modal-btn AL-modal-btn-secondary">
+                    Cancel
+                </button>
+                <button id="almArchiveConfirmBtn" class="AL-modal-btn AL-modal-btn-danger">
+                    Delete
+                </button>
             </div>
         </div>
     </div>
@@ -866,43 +1047,43 @@ $bookingsResult = $mysqli->query($bookingsQuery);
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize notification system
-            const NotificationSystem = {
-                container: null,
-                init: function() {
-                    this.container = document.getElementById('notificationContainer');
-                },
+            // const NotificationSystem = {
+            //     container: null,
+            //     init: function() {
+            //         this.container = document.getElementById('notificationContainer');
+            //     },
 
-                show: function(message, type = 'error', duration = 5000) {
-                    if (!this.container) return;
+            //     show: function(message, type = 'error', duration = 5000) {
+            //         if (!this.container) return;
 
-                    const notification = document.createElement('div');
-                    notification.className = `notification ${type}`;
+            //         const notification = document.createElement('div');
+            //         notification.className = `notification ${type}`;
 
-                    const messageSpan = document.createElement('span');
-                    messageSpan.textContent = message;
+            //         const messageSpan = document.createElement('span');
+            //         messageSpan.textContent = message;
 
-                    const closeButton = document.createElement('button');
-                    closeButton.className = 'notification-close';
-                    closeButton.innerHTML = '×';
-                    closeButton.onclick = () => this.remove(notification);
+            //         const closeButton = document.createElement('button');
+            //         closeButton.className = 'notification-close';
+            //         closeButton.innerHTML = '×';
+            //         closeButton.onclick = () => this.remove(notification);
 
-                    notification.appendChild(messageSpan);
-                    notification.appendChild(closeButton);
-                    this.container.appendChild(notification);
+            //         notification.appendChild(messageSpan);
+            //         notification.appendChild(closeButton);
+            //         this.container.appendChild(notification);
 
-                    setTimeout(() => this.remove(notification), duration);
-                },
+            //         setTimeout(() => this.remove(notification), duration);
+            //     },
 
-                remove: function(notification) {
-                    notification.style.animation = 'slideOut 0.3s ease-out forwards';
-                    setTimeout(() => {
-                        if (notification.parentElement === this.container) {
-                            this.container.removeChild(notification);
-                        }
-                    }, 300);
-                }
-            };
-            NotificationSystem.init();
+            //     remove: function(notification) {
+            //         notification.style.animation = 'slideOut 0.3s ease-out forwards';
+            //         setTimeout(() => {
+            //             if (notification.parentElement === this.container) {
+            //                 this.container.removeChild(notification);
+            //             }
+            //         }, 300);
+            //     }
+            // };
+            // NotificationSystem.init();
 
             // --- Utility Functions ---
 
@@ -1139,6 +1320,7 @@ $bookingsResult = $mysqli->query($bookingsQuery);
                 }
             }
 
+
             // --- Main Booking Modal Logic ---
 
             const bookingModal = document.getElementById('almBookingUserModal');
@@ -1284,11 +1466,12 @@ $bookingsResult = $mysqli->query($bookingsQuery);
 
             // --- Booking Status Management ---
 
+            // --- Booking Status Management ---
+
             document.querySelectorAll('.alm-status-select').forEach(selectElement => {
                 selectElement.addEventListener('change', function(e) {
                     e.stopPropagation();
 
-                    // If default option is selected, do nothing
                     if (this.selectedIndex === 0) {
                         return;
                     }
@@ -1299,23 +1482,24 @@ $bookingsResult = $mysqli->query($bookingsQuery);
                     select = this;
 
                     // Update confirmation message
-                    const confirmMessage = document.getElementById('almStatusConfirmMessage');
+                    const confirmMessage = document.getElementById('AL-modal-desc'); // updated ID in HTML
                     confirmMessage.innerHTML = `Are you sure you want to change the status to <strong>${newStatus.replace('_', ' ')}</strong>?`;
 
-                    statusConfirmModal.style.display = "block";
+                    // Show modal by adding 'active' class
+                    statusConfirmModal.classList.add('active');
                 });
             });
 
             const statusConfirmBtn = document.getElementById('almStatusConfirmBtn');
             const statusCancelBtn = document.getElementById('almStatusCancelBtn');
-            const statusCloseBtn = statusConfirmModal.querySelector('.alm-modal-close');
+            const statusCloseBtn = statusConfirmModal.querySelector('.AL-modal-close'); // updated class
 
             if (statusConfirmBtn) {
                 statusConfirmBtn.onclick = async function() {
                     try {
-                        statusConfirmModal.style.display = "none";
+                        // Hide modal by removing 'active' class
+                        statusConfirmModal.classList.remove('active');
 
-                        // Check availability first for "extend_stay"
                         if (newStatus === 'extend_stay') {
                             showLoading('Checking room availability...');
 
@@ -1337,11 +1521,10 @@ $bookingsResult = $mysqli->query($bookingsQuery);
                                 return;
                             }
 
-                            // Room is available - initialize extension UI
                             window.initExtendStay(
                                 bookingId,
                                 checkData.roomId,
-                                checkData.roomName || `Room ${checkData.roomId}`, // Fallback if roomName not provided
+                                checkData.roomName || `Room ${checkData.roomId}`,
                                 checkData.currentDepartureDate,
                                 checkData.currentDepartureTime,
                                 checkData.pricePerDay
@@ -1351,7 +1534,6 @@ $bookingsResult = $mysqli->query($bookingsQuery);
                             return;
                         }
 
-                        // Add this code to handle other status changes
                         showLoading('Updating booking status...');
 
                         const formData = new FormData();
@@ -1369,14 +1551,10 @@ $bookingsResult = $mysqli->query($bookingsQuery);
 
                         if (data.success) {
                             showToast('Booking status updated successfully', true);
-                            setTimeout(() => {
-                                window.location.reload();
-                            }, 2000);
+                            setTimeout(() => window.location.reload(), 2000);
                         } else {
                             throw new Error(data.message || 'Failed to update booking status');
                         }
-
-                        // Rest of the code for other statuses...
                     } catch (error) {
                         console.error('Error updating booking status:', error);
                         hideLoading();
@@ -1388,16 +1566,14 @@ $bookingsResult = $mysqli->query($bookingsQuery);
 
             if (statusCancelBtn) {
                 statusCancelBtn.onclick = function() {
-                    statusConfirmModal.style.display = "none";
-                    // Reset select to first option
+                    statusConfirmModal.classList.remove('active');
                     if (select) select.selectedIndex = 0;
                 };
             }
 
             if (statusCloseBtn) {
                 statusCloseBtn.onclick = function() {
-                    statusConfirmModal.style.display = "none";
-                    // Reset select to first option
+                    statusConfirmModal.classList.remove('active');
                     if (select) select.selectedIndex = 0;
                 };
             }
@@ -1408,71 +1584,6 @@ $bookingsResult = $mysqli->query($bookingsQuery);
                     bookingModal.style.display = "none";
                 }
             }
-
-            // --- Delete Booking Functionality ---
-
-            window.deleteBooking = function(bookingId, event) {
-                event.stopPropagation();
-
-                const confirmBtn = document.getElementById('almDeleteConfirmBtn');
-                const cancelBtn = document.getElementById('almDeleteCancelBtn');
-                const closeBtn = deleteModal.querySelector('.alm-modal-close');
-
-                deleteModal.style.display = "block";
-
-                const handleDelete = async () => {
-                    try {
-                        deleteModal.style.display = "none";
-                        showLoading('Deleting booking...');
-
-                        const formData = new FormData();
-                        formData.append('booking_id', bookingId);
-
-                        console.log('Sending delete request for booking ID:', bookingId);
-
-                        const response = await fetch('/Alumni-CvSU/admin/delete_booking.php', {
-                            method: 'POST',
-                            body: formData
-                        });
-
-                        console.log('Response status:', response.status);
-
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-
-                        const data = await response.json();
-                        console.log('Response data:', data);
-
-                        if (data.success) {
-                            const row = event.target.closest('tr');
-                            if (row) {
-                                row.remove();
-                            }
-                            hideLoading();
-                            showToast('Booking successfully deleted', true);
-
-                            setTimeout(() => {
-                                window.location.reload();
-                            }, 2000);
-                        } else {
-                            throw new Error(data.message || 'Failed to delete booking');
-                        }
-                    } catch (error) {
-                        console.error('Delete error:', error);
-                        hideLoading();
-                        showToast('Failed to delete booking: ' + error.message, false);
-                    }
-                };
-
-                const handleCancel = () => {
-                    deleteModal.style.display = "none";
-                };
-
-                confirmBtn.onclick = handleDelete;
-                cancelBtn.onclick = handleCancel;
-                closeBtn.onclick = handleCancel;
-            };
 
             // --- Other Booking Status Management Functions ---
 
@@ -1606,7 +1717,6 @@ $bookingsResult = $mysqli->query($bookingsQuery);
                 nextExtendButton.textContent = currentExtendStep === totalExtendSteps ? 'Confirm Extension' : 'Next';
             }
 
-            // Update the summary fields with calculated values
             function updateExtendSummary() {
                 if (!extendData.currentDeparture || !extendData.newDeparture) return;
 
@@ -1623,27 +1733,36 @@ $bookingsResult = $mysqli->query($bookingsQuery);
                     return;
                 }
 
-                // Break down duration
-                const totalMinutes = Math.floor(diffMs / (1000 * 60));
-                const days = Math.floor(totalMinutes / (60 * 24));
-                const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
-                const minutes = totalMinutes % 60;
+                // Calculate the time difference in hours
+                const diffHours = Math.round(diffMs / (1000 * 60 * 60));
+
+                // Check if the new checkout is on a different day
+                const isNextDay = newCheckout.getDate() !== oldCheckout.getDate() ||
+                    newCheckout.getMonth() !== oldCheckout.getMonth() ||
+                    newCheckout.getFullYear() !== oldCheckout.getFullYear();
 
                 let durationText = '';
-                if (days > 0) durationText += `${days} day${days > 1 ? 's' : ''}`;
-                if (hours > 0) durationText += `${durationText ? ', ' : ''}${hours} hour${hours > 1 ? 's' : ''}`;
-                if (minutes > 0) durationText += `${durationText ? ', ' : ''}${minutes} minute${minutes > 1 ? 's' : ''}`;
+                let cost = 0;
 
-                document.getElementById('extend-summary-extra-duration').textContent = durationText || '0 minutes';
-
-                // Calculate cost
-                if (extendData.pricePerDay) {
-                    const cost = (totalMinutes / (60 * 24)) * extendData.pricePerDay;
-                    document.getElementById('extend-summary-extra-cost').textContent = `₱${cost.toFixed(2)}`;
+                if (isNextDay) {
+                    durationText = `${diffHours} hours`; // Display the hours
+                    // Calculate cost based on hours
+                    if (extendData.pricePerDay) {
+                        cost = (diffHours / 24) * extendData.pricePerDay;
+                    } else {
+                        document.getElementById('extend-summary-extra-cost').textContent = 'Price not available';
+                        return;
+                    }
                 } else {
-                    document.getElementById('extend-summary-extra-cost').textContent = 'Price not available';
+                    durationText = 'Less than a day';
+                    cost = 0;
                 }
+
+                document.getElementById('extend-summary-extra-duration').textContent = durationText;
+                document.getElementById('extend-summary-extra-cost').textContent = `₱${cost.toFixed(2)}`;
             }
+
+
 
 
             // Handle navigation between steps
@@ -1778,9 +1897,126 @@ $bookingsResult = $mysqli->query($bookingsQuery);
                 }
             });
         });
-    </script>
-    <!-- Close the modal -->
-    <script>
+
+
+        // Your existing showToast function here
+        function showToast(message, isSuccess = true) {
+            const toast = document.getElementById('view-booking-toast');
+            const toastMessage = toast.querySelector('.view-booking-toast-message');
+            toastMessage.textContent = message;
+
+            toast.className = 'view-booking-toast';
+            if (isSuccess) {
+                toast.classList.add('view-booking-toast-success');
+            } else {
+                toast.classList.add('view-booking-toast-error');
+            }
+
+            toast.style.display = 'flex';
+
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+
+            const closeToast = toast.querySelector('.view-booking-toast-close');
+            closeToast.onclick = () => {
+                toast.style.display = 'none';
+            };
+        }
+
+        // Archive modal code here (after showToast is defined)
+        const archiveModal = document.getElementById('almArchiveConfirmModal');
+        const archiveConfirmBtn = document.getElementById('almArchiveConfirmBtn');
+        const archiveCancelBtn = document.getElementById('almArchiveCancelBtn');
+        const archiveCloseBtn = archiveModal.querySelector('.AL-modal-close');
+
+        let archiveBookingId = null;
+        let archiveEvent = null;
+
+        function archiveBooking(bookingId, event) {
+            event.preventDefault();
+            archiveBookingId = bookingId;
+            archiveEvent = event;
+
+            archiveModal.classList.add('active');
+        }
+
+        // Close modal on close button click if it exists
+        if (archiveCloseBtn) {
+            archiveCloseBtn.onclick = () => {
+                archiveModal.classList.remove('active');
+                archiveBookingId = null;
+                archiveEvent = null;
+            };
+        }
+
+        archiveConfirmBtn.onclick = async () => {
+            if (!archiveBookingId || !archiveEvent) {
+                archiveModal.classList.remove('active');
+                return;
+            }
+
+            // Disable confirm button to prevent multiple clicks
+            archiveConfirmBtn.disabled = true;
+
+            archiveModal.classList.remove('active');
+
+            try {
+                const formData = new FormData();
+                formData.append('booking_id', archiveBookingId);
+                formData.append('action', 'archive');
+
+                const response = await fetch('/Alumni-CvSU/admin/archive_booking.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const row = document.querySelector(`[data-booking-id="${archiveBookingId}"]`);
+                    if (row) {
+                        // Add the slide-out class to trigger CSS animation
+                        row.classList.add('slide-out');
+
+                        // Remove the row after animation completes
+                        row.addEventListener('animationend', () => {
+                            row.remove();
+                        }, {
+                            once: true
+                        });
+                    }
+
+                    // Update active tab counter
+                    const activeTab = document.querySelector('.alm-booking-tab.active');
+                    if (activeTab) {
+                        const countSpan = activeTab.querySelector('.alm-booking-count');
+                        if (countSpan) {
+                            const currentCount = parseInt(countSpan.textContent, 10);
+                            countSpan.textContent = currentCount > 0 ? currentCount - 1 : 0;
+                        }
+                    }
+
+                    showToast('Booking deleted successfully', 'success');
+                } else {
+                    showToast('Error: ' + data.message, false);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('An error occurred while deleting the booking', false);
+            }
+
+            archiveBookingId = null;
+            archiveEvent = null;
+            archiveConfirmBtn.disabled = false;
+        };
+
+        archiveCancelBtn.onclick = () => {
+            archiveModal.classList.remove('active');
+            archiveBookingId = null;
+            archiveEvent = null;
+        };
+
         function closeExtendModal() {
             const modal = document.getElementById('extend-stay-modal');
             if (modal) {

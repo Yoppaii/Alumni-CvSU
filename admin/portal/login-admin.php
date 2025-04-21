@@ -229,24 +229,102 @@ if (isset($_SESSION['admin_id'])) {
             background-color: var(--primary-light);
         }
 
-        .notification {
+        /* Notification styles */
+        #notificationContainer {
             position: fixed;
             top: 20px;
             right: 20px;
-            padding: 15px 20px;
-            border-radius: 4px;
-            color: white;
-            display: none;
-            z-index: 1000;
-            animation: slideIn 0.5s ease-in-out;
+            z-index: 1050;
+            max-width: 400px;
+            width: 100%;
         }
 
-        .notification.success {
-            background-color: var(--primary-color);
+        .notification {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            margin-bottom: 10px;
+            animation: slideIn 0.3s ease-out forwards;
+            min-width: 300px;
+            max-width: 400px;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
         }
 
         .notification.error {
-            background-color: var(--danger-color);
+            border-left: 4px solid #ef4444;
+        }
+
+        .notification.success {
+            border-left: 4px solid #10b981;
+        }
+
+        .notification.warning {
+            border-left: 4px solid #f59e0b;
+        }
+
+        .notification.info {
+            border-left: 4px solid #3b82f6;
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px;
+            color: #64748b;
+        }
+
+        .notification-close:hover {
+            color: #1e293b;
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+                height: auto;
+                padding-top: 12px;
+                /* match your row padding */
+                padding-bottom: 12px;
+            }
+
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+                height: 0;
+                padding-top: 0;
+                padding-bottom: 0;
+                margin: 0;
+                border: 0;
+            }
         }
 
         @keyframes slideIn {
@@ -275,12 +353,25 @@ if (isset($_SESSION['admin_id'])) {
         .error input {
             border-color: var(--danger-color);
         }
+
+        @media (max-width: 480px) {
+
+
+            .notification {
+                left: 20px;
+                right: 20px;
+                text-align: center;
+                justify-content: center;
+            }
+
+
+        }
     </style>
 </head>
 
 <body>
 
-    <div id="notification" class="notification"></div>
+    <div class="notification-container" id="notificationContainer"></div>
 
     <button class="theme-toggle" aria-label="Toggle theme">
         <i class="fas fa-sun"></i>
@@ -376,14 +467,40 @@ if (isset($_SESSION['admin_id'])) {
         document.querySelector('.password-toggle').addEventListener('click', togglePassword);
 
         function showNotification(message, type) {
-            const notification = document.getElementById('notification');
-            notification.textContent = message;
-            notification.className = `notification ${type}`;
-            notification.style.display = 'block';
+            const notificationContainer = document.getElementById('notificationContainer');
 
+            // Create a new notification element
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+
+            // Create the content for the notification
+            notification.innerHTML = `
+        <div>${message}</div>
+        <button class="notification-close">&times;</button>
+    `;
+
+            // Add to container
+            notificationContainer.appendChild(notification);
+
+            // Add event listener to close button
+            notification.querySelector('.notification-close').addEventListener('click', function() {
+                notification.style.animation = 'slideOut 0.3s forwards';
+                setTimeout(() => {
+                    notificationContainer.removeChild(notification);
+                }, 300);
+            });
+
+            // Auto-dismiss after 5 seconds
             setTimeout(() => {
-                notification.style.display = 'none';
-            }, 3000);
+                if (notification.parentNode === notificationContainer) {
+                    notification.style.animation = 'slideOut 0.3s forwards';
+                    setTimeout(() => {
+                        if (notification.parentNode === notificationContainer) {
+                            notificationContainer.removeChild(notification);
+                        }
+                    }, 300);
+                }
+            }, 5000);
         }
 
         document.getElementById('loginForm').addEventListener('submit', function(e) {
