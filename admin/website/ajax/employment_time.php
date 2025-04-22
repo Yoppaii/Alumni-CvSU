@@ -35,7 +35,7 @@ error_log("Year condition: $yearCondition");
 // Query with LEFT JOIN on personal_info
 $query = "SELECT 
         jd.time_to_land,
-        COUNT(*) AS alumni_count
+        COUNT(DISTINCT jd.id) AS alumni_count
     FROM job_duration jd
     LEFT JOIN educational_background eb ON jd.user_id = eb.user_id
     LEFT JOIN employment_data ed ON ed.user_id = jd.user_id

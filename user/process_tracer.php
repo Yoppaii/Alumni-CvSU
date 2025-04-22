@@ -99,16 +99,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     try {
         $mysqli->begin_transaction();
 
-        $check_sql = "SELECT id FROM personal_info WHERE user_id = ?";
-        $check_stmt = $mysqli->prepare($check_sql);
-        $check_stmt->bind_param("i", $logged_user_id);
-        $check_stmt->execute();
-        $check_result = $check_stmt->get_result();
+        // $check_sql = "SELECT id FROM personal_info WHERE user_id = ?";
+        // $check_stmt = $mysqli->prepare($check_sql);
+        // $check_stmt->bind_param("i", $logged_user_id);
+        // $check_stmt->execute();
+        // $check_result = $check_stmt->get_result();
 
-        if ($check_result->num_rows > 0) {
-            throw new Exception("You have already submitted a tracer form.");
-        }
-        $check_stmt->close();
+        // if ($check_result->num_rows > 0) {
+        //     throw new Exception("You have already submitted a tracer form.");
+        // }
+        // $check_stmt->close();
 
         // Step 1: Personal Information
         $stmt = $mysqli->prepare("INSERT INTO personal_info (user_id, civil_status, sex, birthday, course, campus, residence) 

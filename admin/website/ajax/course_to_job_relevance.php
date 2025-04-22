@@ -13,7 +13,7 @@ $courseCondition = ($course === '') ? "" : "AND eb.degree_specialization = '$cou
 $employmentStatusCondition = ($employmentStatus === '') ? "" : "AND ed.present_employment_status = '$employmentStatus'";
 
 
-$query = "SELECT je.course_related, COUNT(je.user_id) AS total 
+$query = "SELECT je.course_related, COUNT(DISTINCT je.id) AS total 
           FROM job_experience je
           LEFT JOIN educational_background eb 
             ON eb.user_id = je.user_id

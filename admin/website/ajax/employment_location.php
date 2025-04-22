@@ -33,7 +33,7 @@ $validLocations = ["local", "abroad", "work_from_home", "hybrid"];
 // Final query
 $query = "SELECT 
             ed.work_place, 
-            COUNT(*) AS total_employees
+            COUNT(DISTINCT ed.id) AS total_employees
           FROM employment_data ed
           LEFT JOIN educational_background eb ON ed.user_id = eb.user_id
           LEFT JOIN personal_info pi ON ed.user_id = pi.user_id

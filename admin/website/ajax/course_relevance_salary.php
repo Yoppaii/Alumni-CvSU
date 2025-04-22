@@ -35,7 +35,7 @@ $query = "SELECT
             ELSE 'Unknown' 
         END AS salary_range,
         je.course_related,
-        COUNT(*) AS alumni_count
+        COUNT(DISTINCT je.id) AS alumni_count
     FROM job_experience je
     LEFT JOIN job_duration jd ON jd.user_id = je.user_id
     LEFT JOIN educational_background eb ON eb.user_id = je.user_id

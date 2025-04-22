@@ -11,19 +11,19 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-$logged_user_id = $_SESSION['user_id'];
-$check_sql = "SELECT id FROM personal_info WHERE user_id = ?";
-$check_stmt = $mysqli->prepare($check_sql);
-$check_stmt->bind_param("i", $logged_user_id);
-$check_stmt->execute();
-$check_result = $check_stmt->get_result();
+// $logged_user_id = $_SESSION['user_id'];
+// $check_sql = "SELECT id FROM personal_info WHERE user_id = ?";
+// $check_stmt = $mysqli->prepare($check_sql);
+// $check_stmt->bind_param("i", $logged_user_id);
+// $check_stmt->execute();
+// $check_result = $check_stmt->get_result();
 
-if ($check_result->num_rows > 0) {
-    ob_end_clean();
-    echo "<script>window.location.href = 'Account?section=home';</script>";
-    exit();
-}
-$check_stmt->close();
+// if ($check_result->num_rows > 0) {
+//     ob_end_clean();
+//     echo "<script>window.location.href = 'Account?section=home';</script>";
+//     exit();
+// }
+// $check_stmt->close();
 
 ob_end_flush();
 ?>
@@ -798,7 +798,6 @@ ob_end_flush();
                         <option value="Public Administration and Defense">Public Administration and Defense</option>
                         <option value="Health and Social Work">Health and Social Work</option>
                         <option value="Extra-territorial Organizations and Bodies">Extra-territorial Organizations and Bodies</option>
-                        <option value="Education">Extra-territorial Organizations and Bodies</option>
                     </select>
                 </div>
 
