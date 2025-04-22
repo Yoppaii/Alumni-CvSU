@@ -805,7 +805,7 @@ function getRoomDisplay($room_number)
                                 <?php if ($current_tab !== 'all'): ?>
                                     <td class="alm-hide-mobile alm-actions-cell">
                                         <div class="alm-action-buttons">
-                                            <?php if (!in_array($booking['status'], ['cancelled', 'completed'])): ?>
+                                            <?php if (!in_array($booking['status'], ['cancelled', 'no_show', 'completed'])): ?>
                                                 <select class="alm-status-select" data-booking-id="<?php echo $booking['id']; ?>">
                                                     <option value="<?php echo $booking['status']; ?>" selected>
                                                         Change Status
@@ -813,9 +813,8 @@ function getRoomDisplay($room_number)
                                                     <?php
                                                     $statuses = match ($booking['status']) {
                                                         'pending' => ['confirmed', 'cancelled'],
-                                                        'confirmed' => ['checked_in', 'cancelled', 'no_show'],
-                                                        'checked_in' => ['completed', 'extend_stay', 'early_checkout'],
-                                                        'no_show' => ['cancelled', 'confirmed'],
+                                                        'confirmed' => ['pending', 'checked_in', 'cancelled', 'no_show'],
+                                                        'checked_in' => ['confirmed', 'completed', 'extend_stay', 'early_checkout'],
                                                         default => []
                                                     };
 

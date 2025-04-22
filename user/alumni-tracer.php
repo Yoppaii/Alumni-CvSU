@@ -525,7 +525,7 @@ ob_end_flush();
                     <label for="campus">Campus</label>
                     <select name="campus" id="campus" required>
                         <option value="">Select Campus</option>
-                        <option value="main">Main Campus</option>
+                        <option value="Main Campus">Main Campus</option>
                         <option value="Cavite City Campus">Cavite City Campus</option>
                         <option value="Gen. Mariano Alvarez Campus">Gen. Mariano Alvarez Campus</option>
                         <option value="Bacoor Campus">Bacoor Campus</option>
