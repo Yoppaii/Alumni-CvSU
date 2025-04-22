@@ -1,6 +1,5 @@
 let employmentRateChart = null;
 let courseRelevanceChart = null;
-let jobSearchChart = null;
 let EmploymentByLocation = null;
 let employmentTimeChart = null;
 
@@ -293,162 +292,71 @@ function fetchJobSearchMethods(campus, course, employmentStatus, fromYear, toYea
     loader.className = "chart-loading";
     chartContainer.appendChild(loader);
 
-    // Construct query parameters
     const params = new URLSearchParams({
         campus: campus,
         course: course,
         employmentStatus: employmentStatus,
-        fromYear: fromYear || '',
-        toYear: toYear || ''
+        fromYear: fromYear || '',  // Keep as empty string if null/undefined
+        toYear: toYear || ''       // Keep as empty string if null/undefined
     });
 
     fetch(`/Alumni-CvSU/admin/website/ajax/job_search_methods.php?${params.toString()}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Network response was not ok");
-            }
-            return response.json();
-        })
+        .then(response => response.json())
         .then(data => {
-            if (!Array.isArray(data) || data.length === 0) {
-                console.warn("No job search data available for the selected filters.");
+            if (!data || Object.values(data).every(value => value === 0)) {
+                console.warn("No job search method data available.");
                 loader.remove();
                 return;
             }
 
-            // Define the expected order of job search methods
-            const methodOrder = ["Job Fair", "Advertisement", "Recommendation", "Walk-in Application", "Online Job Portal"];
-            const methodKeys = ["job_fair", "advertisement", "recommendation", "walk_in", "online"];
+            const labels = ["Job Fair", "Advertisement", "Recommendation", "Walk-in Application", "Online Job Portal"];
+            const jobMethods = ["job_fair", "advertisement", "recommendation", "walk_in", "online"];
 
-            // Map API keys to display labels
-            const keyToLabel = {
-                "job_fair": "Job Fair",
-                "advertisement": "Advertisement",
-                "recommendation": "Recommendation",
-                "walk_in": "Walk-in Application",
-                "online": "Online Job Portal"
-            };
-
-            // Process data to standard format
-            const processedData = [];
+            // Ensure dataset map and total count are correctly initialized
+            let datasetMap = {};
             let totalAlumni = 0;
 
-            methodKeys.forEach((key, index) => {
-                const found = data.find(item => item.method === key);
-                const count = found ? parseInt(found.alumni_count) : 0;
-                totalAlumni += count;
-
-                processedData.push({
-                    job_method: keyToLabel[key],
-                    alumni_count: count
-                });
+            jobMethods.forEach(method => {
+                datasetMap[method] = Number(data[method]) || 0;
+                totalAlumni += datasetMap[method]; // Sum correctly
             });
 
-            // Extract methods and counts
-            const methods = processedData.map(item => item.job_method);
-            const counts = processedData.map(item => item.alumni_count);
 
-            // Destroy existing chart if it exists
+            // Define colors and create gradients
+            const colors = ["#4CAF50", "#FFC107", "#FF5733", "#36A2EB", "#9C27B0"];
+            const gradients = colors.map((color) => {
+                const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+                gradient.addColorStop(0, color);
+                gradient.addColorStop(1, hexToRgba(color, 0.6)); // Smooth transition
+                return gradient;
+            });
+
+            // Destroy previous chart if it exists
             if (window.jobSearchChart instanceof Chart) {
                 window.jobSearchChart.destroy();
             }
 
-            // Define colors for each method
-            const colors = ["#4CAF50", "#facc15", "#f97316", "#36A2EB", "#9C27B0"];
-
-            // Create gradient backgrounds
-            const gradients = colors.map((color) => {
-                const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-                gradient.addColorStop(0, color);
-                gradient.addColorStop(1, hexToRgba(color, 0.5));
-                return gradient;
-            });
-
-            // Store visibility state and original data
-            const dataVisibility = [true, true, true, true, true];
-            const originalData = [...counts];
-
-            // Create the Chart
             window.jobSearchChart = new Chart(ctx, {
                 type: "pie",
                 data: {
-                    labels: methods,
+                    labels: labels,
                     datasets: [{
-                        data: counts,
-                        backgroundColor: gradients,
-                        borderWidth: 1,
-                        borderColor: colors.map(color => hexToRgba(color, 0.5))
+                        data: jobMethods.map(method => datasetMap[method]),
+                        backgroundColor: gradients
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    animation: {
-                        duration: 800,
-                        easing: 'easeOutQuart'
-                    },
                     plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top',
-                            labels: {
-                                usePointStyle: false,
-                                boxWidth: 40,
-                                boxHeight: 10,
-                                padding: 20,
-                                generateLabels: function (chart) {
-                                    return methodOrder.map((method, index) => {
-                                        return {
-                                            text: method,
-                                            fillStyle: gradients[index],
-                                            strokeStyle: colors[index],
-                                            lineWidth: 1,
-                                            hidden: !dataVisibility[index],
-                                            index: index
-                                        };
-                                    });
-                                }
-                            },
-                            onClick: function (e, legendItem, legend) {
-                                const index = legendItem.index;
-                                const ci = legend.chart;
-
-                                // Toggle visibility state
-                                dataVisibility[index] = !dataVisibility[index];
-
-                                // Apply animation
-                                if (dataVisibility[index]) {
-                                    // Showing with animation - start from 0 and animate to actual value
-                                    ci.data.datasets[0].data[index] = 0;
-                                    ci.update('none');
-
-                                    setTimeout(() => {
-                                        ci.data.datasets[0].data[index] = originalData[index];
-                                        ci.update();
-                                    }, 50);
-                                } else {
-                                    // Hiding with animation - animate to 0
-                                    ci.data.datasets[0].data[index] = 0;
-                                    ci.update();
-                                }
-
-                                // Update legend to reflect new state
-                                ci.update();
-                            }
-                        },
+                        legend: { display: true },
                         tooltip: {
-                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                            titleColor: '#333',
-                            bodyColor: '#666',
-                            borderColor: 'rgba(200, 200, 200, 0.5)',
-                            borderWidth: 1,
-                            cornerRadius: 8,
                             callbacks: {
-                                label: function (context) {
-                                    const count = context.raw;
-                                    const method = methods[context.dataIndex];
+                                label: function (tooltipItem) {
+                                    const methodIndex = tooltipItem.dataIndex;
+                                    const count = datasetMap[jobMethods[methodIndex]];
                                     const percentage = totalAlumni > 0 ? ((count / totalAlumni) * 100).toFixed(1) : 0;
-                                    return `${method}: ${count} alumni (${percentage}%)`;
+                                    return `${labels[methodIndex]}: ${count} alumni (${percentage}%)`;
                                 }
                             }
                         }
@@ -462,7 +370,6 @@ function fetchJobSearchMethods(campus, course, employmentStatus, fromYear, toYea
         .catch(error => {
             console.error("Fetch error:", error.message);
             loader.remove();
-            showErrorMessage("jobSearchChart", "Failed to load job search data");
         });
 }
 

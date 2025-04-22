@@ -33,7 +33,7 @@ if (!empty($fromYear) && !empty($toYear)) {
 error_log("Year condition: $yearCondition");
 
 // Build final query
-$query = "SELECT ed.employment_status, ed.user_id, COUNT(DISTINCT ed.id) AS total 
+$query = "SELECT ed.employment_status, COUNT(ed.user_id) AS total 
           FROM employment_data ed 
           LEFT JOIN educational_background eb ON ed.user_id = eb.user_id
           LEFT JOIN personal_info pi ON ed.user_id = pi.user_id

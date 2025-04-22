@@ -1187,7 +1187,6 @@ function getRoomDisplay($room_number)
             }
 
             // --- Booking Calendar Initialization ---
-
             async function initializeCalendars(roomId) {
                 try {
                     const response = await fetch('user/get-room-bookings.php', {
@@ -1203,6 +1202,62 @@ function getRoomDisplay($room_number)
                     const bookedDates = data.bookedDates || [];
                     const bookingTimes = data.bookingTimes || [];
 
+                    // Create a map of dates to their status for easier access
+                    const dateStatusMap = new Map();
+
+                    // Get all arrival and departure dates to understand boundaries
+                    const allBookings = [];
+                    bookingTimes.forEach(booking => {
+                        if (booking.arrival_date && booking.departure_date) {
+                            allBookings.push({
+                                arrival_date: booking.arrival_date,
+                                arrival_time: booking.arrival_time,
+                                departure_date: booking.departure_date,
+                                departure_time: booking.departure_time
+                            });
+                        }
+                    });
+
+                    // Mark fully booked dates
+                    bookedDates.forEach(date => {
+                        dateStatusMap.set(date, {
+                            status: 'fully-booked',
+                            title: 'Fully booked',
+                            class: 'fully-booked-date',
+                            isSelectable: false
+                        });
+                    });
+
+                    // Mark checkout dates
+                    bookingTimes.forEach(booking => {
+                        const checkoutDate = booking.date;
+                        const departureTime = new Date(booking.departure_time);
+                        const availableTime = new Date(departureTime.getTime() + (2 * 60 * 60 * 1000)); // 2 hours for cleaning
+
+                        // Check if the day after this checkout is booked
+                        const nextDayStr = new Date(new Date(checkoutDate).getTime() + 86400000).toISOString().split('T')[0];
+                        const isNextDayBooked = bookedDates.includes(nextDayStr) || allBookings.some(b => b.arrival_date === nextDayStr);
+
+                        // If next day is booked, treat this as fully booked
+                        if (isNextDayBooked) {
+                            dateStatusMap.set(checkoutDate, {
+                                status: 'fully-booked',
+                                title: 'Fully booked',
+                                class: 'fully-booked-date',
+                                isSelectable: false
+                            });
+                        } else {
+                            // Otherwise, mark as a normal checkout day
+                            dateStatusMap.set(checkoutDate, {
+                                status: 'checkout-date',
+                                title: `Available after ${availableTime.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', hour12: true})}`,
+                                availableTime: availableTime,
+                                class: 'checkout-available-date',
+                                isSelectable: true
+                            });
+                        }
+                    });
+
                     const baseConfig = {
                         enableTime: true,
                         dateFormat: "Y-m-d h:i K",
@@ -1216,24 +1271,173 @@ function getRoomDisplay($room_number)
                         disableMobile: "true"
                     };
 
-                    const onDayCreateHandler = function(dObj, dStr, fp, dayElem) {
+                    // Function to enforce time constraints for departure
+                    function enforceTimeConstraints(selectedDate) {
+                        const hours = selectedDate.getHours();
+                        const minutes = selectedDate.getMinutes();
+
+                        // Check-out restrictions: 7:00 AM to 5:00 PM
+                        if (hours < 7) {
+                            NotificationSystem.show('Check-out time must be between 7:00 AM and 5:00 PM. Adjusted to 7:00 AM.', 'info');
+                            selectedDate.setHours(7, 0, 0, 0);
+                            window.departureCalendar.setDate(selectedDate);
+                            return selectedDate;
+                        } else if (hours >= 17) {
+                            NotificationSystem.show('Check-out time must be between 7:00 AM and 5:00 PM. Adjusted to 5:00 PM.', 'info');
+                            selectedDate.setHours(17, 0, 0, 0);
+                            window.departureCalendar.setDate(selectedDate);
+                            return selectedDate;
+                        }
+
+                        return selectedDate;
+                    }
+
+                    // Helper function to find the next unavailable date
+                    function findNextUnavailableDateAfterDate(date) {
+                        if (!date) return null;
+                        const dateStr = flatpickr.formatDate(date, "Y-m-d");
+
+                        // Create an array of all dates that are unavailable (either fully booked or arrival dates)
+                        const unavailableDates = [];
+
+                        // Add fully booked dates
+                        bookedDates.forEach(bookedDate => {
+                            if (bookedDate > dateStr) {
+                                unavailableDates.push({
+                                    date: bookedDate,
+                                    type: 'fully-booked'
+                                });
+                            }
+                        });
+
+                        // Add check-in dates
+                        allBookings.forEach(booking => {
+                            if (booking.arrival_date > dateStr) {
+                                unavailableDates.push({
+                                    date: booking.arrival_date,
+                                    type: 'check-in',
+                                    arrival_time: booking.arrival_time
+                                });
+                            }
+                        });
+
+                        // Sort by date to find the closest one
+                        unavailableDates.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+                        // Return the next unavailable date, or null if there are none
+                        return unavailableDates.length > 0 ? unavailableDates[0] : null;
+                    }
+
+                    // Helper function to check if a date is valid for new departure
+                    function isValidDepartureDate(date, arrivalDate) {
+                        // Modified to allow today's date
+                        // Check if date is in the past (before today)
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        if (date < today) {
+                            return false;
+                        }
+
+                        // If arrival date is provided, ensure the departure is after or equal to arrival
+                        if (arrivalDate) {
+                            const arrivalDateOnly = new Date(arrivalDate);
+                            arrivalDateOnly.setHours(0, 0, 0, 0);
+
+                            // If it's the same day as arrival, it's valid (allow same-day checkout)
+                            if (date.getTime() === arrivalDateOnly.getTime()) {
+                                return true;
+                            }
+
+                            // If it's before arrival date, it's invalid
+                            if (date < arrivalDateOnly) {
+                                return false;
+                            }
+                        }
+
+                        const dateStr = flatpickr.formatDate(date, "Y-m-d");
+                        const dateStatus = dateStatusMap.get(dateStr);
+
+                        // If fully booked, it's not available
+                        if (dateStatus && dateStatus.status === 'fully-booked') {
+                            return false;
+                        }
+
+                        // Find the next unavailable date after our arrival
+                        const nextUnavailable = findNextUnavailableDateAfterDate(arrivalDate || today);
+
+                        // If there's a next unavailable date, we can only select dates up to (but not including) it
+                        if (nextUnavailable) {
+                            const nextUnavailableDateStr = nextUnavailable.date;
+                            const nextUnavailableDate = new Date(nextUnavailableDateStr);
+                            nextUnavailableDate.setHours(0, 0, 0, 0);
+
+                            // The date we're checking must be before the next unavailable date
+                            if (date >= nextUnavailableDate) {
+                                return false;
+                            }
+                        }
+
+                        // All other dates between arrival/today and next unavailable date are valid
+                        return true;
+                    }
+
+                    // Custom day create handler specifically for departure calendar
+                    const departureDayCreateHandler = function(dObj, dStr, fp, dayElem) {
                         const dateStr = flatpickr.formatDate(dayElem.dateObj, "Y-m-d");
-                        const dateBooking = bookingTimes.find(b => b.date === dateStr);
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
 
-                        if (dateBooking) {
-                            dayElem.classList.add('checkout-date');
+                        // Check if the date is in the past (before today)
+                        if (dayElem.dateObj < today) {
+                            dayElem.classList.add('past-date');
+                            dayElem.title = 'Past date';
+                            dayElem.classList.add('flatpickr-disabled');
+                            return;
+                        }
 
-                            const departureTime = new Date(dateBooking.departure_time);
-                            const availableTime = new Date(departureTime.getTime() + (2 * 60 * 60 * 1000));
-                            const formattedTime = availableTime.toLocaleTimeString('en-US', {
-                                hour: 'numeric',
-                                minute: '2-digit',
-                                hour12: true
-                            });
-                            dayElem.title = `Available after ${formattedTime}`;
-                        } else if (bookedDates.includes(dateStr)) {
-                            dayElem.classList.add('booked-date');
-                            dayElem.title = "Fully booked";
+                        // If this is today, make sure it's selectable
+                        if (dayElem.dateObj.getTime() === today.getTime()) {
+                            dayElem.classList.add('available-date');
+                            dayElem.title = 'Available for booking';
+                            if (dayElem.classList.contains('flatpickr-disabled')) {
+                                dayElem.classList.remove('flatpickr-disabled');
+                            }
+                        }
+
+                        const dateStatus = dateStatusMap.get(dateStr);
+                        if (dateStatus) {
+                            dayElem.classList.add(dateStatus.class);
+                            dayElem.title = dateStatus.title;
+
+                            // Make sure checkout-available-date and transition-available-date are not disabled
+                            if ((dateStatus.class === 'checkout-available-date' || dateStatus.class === 'transition-available-date') &&
+                                dayElem.classList.contains('flatpickr-disabled')) {
+                                dayElem.classList.remove('flatpickr-disabled');
+                            }
+                        } else {
+                            dayElem.classList.add('available-date');
+                            dayElem.title = 'Available for booking';
+                        }
+
+                        // If we have an arrival date selected (bookingData.arrival)
+                        if (bookingData.arrival) {
+                            // Check if this date is valid for departure
+                            if (!isValidDepartureDate(dayElem.dateObj, bookingData.arrival)) {
+                                // Mark unavailable dates with a specific class for styling
+                                dayElem.classList.add('unavailable-departure-date');
+                                dayElem.classList.add('flatpickr-disabled');
+
+                                // Next unavailable date check
+                                const nextUnavailable = findNextUnavailableDateAfterDate(bookingData.arrival);
+                                if (nextUnavailable) {
+                                    const nextUnavailableDate = new Date(nextUnavailable.date);
+                                    if (dateStr >= nextUnavailable.date) {
+                                        dayElem.title = 'Unavailable - Conflict with another booking';
+                                    }
+                                } else {
+                                    dayElem.title = 'Unavailable for checkout';
+                                }
+                            }
                         }
                     };
 
@@ -1243,83 +1447,382 @@ function getRoomDisplay($room_number)
 
                     window.departureCalendar = flatpickr("#extend-departure-datetime", {
                         ...baseConfig,
-                        minDate: bookingData.arrival || "today",
+                        minTime: "07:00", // 7am
+                        maxTime: "17:00", // 5pm
+                        minDate: "today", // Always allow today's date
                         onChange: function(selectedDates) {
                             if (selectedDates.length > 0) {
-                                const selectedDate = selectedDates[0];
+                                let selectedDate = selectedDates[0];
                                 const dateStr = flatpickr.formatDate(selectedDate, "Y-m-d");
 
-                                if (bookingData.arrival && selectedDate <= bookingData.arrival) {
-                                    NotificationSystem.show('Departure time must be after arrival time', 'error');
+                                // First enforce time constraints
+                                selectedDate = enforceTimeConstraints(selectedDate);
+
+                                // Modified to make today a valid date
+                                const today = new Date();
+                                const selectedDateOnly = new Date(selectedDate);
+                                selectedDateOnly.setHours(0, 0, 0, 0);
+                                today.setHours(0, 0, 0, 0);
+
+                                // If arrival date exists and selected date is before it (except for today)
+                                if (bookingData.arrival && selectedDate < bookingData.arrival &&
+                                    selectedDateOnly.getTime() !== today.getTime()) {
+                                    NotificationSystem.show('The departure date cannot be before your arrival date.', 'error');
                                     window.departureCalendar.clear();
+                                    return;
+                                }
+
+                                // Checking for valid date based on bookingData.arrival (allowing today)
+                                if (!isValidDepartureDate(selectedDate, bookingData.arrival) &&
+                                    selectedDateOnly.getTime() !== today.getTime()) {
+                                    NotificationSystem.show('This date is not available for extending your stay. Please select another date.', 'error');
+                                    window.departureCalendar.clear();
+                                    return;
+                                }
+
+                                // Find the next unavailable date after our arrival
+                                const nextUnavailable = findNextUnavailableDateAfterDate(bookingData.arrival || today);
+
+                                // Special handling for dates adjacent to next check-in
+                                if (nextUnavailable && nextUnavailable.type === 'check-in') {
+                                    const nextUnavailableDateStr = nextUnavailable.date;
+                                    const checkoutDateStr = flatpickr.formatDate(selectedDate, "Y-m-d");
+
+                                    // If the selected date is the day before the next check-in
+                                    if (checkoutDateStr === nextUnavailableDateStr) {
+                                        NotificationSystem.show('Cannot check out on a day that has an incoming guest. Please select an earlier date.', 'error');
+                                        window.departureCalendar.clear();
+                                        return;
+                                    }
+
+                                    // For the day before check-in, ensure checkout is early enough
+                                    const nextDay = new Date(checkoutDateStr);
+                                    nextDay.setDate(nextDay.getDate() + 1);
+                                    const nextDayStr = flatpickr.formatDate(nextDay, "Y-m-d");
+                                    if (nextDayStr === nextUnavailableDateStr) {
+                                        const nextArrivalTime = new Date(nextUnavailable.arrival_time);
+                                        // Allow checkout at least 2 hours before next check-in for cleaning
+                                        const latestCheckoutTime = new Date(nextArrivalTime.getTime() - (2 * 60 * 60 * 1000));
+                                        if (selectedDate > latestCheckoutTime) {
+                                            const formattedTime = latestCheckoutTime.toLocaleTimeString('en-US', {
+                                                hour: 'numeric',
+                                                minute: '2-digit',
+                                                hour12: true
+                                            });
+                                            NotificationSystem.show(`You must check out at least 2 hours before the next guest arrival. Time adjusted to ${formattedTime}`, 'info');
+                                            window.departureCalendar.setDate(latestCheckoutTime);
+                                            bookingData.newCheckout = latestCheckoutTime;
+                                            extendData.newDeparture = latestCheckoutTime;
+                                        } else {
+                                            bookingData.newCheckout = selectedDate;
+                                            extendData.newDeparture = selectedDate;
+                                        }
+                                    } else {
+                                        bookingData.newCheckout = selectedDate;
+                                        extendData.newDeparture = selectedDate;
+                                    }
                                 } else {
-                                    // Update both data structures
                                     bookingData.newCheckout = selectedDate;
                                     extendData.newDeparture = selectedDate;
-                                    updateSummary();
                                 }
+
+                                updateSummary();
                             }
                         },
-                        onDayCreate: onDayCreateHandler
+                        onDayCreate: departureDayCreateHandler,
+                        disable: [(date) => {
+                            // Only disable past dates (before today)
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0);
+                            if (date < today) {
+                                return true;
+                            }
+
+                            // Today's date should always be selectable
+                            if (date.getTime() === today.getTime()) {
+                                return false;
+                            }
+
+                            // For other dates, use our validation function
+                            return !isValidDepartureDate(date, bookingData.arrival);
+                        }]
                     });
+
+                    // Add a MutationObserver to ensure checkout-available-date is never disabled
+                    const observer = new MutationObserver(mutations => {
+                        mutations.forEach(mutation => {
+                            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                                const dayElem = mutation.target;
+                                // Don't enable past dates (before today)
+                                if (dayElem.classList.contains('past-date')) {
+                                    if (!dayElem.classList.contains('flatpickr-disabled')) {
+                                        dayElem.classList.add('flatpickr-disabled');
+                                    }
+                                    return;
+                                }
+
+                                // Make sure today is selectable
+                                const today = new Date();
+                                today.setHours(0, 0, 0, 0);
+                                const elemDate = new Date(dayElem.dateObj);
+                                elemDate.setHours(0, 0, 0, 0);
+
+                                if (elemDate.getTime() === today.getTime()) {
+                                    if (dayElem.classList.contains('flatpickr-disabled')) {
+                                        dayElem.classList.remove('flatpickr-disabled');
+                                    }
+                                    return;
+                                }
+
+                                // Keep unavailable-departure-dates disabled
+                                if (dayElem.classList.contains('unavailable-departure-date')) {
+                                    if (!dayElem.classList.contains('flatpickr-disabled')) {
+                                        dayElem.classList.add('flatpickr-disabled');
+                                    }
+                                    return;
+                                }
+                                if (dayElem.classList.contains('checkout-available-date') ||
+                                    dayElem.classList.contains('transition-available-date')) {
+                                    if (dayElem.classList.contains('flatpickr-disabled')) {
+                                        dayElem.classList.remove('flatpickr-disabled');
+                                    }
+                                }
+                            }
+                        });
+                    });
+
+                    // Start observing after a short delay to ensure flatpickr has rendered
+                    setTimeout(() => {
+                        const calendarDays = document.querySelectorAll('.flatpickr-day');
+                        calendarDays.forEach(day => {
+                            observer.observe(day, {
+                                attributes: true
+                            });
+                        });
+                    }, 500);
 
                     const calendarStyles = document.createElement('style');
                     calendarStyles.textContent = `
-                .flatpickr-day.checkout-date {
-                    background-color: #fff3e0 !important;
-                    color: #ff9800 !important;
-                    border-color: #ffe0b2 !important;
-                    text-decoration: none !important;
-                    cursor: pointer !important;
+            /* Available date styling */
+            .flatpickr-time input.flatpickr-hour,
+            .flatpickr-time input.flatpickr-minute {
+                font-weight: bold !important;
+            }
+            
+            .flatpickr-time input.flatpickr-hour[disabled],
+            .flatpickr-time input.flatpickr-minute[disabled] {
+                background-color: #f1f1f1 !important;
+                color: #9e9e9e !important;
+                cursor: not-allowed !important;
+            }
+            
+            /* Visual indicator for time restrictions */
+            .time-restrictions-notice {
+                text-align: center;
+                font-size: 0.85rem;
+                color: #ff9800;
+                background-color: #fff3e0;
+                padding: 3px;
+                border-radius: 3px;
+                margin-top: 5px;
+                border: 1px solid #ffe0b2;
+            }
+            
+            .flatpickr-day.available-date {
+                background-color: #f1f8e9 !important;
+                color: #558b2f !important;
+                border-color: #c5e1a5 !important;
+                pointer-events: auto !important;
+            }
+            
+            .flatpickr-day.available-date:hover {
+                background-color: #dcedc8 !important;
+                color: #33691e !important;
+            }
+            
+            /* Past date styling */
+            .flatpickr-day.past-date {
+                background-color: #f5f5f5 !important;
+                color: #9e9e9e !important;
+                border-color: #e0e0e0 !important;
+                cursor: not-allowed !important;
+                pointer-events: none !important;
+                text-decoration: line-through !important;
+                opacity: 0.6 !important;
+            }
+            
+            /* Checkout but available after cleaning */
+            .flatpickr-day.checkout-available-date {
+                background-color: #fff3e0 !important;
+                color: #ff9800 !important;
+                border-color: #ffe0b2 !important;
+                text-decoration: none !important;
+                cursor: pointer !important;
+                pointer-events: auto !important;
+                /* Add a small checkout indicator */
+                background-image: linear-gradient(135deg, #ff980033 25%, transparent 25%) !important;
+                background-size: 10px 10px !important;
+            }
+            
+            .flatpickr-day.checkout-available-date:hover {
+                background-color: #ffe0b2 !important;
+                color: #f57c00 !important;
+            }
+            
+            /* Make sure flatpickr-disabled is overridden for checkout-available-date */
+            .flatpickr-day.checkout-available-date.flatpickr-disabled {
+                color: #ff9800 !important;
+                background-color: #fff3e0 !important;
+                cursor: pointer !important;
+                opacity: 1 !important;
+            }
+            
+            /* Transition days - both checkout and checkin */
+            .flatpickr-day.transition-available-date {
+                background-color: #e3f2fd !important;
+                color: #1976d2 !important;
+                border-color: #bbdefb !important;
+                cursor: pointer !important;
+                pointer-events: auto !important;
+                /* Diagonal split background */
+                background-image: linear-gradient(135deg, #fff3e0 50%, #e3f2fd 50%) !important;
+            }
+            
+            .flatpickr-day.transition-available-date:hover {
+                background-color: #bbdefb !important;
+                color: #0d47a1 !important;
+            }
+            
+            /* Make sure flatpickr-disabled is overridden for transition-available-date */
+            .flatpickr-day.transition-available-date.flatpickr-disabled {
+                color: #1976d2 !important;
+                background-color: #e3f2fd !important;
+                background-image: linear-gradient(135deg, #fff3e0 50%, #e3f2fd 50%) !important;
+                cursor: pointer !important;
+                opacity: 1 !important;
+            }
+            
+            /* Fully booked days */
+            .flatpickr-day.fully-booked-date {
+                background-color: #ffebee !important;
+                color: #d32f2f !important;
+                text-decoration: line-through !important;
+                border-color: #ffcdd2 !important;
+            }
+            
+            .flatpickr-day.fully-booked-date:hover {
+                background-color: #ffebee !important;
+                color: #d32f2f !important;
+            }
+            
+            /* Unavailable departure dates */
+            .flatpickr-day.unavailable-departure-date {
+                background-color: #e0e0e0 !important;
+                color: #9e9e9e !important;
+                cursor: not-allowed !important;
+                border-color: #bdbdbd !important;
+                pointer-events: none !important;
+                opacity: 0.7 !important;
+            }
+            
+            /* Make sure these stay disabled */
+            .flatpickr-day.unavailable-departure-date.flatpickr-disabled {
+                background-color: #e0e0e0 !important;
+                color: #9e9e9e !important;
+                cursor: not-allowed !important;
+                pointer-events: none !important;
+            }
+            
+            /* Calendar legend */
+            .calendar-legend {
+                display: flex;
+                flex-wrap: wrap;
+                margin-top: 10px;
+                font-size: 0.85rem;
+            }
+            
+            .legend-item {
+                display: flex;
+                align-items: center;
+                margin-right: 10px;
+                margin-bottom: 5px;
+            }
+            
+            .legend-color {
+                width: 15px;
+                height: 15px;
+                margin-right: 5px;
+                border-radius: 3px;
+                border: 1px solid #ddd;
+            }
+            
+            /* Responsive calendar */
+            @media (max-width: 768px) {
+                .flatpickr-calendar {
+                    width: 100% !important;
+                    max-width: 350px;
+                    margin: 0 auto;
                 }
-
-                .flatpickr-day.checkout-date:hover {
-                    background-color: #ffe0b2 !important;
-                    color: #f57c00 !important;
+                
+                .flatpickr-days {
+                    width: 100% !important;
                 }
-
-                .flatpickr-day.booked-date {
-                    background-color: #ffebee !important;
-                    color: #d32f2f !important;
-                    text-decoration: line-through;
-                    border-color: #ffcdd2 !important;
+                
+                .dayContainer {
+                    width: 100% !important;
+                    min-width: 100% !important;
+                    max-width: 100% !important;
                 }
-
-                .flatpickr-day.booked-date:hover {
-                    background-color: #ffebee !important;
-                    color: #d32f2f !important;
+                
+                .flatpickr-day {
+                    max-width: none !important;
                 }
-
-                @media (max-width: 768px) {
-                    .flatpickr-calendar {
-                        width: 100% !important;
-                        max-width: 350px;
-                        margin: 0 auto;
-                    }
-
-                    .flatpickr-days {
-                        width: 100% !important;
-                    }
-
-                    .dayContainer {
-                        width: 100% !important;
-                        min-width: 100% !important;
-                        max-width: 100% !important;
-                    }
-
-                    .flatpickr-day {
-                        max-width: none !important;
-                    }
+                
+                .calendar-legend {
+                    justify-content: center;
                 }
-            `;
+            }
+        `;
+
                     document.head.appendChild(calendarStyles);
+
+                    // Add legend to explain colors for extend booking calendar
+                    const legend = document.createElement('div');
+                    legend.className = 'calendar-legend';
+                    legend.innerHTML = `
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #f1f8e9;"></div>
+                <span>Available</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #fff3e0; background-image: linear-gradient(135deg, #ff980033 25%, transparent 25%); background-size: 10px 10px;"></div>
+                <span>Checkout day (available after cleaning)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #ffebee;"></div>
+                <span>Fully booked</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #f5f5f5; opacity: 0.6; text-decoration: line-through;"></div>
+                <span>Past date</span>
+            </div>
+        `;
+
+                    // Insert the legend after the extend departure calendar
+                    const departureCalendarContainer = document.querySelector('#extend-departure-datetime').closest('.flatpickr-calendar-container');
+                    if (departureCalendarContainer) {
+                        departureCalendarContainer.appendChild(legend.cloneNode(true));
+                        const departureTimeNotice = document.createElement('div');
+                        departureTimeNotice.className = 'time-restrictions-notice';
+                        departureTimeNotice.textContent = 'Check-out times: 7:00 AM - 5:00 PM only';
+                        departureCalendarContainer.appendChild(departureTimeNotice);
+                    }
 
                 } catch (error) {
                     console.error('Error initializing calendars:', error);
                     NotificationSystem.show('Error loading calendar data', 'error');
                 }
             }
-
 
             // --- Main Booking Modal Logic ---
 
@@ -1746,9 +2249,17 @@ function getRoomDisplay($room_number)
 
                 if (isNextDay) {
                     durationText = `${diffHours} hours`; // Display the hours
-                    // Calculate cost based on hours
+
+                    // Calculate number of additional calendar days
+                    const oldDate = new Date(oldCheckout);
+                    oldDate.setHours(0, 0, 0, 0);
+                    const newDate = new Date(newCheckout);
+                    newDate.setHours(0, 0, 0, 0);
+                    const diffDays = Math.ceil((newDate - oldDate) / (1000 * 60 * 60 * 24));
+
+                    // Charge the full day rate for each additional calendar day
                     if (extendData.pricePerDay) {
-                        cost = (diffHours / 24) * extendData.pricePerDay;
+                        cost = diffDays * extendData.pricePerDay;
                     } else {
                         document.getElementById('extend-summary-extra-cost').textContent = 'Price not available';
                         return;

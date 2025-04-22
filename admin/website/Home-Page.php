@@ -7,7 +7,7 @@
     <title>Alumni Cavite State University</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
     <link rel="stylesheet" href="admin/website/components/home/home-styles.css">
-    
+
     <!-- Add animation library -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 
@@ -26,7 +26,7 @@
         position: relative;
         overflow: hidden;
     }
-    
+
     .swiper-slide {
         text-align: center;
         background-position: center;
@@ -37,16 +37,16 @@
         align-items: center;
         justify-content: center;
     }
-    
+
     /* Individual slide backgrounds */
     .slide-1 {
         background-image: url('asset/images/bground2.jpg');
     }
-    
+
     .slide-2 {
         background-image: url('asset/images/bground2.jpg');
     }
-    
+
     .slide-3 {
         background-image: url('asset/images/bground2.jpg');
     }
@@ -60,7 +60,7 @@
         opacity: 0;
         transition: opacity 0.5s ease;
     }
-    
+
     .slide-content h2 {
         font-family: 'Times New Roman', Times, serif;
         font-size: 35px;
@@ -88,7 +88,7 @@
         line-height: 1;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
     }
-    
+
     .slide-content p {
         font-size: 16px;
         margin-bottom: 30px;
@@ -102,7 +102,7 @@
         transition: all 0.8s ease 0.3s;
         text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
     }
-    
+
     .slide-content .cta-btn {
         padding: 12px 25px;
         background: var(--cvsu-primary-green);
@@ -118,17 +118,17 @@
         transition: all 0.8s ease 0.6s;
         text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
     }
-    
+
     .slide-content .cta-btn:hover {
         background: var(--cvsu-hover-green);
         transform: translateY(-2px) scale(1.05);
     }
-    
+
     /* Active slide animations */
     .swiper-slide-active .slide-content {
         opacity: 1;
     }
-    
+
     .swiper-slide-active .slide-content h2,
     .swiper-slide-active .slide-content p,
     .swiper-slide-active .slide-content .cta-btn,
@@ -136,24 +136,24 @@
         opacity: 1;
         transform: translateY(0) scale(1);
     }
-    
+
     /* Navigation button styles */
-    .swiper-button-next, 
+    .swiper-button-next,
     .swiper-button-prev {
         color: white;
     }
-    
+
     /* Pagination styles */
     .swiper-pagination-bullet {
         background: white;
         opacity: 0.5;
     }
-    
+
     .swiper-pagination-bullet-active {
         opacity: 1;
         background: white;
     }
-    
+
     /* Original herodaw for backward compatibility - can be removed if replaced */
     .herodaw {
         color: white;
@@ -228,32 +228,45 @@
     }
 
     .slide-image {
-        width: 100%; /* Make the image responsive */
-        height: auto; /* Maintain aspect ratio */
-        display: block; /* Remove bottom space */
+        width: 100%;
+        /* Make the image responsive */
+        height: auto;
+        /* Maintain aspect ratio */
+        display: block;
+        /* Remove bottom space */
     }
 
     .slide-content {
-        position: absolute; /* Position content over the image */
+        position: absolute;
+        /* Position content over the image */
         top: 50%;
         left: 35%;
-        transform: translate(-50%, -50%); /* Center the content */
-        text-align: right; /* Center text */
-        z-index: 2; /* Ensure content is above the image */
-        color: white; /* Optional: Text color for contrast */
+        transform: translate(-50%, -50%);
+        /* Center the content */
+        text-align: right;
+        /* Center text */
+        z-index: 2;
+        /* Ensure content is above the image */
+        color: white;
+        /* Optional: Text color for contrast */
         margin: 0 auto;
         width: 45%;
         max-width: 500px;
     }
 
     .slide-content2 {
-        position: absolute; /* Position content over the image */
+        position: absolute;
+        /* Position content over the image */
         top: 50%;
         left: 65%;
-        transform: translate(-50%, -50%); /* Center the content */
-        text-align: left; /* Center text */
-        z-index: 2; /* Ensure content is above the image */
-        color: white; /* Optional: Text color for contrast */
+        transform: translate(-50%, -50%);
+        /* Center the content */
+        text-align: left;
+        /* Center text */
+        z-index: 2;
+        /* Ensure content is above the image */
+        color: white;
+        /* Optional: Text color for contrast */
         opacity: 0;
         transition: opacity 0.5s ease;
         margin: 0 auto;
@@ -267,30 +280,38 @@
 
     .support-icon {
         display: flex;
-        width: 300px; /* Set width of the image */
-        height: 300px; /* Set height of the image */
-        margin-left: 700px; /* Space between image and text */
+        width: 300px;
+        /* Set width of the image */
+        height: 300px;
+        /* Set height of the image */
+        margin-left: 700px;
+        /* Space between image and text */
         transition: transform 0.8s ease;
         opacity: 0;
         transform: translateX(-50px);
         transition: all 1s ease;
     }
-    
+
     .support-icons {
         display: flex;
-        width: 300px; /* Set width of the image */
-        height: 300px; /* Set height of the image */    
+        width: 300px;
+        /* Set width of the image */
+        height: 300px;
+        /* Set height of the image */
         transition: transform 0.8s ease;
         opacity: 0;
         transform: translateX(50px);
         transition: all 1s ease;
     }
-    
+
     .support-icon2 {
         display: flex;
-        width: 400px; /* Set width of the image */
-        height: 400px; /* Set height of the image */
-        margin-right: 700px; /* Space between image and text */
+        width: 400px;
+        /* Set width of the image */
+        height: 400px;
+        /* Set height of the image */
+        margin-right: 700px;
+        /* Space between image and text */
         transition: transform 0.8s ease;
         opacity: 0;
         transform: translateY(50px);
@@ -302,59 +323,84 @@
         opacity: 1;
         transform: translateX(0);
     }
-    
+
     .swiper-slide-active .support-icons {
         opacity: 1;
         transform: translateX(0);
     }
-    
+
     .swiper-slide-active .support-icon2 {
         opacity: 1;
         transform: translateY(0);
     }
 
     .cta-btn {
-        display: inline-block; /* Make it behave like a button */
-        padding: 10px 20px; /* Add padding for size */
-        background-color: gold; /* Gold background color */
-        color: #000005; /* Text color */
-        font-size: 18px; /* Font size */
-        font-weight: bold; /* Bold text */
-        border: none; /* Remove border */
-        border-radius: 5px; /* Rounded corners */
-        text-align: center; /* Center text */
-        text-decoration: none; /* Remove underline */
-        transition: background-color 0.3s ease, transform 0.3s ease; /* Transition effects */
+        display: inline-block;
+        /* Make it behave like a button */
+        padding: 10px 20px;
+        /* Add padding for size */
+        background-color: gold;
+        /* Gold background color */
+        color: #000005;
+        /* Text color */
+        font-size: 18px;
+        /* Font size */
+        font-weight: bold;
+        /* Bold text */
+        border: none;
+        /* Remove border */
+        border-radius: 5px;
+        /* Rounded corners */
+        text-align: center;
+        /* Center text */
+        text-decoration: none;
+        /* Remove underline */
+        transition: background-color 0.3s ease, transform 0.3s ease;
+        /* Transition effects */
     }
 
     .cta-btn:hover {
-        background-color: darkgoldenrod; /* Darker gold on hover */
-        transform: scale(1.05); /* Scale effect on hover */
+        background-color: darkgoldenrod;
+        /* Darker gold on hover */
+        transform: scale(1.05);
+        /* Scale effect on hover */
     }
 
     /* Adding animation class */
     .animate__animated.animate__zoomIn {
-        animation-duration: 0.5s; /* Set animation duration */
+        animation-duration: 0.5s;
+        /* Set animation duration */
     }
 
     .check-icon {
         display: inline-block;
-        width: 30px; /* Width of the circle */
-        height: 24px; /* Height of the circle */
-        border: 2px solid gold; /* Circle outline */
-        border-radius: 50%; /* Make it circular */
-        color: gold; /* Set check mark color to gold */
-        text-align: center; /* Center the check mark */
-        line-height: 24px; /* Center vertically */
-        margin-right: 10px; /* Space between the icon and text */
-        font-size: 18px; /* Adjust font size if needed */
+        width: 30px;
+        /* Width of the circle */
+        height: 24px;
+        /* Height of the circle */
+        border: 2px solid gold;
+        /* Circle outline */
+        border-radius: 50%;
+        /* Make it circular */
+        color: gold;
+        /* Set check mark color to gold */
+        text-align: center;
+        /* Center the check mark */
+        line-height: 24px;
+        /* Center vertically */
+        margin-right: 10px;
+        /* Space between the icon and text */
+        font-size: 18px;
+        /* Adjust font size if needed */
         padding-right: 20px;
     }
 
-    .check-icon::after{
+    .check-icon::after {
         content: '✔';
-        margin-left: 5px; /* Add margin to move it to the right */
-        color: gold; /* Keep check mark color gold */
+        margin-left: 5px;
+        /* Add margin to move it to the right */
+        color: gold;
+        /* Keep check mark color gold */
     }
 
     /* Mobile alternative section - shown only on small screens */
@@ -386,7 +432,7 @@
 
     .mobile-hero-content p {
         font-size: 14px;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); 
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
         margin-bottom: 20px;
         line-height: 1.4;
     }
@@ -417,7 +463,8 @@
 
     /* Enhanced Media Queries for Responsiveness */
     @media (max-width: 1200px) {
-        .support-icon, 
+
+        .support-icon,
         .support-icons {
             width: 220px;
             height: 220px;
@@ -425,7 +472,7 @@
             margin-left: auto;
             margin-right: auto;
         }
-        
+
         .support-icon2 {
             width: 280px;
             height: 280px;
@@ -452,33 +499,33 @@
             left: 25%;
             width: 45%;
         }
-        
+
         .slide-content2 {
             left: 75%;
             width: 45%;
         }
-        
-        .support-icon, 
+
+        .support-icon,
         .support-icons {
             width: 180px;
             height: 180px;
         }
-        
+
         .support-icon2 {
             width: 200px;
             height: 200px;
         }
-        
+
         .hero-swiper-container {
             height: 450px;
         }
-        
-        .slide-content h2, 
+
+        .slide-content h2,
         .slide-content2 h2 {
             font-size: 26px;
         }
-        
-        .slide-content p, 
+
+        .slide-content p,
         .slide-content2 p {
             font-size: 15px;
             line-height: 1.5;
@@ -492,8 +539,8 @@
             padding: 20px 0;
             height: auto;
         }
-        
-        .slide-content, 
+
+        .slide-content,
         .slide-content2 {
             position: relative;
             left: auto;
@@ -506,8 +553,8 @@
             opacity: 1;
         }
 
-        .support-icon, 
-        .support-icons, 
+        .support-icon,
+        .support-icons,
         .support-icon2 {
             width: 150px;
             height: 150px;
@@ -515,7 +562,7 @@
             display: block;
             order: 1;
         }
-        
+
         .slide-content,
         .slide-content2 {
             order: 2;
@@ -525,7 +572,7 @@
             height: auto;
             min-height: 600px;
         }
-        
+
         .check-icon {
             width: 25px;
             height: 20px;
@@ -547,7 +594,7 @@
             transform: translateY(0) scale(1);
             transition-delay: 0.2s;
         }
-        
+
         .swiper-slide-active .support-icon,
         .swiper-slide-active .support-icons,
         .swiper-slide-active .support-icon2 {
@@ -558,39 +605,42 @@
     }
 
     @media (max-width: 576px) {
+
         /* For smaller devices, implement a stacked layout */
         .hero-swiper-section {
-            display: none; /* Hide swiper on small screens */
+            display: none;
+            /* Hide swiper on small screens */
         }
-        
+
         .mobile-hero-alternative {
-            display: block; /* Show the mobile alternative */
+            display: block;
+            /* Show the mobile alternative */
         }
-        
-        .slide-content, 
+
+        .slide-content,
         .slide-content2 {
             width: 100%;
             padding: 10px;
             margin: 10px 0;
         }
-        
-        .slide-content h2, 
+
+        .slide-content h2,
         .slide-content2 h2 {
             font-size: 22px;
             margin-bottom: 10px;
         }
-        
-        .slide-content p, 
+
+        .slide-content p,
         .slide-content2 p {
             font-size: 14px;
             margin-bottom: 15px;
         }
-        
+
         .cta-btn {
             padding: 8px 16px;
             font-size: 15px;
         }
-        
+
         /* Make sure mobile alternative works well */
         .mobile-hero-content {
             padding: 20px 10px;
@@ -601,32 +651,32 @@
         .hero-swiper-container {
             min-height: 500px;
         }
-        
-        .support-icon, 
-        .support-icons, 
+
+        .support-icon,
+        .support-icons,
         .support-icon2 {
             width: 120px;
             height: 120px;
             margin: 5px auto;
         }
-        
-        .slide-content h2, 
+
+        .slide-content h2,
         .slide-content2 h2 {
             font-size: 20px;
         }
-        
+
         .mobile-hero-content {
             margin-bottom: 15px;
         }
-        
+
         .mobile-hero-content h2 {
             font-size: 20px;
         }
-        
+
         .mobile-hero-content p {
             font-size: 13px;
         }
-        
+
         .mobile-image-container img {
             max-width: 120px;
         }
@@ -648,25 +698,26 @@
                         <!--<a href="Room-Accomodation.php" class="cta-btn animate__animated animate__zoomIn">Explore Our Services</a> -->
                     </div>
                 </div>
-                
+
                 <!-- Second slide -->
                 <div class="swiper-slide slide-2">
                     <img src="asset/images/signup1.png" alt="Support Icon" class="support-icon2">
                     <div class="slide-content2">
                         <h2 class="animate__animated animate__fadeInDown">REGISTER & UPDATE<br>YOUR ALUMNI PROFILE<br></h2>
                         <p class="animate__animated animate__fadeInUp"> To access exclusive alumni features: <br>
-                            <span class="check-icon">   </span>      Alumni ID<br>
-                            <span class="check-icon">   </span>      Alumni Tracer<br>
-                            <span class="check-icon">   </span>      Room Booking<br><br></p>
-                        <a href="Account.php" class="cta-btn animate__animated animate__zoomIn">Sign-Up Here</a> 
+                            <span class="check-icon"> </span> Alumni ID<br>
+                            <span class="check-icon"> </span> Alumni Tracer<br>
+                            <span class="check-icon"> </span> Room Booking<br><br>
+                        </p>
+                        <a href="Access-Point?Cavite-State-University=register" class="cta-btn animate__animated animate__zoomIn">Sign-Up Here</a>
                     </div>
                 </div>
             </div>
-            
+
             <!-- Add navigation buttons -->
             <div class="swiper-button-next"></div>
             <div class="swiper-button-prev"></div>
-            
+
             <!-- Add pagination -->
             <div class="swiper-pagination"></div>
         </div>
@@ -683,7 +734,7 @@
             </div>
             <p>The Office of Alumni Affairs at Cavite State University is here to strengthen our connection with fellow graduates. We provide resources for networking, professional development, and community engagement.</p>
         </div>
-        
+
         <!-- Second mobile panel -->
         <div class="mobile-hero-content">
             <h2>REGISTER & UPDATE YOUR ALUMNI PROFILE</h2>
@@ -715,7 +766,7 @@
 
     <!-- Swiper JS -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
-    
+
     <!-- Initialize Swiper -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -727,28 +778,28 @@
                     loop: true,
                     grabCursor: true,
                     effect: 'slide', // Changed from fade to slide animation
-                    
+
                     // Auto play - ensure it's always running
                     autoplay: {
                         delay: 5000,
                         disableOnInteraction: false,
                     },
-                    
+
                     // Speed
                     speed: 1000,
-                    
+
                     // Pagination
                     pagination: {
                         el: '.swiper-pagination',
                         clickable: true,
                     },
-                    
+
                     // Navigation arrows
                     navigation: {
                         nextEl: '.swiper-button-next',
                         prevEl: '.swiper-button-prev',
                     },
-                    
+
                     // On slide change event - for custom animations
                     on: {
                         init: function() {
@@ -758,7 +809,7 @@
                                 this.animateSlide(activeSlide);
                             }, 100);
                         },
-                        
+
                         slideChangeTransitionStart: function() {
                             // Hide all slide content first
                             const slides = document.querySelectorAll('.swiper-slide');
@@ -767,7 +818,7 @@
                                 const p = slide.querySelector('p');
                                 const btn = slide.querySelector('.cta-btn');
                                 const icons = slide.querySelectorAll('img[class^="support"]');
-                                
+
                                 if (h2) {
                                     h2.classList.remove('animate__fadeInDown');
                                     h2.style.opacity = 0;
@@ -787,7 +838,7 @@
                                 }
                             });
                         },
-                        
+
                         slideChangeTransitionEnd: function() {
                             // Animate the active slide
                             const activeSlide = document.querySelector('.swiper-slide-active');
@@ -795,16 +846,16 @@
                         }
                     }
                 });
-                
+
                 // Add custom animation method to Swiper instance
                 heroSwiper.animateSlide = function(slide) {
                     if (!slide) return;
-                    
+
                     const h2 = slide.querySelector('h2');
                     const p = slide.querySelector('p');
                     const btn = slide.querySelector('.cta-btn');
                     const icons = slide.querySelectorAll('img[class^="support"]');
-                    
+
                     // First animate the icons with a small delay
                     if (icons) {
                         icons.forEach((icon, index) => {
@@ -814,7 +865,7 @@
                             }, index * 200);
                         });
                     }
-                    
+
                     // Then animate text content with sequential delays
                     setTimeout(() => {
                         if (h2) {
@@ -822,14 +873,14 @@
                             h2.style.opacity = 1;
                             h2.style.animationDuration = '0.8s';
                         }
-                        
+
                         setTimeout(() => {
                             if (p) {
                                 p.classList.add('animate__fadeInUp');
                                 p.style.opacity = 1;
                                 p.style.animationDuration = '0.8s';
                             }
-                            
+
                             setTimeout(() => {
                                 if (btn) {
                                     btn.classList.add('animate__zoomIn');
@@ -847,14 +898,14 @@
                 // Check if we've crossed the breakpoint
                 const heroSection = document.querySelector('.hero-swiper-section');
                 const isMobile = window.matchMedia('(max-width: 576px)').matches;
-                
+
                 if (isMobile) {
                     heroSection.style.display = 'none';
                     document.querySelector('.mobile-hero-alternative').style.display = 'block';
                 } else {
                     heroSection.style.display = 'block';
                     document.querySelector('.mobile-hero-alternative').style.display = 'none';
-                    
+
                     // Reinitialize Swiper if needed
                     if (typeof heroSwiper === 'undefined' || !heroSwiper) {
                         // Initialize swiper again if needed
@@ -865,4 +916,5 @@
         });
     </script>
 </body>
+
 </html>

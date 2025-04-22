@@ -2314,6 +2314,41 @@ $mysqli->close();
             //         NotificationSystem.show('Error loading calendar data', 'error');
             //     }
             // }
+            // Add this function to handle time constraints for both arrival and departure
+            function enforceTimeConstraints(selectedDate, calendarInstance, isArrival) {
+                const hours = selectedDate.getHours();
+                const minutes = selectedDate.getMinutes();
+
+                if (isArrival) {
+                    // Check-in restrictions: 9:00 AM to 7:00 PM
+                    if (hours < 9) {
+                        NotificationSystem.show('Check-in time must be between 9:00 AM and 7:00 PM. Adjusted to 9:00 AM.', 'info');
+                        selectedDate.setHours(9, 0, 0, 0);
+                        calendarInstance.setDate(selectedDate);
+                        return selectedDate;
+                    } else if (hours > 19) {
+                        NotificationSystem.show('Check-in time must be between 9:00 AM and 7:00 PM. Adjusted to 7:00 PM.', 'info');
+                        selectedDate.setHours(18, 30, 0, 0); // 6:30 PM to ensure within boundary
+                        calendarInstance.setDate(selectedDate);
+                        return selectedDate;
+                    }
+                } else {
+                    // Check-out restrictions: 7:00 AM to 5:00 PM
+                    if (hours < 7) {
+                        NotificationSystem.show('Check-out time must be between 7:00 AM and 5:00 PM. Adjusted to 7:00 AM.', 'info');
+                        selectedDate.setHours(7, 0, 0, 0);
+                        calendarInstance.setDate(selectedDate);
+                        return selectedDate;
+                    } else if (hours >= 17) {
+                        NotificationSystem.show('Check-out time must be between 7:00 AM and 5:00 PM. Adjusted to 5:00 PM.', 'info');
+                        selectedDate.setHours(17, 0, 0, 0);
+                        calendarInstance.setDate(selectedDate);
+                        return selectedDate;
+                    }
+                }
+
+                return selectedDate;
+            }
 
             async function initializeCalendars(roomId) {
                 try {
@@ -2420,7 +2455,7 @@ $mysqli->close();
                         allowInput: true,
                         enableSeconds: false,
                         noCalendar: false,
-                        disableMobile: "true"
+                        disableMobile: "true",
                     };
 
                     function isCheckoutOnlyDate(dateStr) {
@@ -2529,9 +2564,9 @@ $mysqli->close();
                     };
 
                     function isValidArrivalTime(date) {
-                        // Check if the time is after 7 PM (19:00)
+                        // Check if the time is between 7 AM (07:00) and 7 PM (19:00)
                         const hours = date.getHours();
-                        return hours < 19; // Returns false if hours is 19 or greater (7 PM or later)
+                        return hours >= 7 && hours < 19;
                     }
 
                     // Helper function to check if a date is valid for arrival
@@ -2674,43 +2709,16 @@ $mysqli->close();
                     // Modify the onChange function in the arrival calendar initialization
                     window.arrivalCalendar = flatpickr("#book-arrival-datetime", {
                         ...baseConfig,
+                        minTime: "09:00", // 9am
+                        maxTime: "19:00", // 7pm
                         onChange: function(selectedDates) {
                             if (selectedDates.length > 0) {
-                                const selectedDate = selectedDates[0];
+                                let selectedDate = selectedDates[0];
                                 const dateStr = flatpickr.formatDate(selectedDate, "Y-m-d");
                                 const dateStatus = dateStatusMap.get(dateStr);
 
-                                // First check for 7 PM cutoff
-                                if (!isValidArrivalTime(selectedDate)) {
-                                    NotificationSystem.show('Check-ins are not allowed after 7:00 PM. Please select an earlier time or a different date.', 'error');
-
-                                    // Reset the time to 7:00 PM
-                                    const adjustedDate = new Date(selectedDate);
-                                    adjustedDate.setHours(19, 0, 0, 0);
-                                    // Set to 7:00 PM of the previous day if possible
-                                    adjustedDate.setDate(adjustedDate.getDate() - 1);
-
-                                    // Only set this time if the previous day is valid
-                                    const prevDayStr = flatpickr.formatDate(adjustedDate, "Y-m-d");
-                                    const prevDayStatus = dateStatusMap.get(prevDayStr);
-
-                                    if (isValidArrivalDate(adjustedDate) && (!prevDayStatus ||
-                                            (prevDayStatus && (prevDayStatus.status === 'checkout-date' ||
-                                                prevDayStatus.status === 'transition-date' ||
-                                                !prevDayStatus.status)))) {
-                                        window.arrivalCalendar.setDate(adjustedDate);
-                                        bookingData.arrival = adjustedDate;
-                                        NotificationSystem.show('Time adjusted to 7:00 PM of the previous day', 'info');
-                                    } else {
-                                        // If previous day isn't valid, just set to 7:00 PM
-                                        adjustedDate.setDate(adjustedDate.getDate() + 1); // Move back to selected day
-                                        adjustedDate.setHours(18, 59, 0, 0); // Set to 6:59 PM
-                                        window.arrivalCalendar.setDate(adjustedDate);
-                                        bookingData.arrival = adjustedDate;
-                                        NotificationSystem.show('Time adjusted to 6:59 PM', 'info');
-                                    }
-                                    return;
-                                }
+                                // First enforce time constraints
+                                selectedDate = enforceTimeConstraints(selectedDate, window.arrivalCalendar, true);
 
                                 if (dateStatus && (dateStatus.status === 'checkout-date' || dateStatus.status === 'transition-date')) {
                                     if (selectedDate < dateStatus.availableTime) {
@@ -2787,17 +2795,28 @@ $mysqli->close();
                         }]
                     });
 
+
                     if (window.departureCalendar) {
                         window.departureCalendar.destroy();
                     }
 
                     window.departureCalendar = flatpickr("#book-departure-datetime", {
                         ...baseConfig,
-                        minDate: bookingData.arrival || "today",
+                        minTime: "07:00", // 7am
+                        maxTime: "17:00", // 5pm
+                        minDate: bookingData.arrival ? (() => {
+                            // Create a new date for the day after arrival
+                            const nextDay = new Date(bookingData.arrival);
+                            nextDay.setDate(nextDay.getDate() + 1);
+                            return nextDay;
+                        })() : "today", // Replace the departure calendar onChange function with this
                         onChange: function(selectedDates) {
                             if (selectedDates.length > 0) {
-                                const selectedDate = selectedDates[0];
+                                let selectedDate = selectedDates[0];
                                 const dateStr = flatpickr.formatDate(selectedDate, "Y-m-d");
+
+                                // First enforce time constraints
+                                selectedDate = enforceTimeConstraints(selectedDate, window.departureCalendar, false);
 
                                 if (!isValidDepartureDate(selectedDate, bookingData.arrival)) {
                                     NotificationSystem.show('This date is not available for checkout. Please select another date.', 'error');
@@ -2912,6 +2931,30 @@ $mysqli->close();
                     const calendarStyles = document.createElement('style');
                     calendarStyles.textContent = `
                         /* Available date styling */
+                        /* Add this to your calendarStyles.textContent CSS block */
+                        .flatpickr-time input.flatpickr-hour,
+                        .flatpickr-time input.flatpickr-minute {
+                            font-weight: bold !important;
+                        }
+
+                        .flatpickr-time input.flatpickr-hour[disabled],
+                        .flatpickr-time input.flatpickr-minute[disabled] {
+                            background-color: #f1f1f1 !important;
+                            color: #9e9e9e !important;
+                            cursor: not-allowed !important;
+                        }
+
+                        /* Visual indicator for time restrictions */
+                        .time-restrictions-notice {
+                            text-align: center;
+                            font-size: 0.85rem;
+                            color: #ff9800;
+                            background-color: #fff3e0;
+                            padding: 3px;
+                            border-radius: 3px;
+                            margin-top: 5px;
+                            border: 1px solid #ffe0b2;
+                        }
                         .flatpickr-day.available-date {
                             background-color: #f1f8e9 !important;
                             color: #558b2f !important;
@@ -3114,11 +3157,20 @@ $mysqli->close();
 
                     if (arrivalCalendarContainer) {
                         arrivalCalendarContainer.appendChild(legend.cloneNode(true));
+                        const arrivalTimeNotice = document.createElement('div');
+                        arrivalTimeNotice.className = 'time-restrictions-notice';
+                        arrivalTimeNotice.textContent = 'Check-in times: 9:00 AM - 7:00 PM only';
+                        arrivalCalendarContainer.appendChild(arrivalTimeNotice);
                     }
 
                     if (departureCalendarContainer) {
                         departureCalendarContainer.appendChild(legend.cloneNode(true));
+                        const departureTimeNotice = document.createElement('div');
+                        departureTimeNotice.className = 'time-restrictions-notice';
+                        departureTimeNotice.textContent = 'Check-out times: 7:00 AM - 5:00 PM only';
+                        departureCalendarContainer.appendChild(departureTimeNotice);
                     }
+
 
                 } catch (error) {
                     console.error('Error initializing calendars:', error);
@@ -3126,10 +3178,10 @@ $mysqli->close();
                 }
             }
 
-            document.addEventListener('DOMContentLoaded', function() {
-                // Wait for flatpickr to initialize
-                setTimeout(initEnhancedTimePicker, 500);
-            });
+            // document.addEventListener('DOMContentLoaded', function() {
+            //     // Wait for flatpickr to initialize
+            //     setTimeout(initEnhancedTimePicker, 500);
+            // });
 
 
             const urlParams = new URLSearchParams(window.location.search);

@@ -1,16 +1,29 @@
 <?php
 require_once('main_db.php');
 
-$userExists = false;
-if (isset($_SESSION['user_id'])) {
-    // Using your mysqli connection style
-    $query = "SELECT user_id FROM personal_info WHERE user_id = ?";
-    $stmt = $mysqli->prepare($query);
-    $stmt->bind_param("s", $_SESSION['user_id']);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $userExists = ($result->num_rows > 0);
-    $stmt->close();
+$userLoggedIn = isset($_SESSION['user_id']);
+$userVerified = false;
+$userExistsInPersonalInfo = false;
+
+if ($userLoggedIn) {
+    // Check if user exists in 'user' table (verified)
+    $queryUser = "SELECT user_id FROM user WHERE user_id = ?";
+    $stmtUser = $mysqli->prepare($queryUser);
+    $stmtUser->bind_param("s", $_SESSION['user_id']);
+    $stmtUser->execute();
+    $resultUser = $stmtUser->get_result();
+    $userVerified = ($resultUser->num_rows > 0);
+    $stmtUser->close();
+}
+if ($userVerified) {
+    // Check if user exists in personal_info table
+    $queryPersonalInfo = "SELECT user_id FROM personal_info WHERE user_id = ?";
+    $stmtPersonal = $mysqli->prepare($queryPersonalInfo);
+    $stmtPersonal->bind_param("s", $_SESSION['user_id']);
+    $stmtPersonal->execute();
+    $resultPersonal = $stmtPersonal->get_result();
+    $userExistsInPersonalInfo = ($resultPersonal->num_rows > 0);
+    $stmtPersonal->close();
 }
 ?>
 
@@ -141,10 +154,14 @@ if (isset($_SESSION['user_id'])) {
     <section class="ats-hero">
         <h2>Welcome to Alumni Statistics</h2>
         <p>You can view alumni data by querying the database for relevant metrics. This includes details like graduation year, employment status, and field of expertise. These insights help in understanding alumni trends and achievements.</p>
-        <?php if ($userExists): ?>
+        <?php if (!$userLoggedIn || $userExistsInPersonalInfo): ?>
             <a href="#services" class="cta-btn" id="scroll-btn">View Alumni Tracer</a>
+
+        <?php elseif ($userLoggedIn && !$userVerified): ?>
+            <a href="Account?section=Verify-Account" class="cta-btn">Take the Alumni Tracer Survey</a>
+
         <?php else: ?>
-            <a href="Account?section=Alumni-Tracer-Form" class="cta-btn" id="scroll-btn">Take the Alumni Tracer Survey</a>
+            <a href="Account?section=Alumni-Tracer-Form" class="cta-btn">Take the Alumni Tracer Survey</a>
         <?php endif; ?>
     </section>
 

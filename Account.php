@@ -6,16 +6,16 @@ require_once 'user/check_security_access.php';
 require('main_db.php');
 
 
-// $hasSubmittedTracer = false;
-// if (isset($_SESSION['user_id'])) {
-//     $check_tracer_sql = "SELECT id FROM personal_info WHERE user_id = ?";
-//     $check_tracer_stmt = $mysqli->prepare($check_tracer_sql);
-//     $check_tracer_stmt->bind_param("i", $_SESSION['user_id']);
-//     $check_tracer_stmt->execute();
-//     $check_tracer_result = $check_tracer_stmt->get_result();
-//     $hasSubmittedTracer = ($check_tracer_result->num_rows > 0);
-//     $check_tracer_stmt->close();
-// }
+$hasSubmittedTracer = false;
+if (isset($_SESSION['user_id'])) {
+    $check_tracer_sql = "SELECT id FROM personal_info WHERE user_id = ?";
+    $check_tracer_stmt = $mysqli->prepare($check_tracer_sql);
+    $check_tracer_stmt->bind_param("i", $_SESSION['user_id']);
+    $check_tracer_stmt->execute();
+    $check_tracer_result = $check_tracer_stmt->get_result();
+    $hasSubmittedTracer = ($check_tracer_result->num_rows > 0);
+    $check_tracer_stmt->close();
+}
 
 function isLoggedIn()
 {
@@ -100,7 +100,18 @@ $user = $result->fetch_assoc();
 
 if ($user) {
     $verified = $user['verified'];
-    $userStatus = $user['user_status'];
+
+    // Check if alumni_id_card_no exists in alumni table and if it's archived
+    if ($user['alumni_id_card_no'] && $user['is_archived'] === NULL) {
+        // alumni_id_card_no doesn't exist in alumni table
+        $userStatus = 'Guest';
+    } else if ($user['alumni_id_card_no'] && $user['is_archived'] == 1) {
+        // alumni_id_card_no exists but is archived
+        $userStatus = 'Guest';
+    } else {
+        // Use the status from database
+        $userStatus = $user['user_status'];
+    }
 } else {
     $verified = 0;
     $userStatus = 'Guest';
@@ -735,7 +746,9 @@ $_SESSION['has_booking'] = $hasBooking;
                 <?php endif; ?>
                 <li class="nav-item"><a href="?section=booking_history" class="nav-link"><i class="fas fa-calendar-check"></i> Booking History</a></li>
 
-                <li class="nav-item"><a href="?section=Alumni-Tracer-Form" class="nav-link"><i class="fas fa-user"></i> Alumni Tracer Form</a></li>
+                <?php if (!$hasSubmittedTracer && $verified == 1): ?>
+                    <li class="nav-item"><a href="?section=Alumni-Tracer-Form" class="nav-link"><i class="fas fa-user"></i> Alumni Tracer Form</a></li>
+                <?php endif; ?>
 
                 <li class="nav-item settings-dropdown">
                     <a href="#" class="nav-link settings-trigger">
@@ -823,14 +836,14 @@ $_SESSION['has_booking'] = $hasBooking;
             case 'recovery-email':
                 include 'user/security-page/recovery_emails.php';
                 break;
-            // case 'Alumni-Tracer-Form':
-            //     if (!$hasSubmittedTracer && $verified == 1) {
-            //         include 'user/alumni-tracer.php';
-            //     } else {
-            //         header("Location: Account?section=home");
-            //         exit();
-            //     }
-            //     break;
+            case 'Alumni-Tracer-Form':
+                if (!$hasSubmittedTracer && $verified == 1) {
+                    include 'user/alumni-tracer.php';
+                } else {
+                    header("Location: Account?section=home");
+                    exit();
+                }
+                break;
             case 'home':
             default:
                 include 'user/home.php';

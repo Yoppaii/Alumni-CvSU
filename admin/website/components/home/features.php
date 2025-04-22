@@ -4,7 +4,7 @@
             <i class="fas fa-bed"></i>
             Available Rooms
         </h2>
-
+ 
         <div class="slider-wrapper">
             <div class="swiper slider">
                 <div class="swiper-wrapper">
