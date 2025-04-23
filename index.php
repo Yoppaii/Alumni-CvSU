@@ -432,7 +432,7 @@ if (session_status() === PHP_SESSION_NONE) {
             text-align: center;
         }
 
-        .cvsu-nav-list .cvsu-login-btn {
+        /* .cvsu-nav-list .cvsu-login-btn {
             background-color: #f1f1f1;
             border-color: var(--cvsu-border-color);
             color: white;
@@ -442,7 +442,7 @@ if (session_status() === PHP_SESSION_NONE) {
             background-color: #f1e429;
             border-color: var(--cvsu-primary-green);
             color: white;
-        }
+        } */
 
         .cvsu-secondary-nav {
             padding: 0.25rem 0;

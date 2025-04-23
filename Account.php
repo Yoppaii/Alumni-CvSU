@@ -682,18 +682,18 @@ $_SESSION['has_booking'] = $hasBooking;
             <i class="fas fa-bars"></i>
         </button>
         <div class="header-right">
-            <button class="notification-btn">
-                <i class="fas fa-bell"></i>
-                <span class="notification-badge" style="display: none;">0</span>
-            </button>
+            <a href="Account?section=notification-settings" class="notification-btn"> <i class="fas fa-bell"></i>
+            </a>
+
+            <span class="notification-badge" style="display: none;">0</span>
             <div class="user-dropdown">
                 <div class="dropdown-trigger">
                     <span><?php echo isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest'; ?></span>
                     <i class="fas fa-caret-down"></i>
                 </div>
                 <div class="dropdown-menu">
-                    <a href="#">Profile</a>
-                    <a href="#">Settings</a>
+                    <a href="Account?section=home">Profile</a>
+                    <a href="Account?section=security-settings">Settings</a>
                     <a href="/Alumni-CvSU/user/logout.php">Log Out</a>
                 </div>
             </div>
