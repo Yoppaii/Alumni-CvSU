@@ -749,6 +749,8 @@ $_SESSION['has_booking'] = $hasBooking;
                 <?php if (!$hasSubmittedTracer && $verified == 1): ?>
                     <li class="nav-item"><a href="?section=Alumni-Tracer-Form" class="nav-link"><i class="fas fa-user"></i> Alumni Tracer Form</a></li>
                 <?php endif; ?>
+                <li class="nav-item"><a href="?section=Alumni-Tracer-Referal" class="nav-link"><i class="fas fa-user"></i> Alumni Tracer Referal</a></li>
+
 
                 <li class="nav-item settings-dropdown">
                     <a href="#" class="nav-link settings-trigger">
@@ -821,9 +823,6 @@ $_SESSION['has_booking'] = $hasBooking;
             case 'privacy-settings':
                 include 'user/privacy-settings.php';
                 break;
-            case 'Alumni-Tracer-Form':
-                include 'user/alumni-tracer.php';
-                break;
             case '2-step-verification':
                 include 'user/security-page/2_step_verification.php';
                 break;
@@ -843,6 +842,9 @@ $_SESSION['has_booking'] = $hasBooking;
                     header("Location: Account?section=home");
                     exit();
                 }
+                break;
+            case 'Alumni-Tracer-Referal':
+                include 'user/alumni_tracer_referal.php';
                 break;
             case 'home':
             default:

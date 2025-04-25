@@ -495,7 +495,7 @@ if (session_status() === PHP_SESSION_NONE) {
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="cvsu-dropdown-menu">
-                        <a href="Account?section=profile-settings"><i class="fas fa-user-circle"></i> Profile</a>
+                        <a href="Account?section=home"><i class="fas fa-user-circle"></i> Profile</a>
                         <a href="Account?section=Room-Reservation"><i class="fas fa-calendar-alt"></i> Bookings</a>
                         <a href="Account?section=notification-settings"><i class="fas fa-bell"></i> Notifications</a>
                         <div class="cvsu-dropdown-divider"></div>
@@ -522,7 +522,7 @@ if (session_status() === PHP_SESSION_NONE) {
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="cvsu-dropdown-menu">
-                        <a href="?section=profile-settings"><i class="fas fa-user-circle"></i> Profile</a>
+                        <a href="Account?section=home"><i class="fas fa-user-circle"></i> Profile</a>
                         <a href="?section=Room-Reservation"><i class="fas fa-calendar-alt"></i> Bookings</a>
                         <a href="?section=notification-settings"><i class="fas fa-bell"></i> Notifications</a>
                         <div class="cvsu-dropdown-divider"></div>

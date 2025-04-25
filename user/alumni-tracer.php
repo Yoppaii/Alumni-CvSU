@@ -1391,6 +1391,7 @@ ob_end_flush();
                 `;
                 container.appendChild(newPerson);
             };
+
             window.removePerson = function(button) {
                 if (personCount > 1) {
                     const personEntry = button.closest('.person-entry');
