@@ -60,19 +60,14 @@ $result = $mysqli->query($query);
             ?>
         </div>
 
-        <?php if ($result && $result->num_rows > 5) : ?>
-            <div class="announcement-actions">
-                <a href="?pages=news-features" class="announcement-view-all">
-                    See all announcements
-                    <i class="fas fa-chevron-right"></i>
-                </a>
-            </div>
-        <?php endif; ?>
+        <!-- Removed the conditional check to always show the "See all" link -->
+        <div class="announcement-actions">
+            <a href="?pages=announcement" class="announcement-view-all">
+                See all announcements
+                <i class="fas fa-chevron-right"></i>
+            </a>
+        </div>
     </div>
-</section>
-
-<section id="announcement-section">
-    <!-- PHP code and HTML structure remains the same -->
 </section>
 
 <style>
@@ -381,5 +376,24 @@ $result = $mysqli->query($query);
                 }
             });
         });
+
+        // Add hover effect for "See all announcements" link
+        const viewAllLink = document.querySelector('.announcement-view-all');
+        if (viewAllLink) {
+            viewAllLink.addEventListener('mouseenter', function() {
+                const icon = this.querySelector('i.fa-chevron-right');
+                if (icon) {
+                    icon.style.transition = 'transform 0.3s ease';
+                    icon.style.transform = 'translateX(4px)';
+                }
+            });
+
+            viewAllLink.addEventListener('mouseleave', function() {
+                const icon = this.querySelector('i.fa-chevron-right');
+                if (icon) {
+                    icon.style.transform = 'translateX(0)';
+                }
+            });
+        }
     });
 </script>

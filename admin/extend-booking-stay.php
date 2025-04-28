@@ -9,10 +9,15 @@ $input = json_decode(file_get_contents('php://input'), true);
 
 // First try to get booking_id from JSON input
 $bookingId = isset($input['booking_id']) ? intval($input['booking_id']) : 0;
+$newTotalPrice = isset($input['new_total_price']) ? floatval($input['new_total_price']) : 0;
 
 // If not found in JSON, check POST data
 if (!$bookingId && isset($_POST['booking_id'])) {
     $bookingId = intval($_POST['booking_id']);
+}
+
+if ($newTotalPrice === 0 && isset($_POST['new_total_price'])) {
+    $newTotalPrice = floatval($_POST['new_total_price']);
 }
 
 // Check if we're handling an extension confirmation
@@ -50,14 +55,14 @@ if ($isConfirmation && $newDepartureDate && $newDepartureTime) {
     // Update the booking with the new departure date and time
     $updateQuery = "
         UPDATE bookings 
-        SET departure_date = ?, departure_time = ?, status = 'checked_in'
+        SET departure_date = ?, departure_time = ?, status = 'checked_in', price = ?
         WHERE id = ?
     ";
 
     $updateStmt = $mysqli->prepare($updateQuery);
     $formattedDate = date('Y-m-d', strtotime($newDepartureDate));
     $formattedTime = date('H:i:s', strtotime($newDepartureTime));
-    $updateStmt->bind_param("ssi", $formattedDate, $formattedTime, $bookingId);
+    $updateStmt->bind_param("ssii", $formattedDate, $formattedTime, $newTotalPrice, $bookingId);
 
     if ($updateStmt->execute()) {
         echo json_encode(['success' => true, 'message' => 'Stay extended successfully']);

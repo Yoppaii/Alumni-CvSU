@@ -675,7 +675,7 @@ function formatOutput($data)
             </div>
         </div>
     </div>
-
+ 
     <script>
         // Notification system
         function showNotification(message, type = 'info') {

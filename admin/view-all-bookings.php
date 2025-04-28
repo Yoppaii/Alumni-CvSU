@@ -777,7 +777,7 @@ function getRoomDisplay($room_number)
                                 data-occupancy="<?php echo htmlspecialchars($booking['occupancy']); ?>"
                                 data-price-per-day="<?php echo htmlspecialchars($booking['price_per_day']); ?>"
                                 data-mattress-fee="<?php echo htmlspecialchars($booking['mattress_fee']); ?>"
-                                data-total-price="<?php echo htmlspecialchars($booking['total_price']); ?>">
+                                data-total-price="<?php echo htmlspecialchars($booking['price']); ?>">
                                 <td>
                                     <i class=" fas fa-bookmark"></i>
                                     <?php echo htmlspecialchars($booking['reference_number']); ?>
@@ -1291,10 +1291,11 @@ function getRoomDisplay($room_number)
                         return selectedDate;
                     }
 
-                    // Helper function to find the next unavailable date
+                    // Update the findNextUnavailableDateAfterDate function to better handle date extensions
                     function findNextUnavailableDateAfterDate(date) {
                         if (!date) return null;
-                        const dateStr = flatpickr.formatDate(date, "Y-m-d");
+                        const dateObj = date instanceof Date ? date : new Date(date);
+                        const dateStr = flatpickr.formatDate(dateObj, "Y-m-d");
 
                         // Create an array of all dates that are unavailable (either fully booked or arrival dates)
                         const unavailableDates = [];
@@ -1326,10 +1327,8 @@ function getRoomDisplay($room_number)
                         // Return the next unavailable date, or null if there are none
                         return unavailableDates.length > 0 ? unavailableDates[0] : null;
                     }
-
                     // Helper function to check if a date is valid for new departure
                     function isValidDepartureDate(date, arrivalDate) {
-                        // Modified to allow today's date
                         // Check if date is in the past (before today)
                         const today = new Date();
                         today.setHours(0, 0, 0, 0);
@@ -1361,8 +1360,13 @@ function getRoomDisplay($room_number)
                             return false;
                         }
 
-                        // Find the next unavailable date after our arrival
-                        const nextUnavailable = findNextUnavailableDateAfterDate(arrivalDate || today);
+                        // For extend stay, we need to check against the next booking after the current checkout
+                        // Find the next unavailable date after our current checkout
+                        const currentCheckout = extendData.currentDeparture || bookingData.checkout;
+
+                        // When extending, we should look for unavailable dates after the CURRENT checkout date,
+                        // not just after the arrival date
+                        const nextUnavailable = findNextUnavailableDateAfterDate(currentCheckout);
 
                         // If there's a next unavailable date, we can only select dates up to (but not including) it
                         if (nextUnavailable) {
@@ -1376,7 +1380,7 @@ function getRoomDisplay($room_number)
                             }
                         }
 
-                        // All other dates between arrival/today and next unavailable date are valid
+                        // All other dates between current checkout and next unavailable date are valid
                         return true;
                     }
 
@@ -1444,50 +1448,45 @@ function getRoomDisplay($room_number)
                         window.departureCalendar.destroy();
                     }
 
+                    // Update the departure calendar configuration
                     window.departureCalendar = flatpickr("#extend-departure-datetime", {
                         ...baseConfig,
                         minTime: "07:00", // 7am
                         maxTime: "17:00", // 5pm
-                        minDate: "today", // Always allow today's date
+                        minDate: bookingData.checkout || "today", // Set min date to current checkout date
                         onChange: function(selectedDates) {
                             if (selectedDates.length > 0) {
                                 let selectedDate = selectedDates[0];
-                                const dateStr = flatpickr.formatDate(selectedDate, "Y-m-d");
 
                                 // First enforce time constraints
                                 selectedDate = enforceTimeConstraints(selectedDate);
 
-                                // Modified to make today a valid date
-                                const today = new Date();
-                                const selectedDateOnly = new Date(selectedDate);
-                                selectedDateOnly.setHours(0, 0, 0, 0);
-                                today.setHours(0, 0, 0, 0);
+                                // Get the current checkout date for comparison
+                                const currentCheckout = extendData.currentDeparture || bookingData.checkout;
 
-                                // If arrival date exists and selected date is before it (except for today)
-                                if (bookingData.arrival && selectedDate < bookingData.arrival &&
-                                    selectedDateOnly.getTime() !== today.getTime()) {
-                                    NotificationSystem.show('The departure date cannot be before your arrival date.', 'error');
+                                // For extending stay, the selected date must be after the current checkout
+                                if (currentCheckout && selectedDate <= currentCheckout) {
+                                    NotificationSystem.show('The new departure date must be after your current checkout date.', 'error');
                                     window.departureCalendar.clear();
                                     return;
                                 }
 
-                                // Checking for valid date based on bookingData.arrival (allowing today)
-                                if (!isValidDepartureDate(selectedDate, bookingData.arrival) &&
-                                    selectedDateOnly.getTime() !== today.getTime()) {
+                                // Check if this is a valid date to extend to
+                                if (!isValidDepartureDate(selectedDate, bookingData.arrival)) {
                                     NotificationSystem.show('This date is not available for extending your stay. Please select another date.', 'error');
                                     window.departureCalendar.clear();
                                     return;
                                 }
 
-                                // Find the next unavailable date after our arrival
-                                const nextUnavailable = findNextUnavailableDateAfterDate(bookingData.arrival || today);
+                                // Find the next unavailable date after current checkout
+                                const nextUnavailable = findNextUnavailableDateAfterDate(currentCheckout);
 
                                 // Special handling for dates adjacent to next check-in
                                 if (nextUnavailable && nextUnavailable.type === 'check-in') {
                                     const nextUnavailableDateStr = nextUnavailable.date;
                                     const checkoutDateStr = flatpickr.formatDate(selectedDate, "Y-m-d");
 
-                                    // If the selected date is the day before the next check-in
+                                    // If the selected date is the day of the next check-in
                                     if (checkoutDateStr === nextUnavailableDateStr) {
                                         NotificationSystem.show('Cannot check out on a day that has an incoming guest. Please select an earlier date.', 'error');
                                         window.departureCalendar.clear();
@@ -1537,16 +1536,23 @@ function getRoomDisplay($room_number)
                                 return true;
                             }
 
-                            // Today's date should always be selectable
-                            if (date.getTime() === today.getTime()) {
-                                return false;
+                            // Get current checkout date
+                            const currentCheckout = extendData.currentDeparture || bookingData.checkout;
+                            if (currentCheckout) {
+                                const currentCheckoutOnly = new Date(currentCheckout);
+                                currentCheckoutOnly.setHours(0, 0, 0, 0);
+
+                                // If the date is on or before the current checkout, disable it
+                                // We want to select dates AFTER the current checkout for extension
+                                if (date <= currentCheckoutOnly) {
+                                    return true;
+                                }
                             }
 
                             // For other dates, use our validation function
                             return !isValidDepartureDate(date, bookingData.arrival);
                         }]
                     });
-
                     // Add a MutationObserver to ensure checkout-available-date is never disabled
                     const observer = new MutationObserver(mutations => {
                         mutations.forEach(mutation => {
@@ -2297,6 +2303,7 @@ function getRoomDisplay($room_number)
                             }
                             extendData.newDeparture = new Date(departureInput.value);
                             updateExtendSummary();
+
                         }
 
                         currentExtendStep++;
@@ -2316,11 +2323,22 @@ function getRoomDisplay($room_number)
                     // Format the new departure date and time
                     const newDepartureDate = extendData.newDeparture.toISOString().split('T')[0];
                     const newDepartureTime = extendData.newDeparture.toTimeString().split(' ')[0];
+                    const additionalPrice = parseFloat(document.getElementById('extend-summary-extra-cost').textContent.replace(/[^0-9.-]+/g, '')) || 0;
+                    const totalPrice = parseFloat(extendData.originalTotalPrice) || 0;
+                    const newTotalPrice = totalPrice + additionalPrice;
+
+
+                    console.log('Additional Price:', additionalPrice);
+                    console.log('Current total price:', totalPrice);
+                    console.log('New total price:', newTotalPrice);
 
                     const formData = new FormData();
                     formData.append('booking_id', extendData.bookingId);
                     formData.append('new_departure_date', newDepartureDate);
                     formData.append('new_departure_time', newDepartureTime);
+                    formData.append('new_total_price', newTotalPrice);
+
+                    console.log('Form data:', Array.from(formData.entries()));
 
                     const response = await fetch('/Alumni-CvSU/admin/extend-booking-stay.php', {
                         method: 'POST',
@@ -2362,6 +2380,13 @@ function getRoomDisplay($room_number)
                 extendData.currentDepartureDate = currentDepartureDate;
                 extendData.currentDepartureTime = currentDepartureTime;
                 extendData.pricePerDay = pricePerDay;
+
+                const bookingRow = document.querySelector(`tr[data-booking-id="${bookingId}"]`);
+                const totalPrice = bookingRow ? parseFloat(bookingRow.getAttribute('data-total-price') || '0') : 0;
+                extendData.originalTotalPrice = totalPrice;
+
+                console.log('Original total price:', totalPrice);
+
 
                 // Create a combined date string for display purposes
                 const combinedDeparture = `${currentDepartureDate}T${currentDepartureTime}`;

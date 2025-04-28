@@ -31,501 +31,552 @@ $check_existing->close();
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alumni ID Application</title>
 </head>
-    <style>
-        :root {
-            --primary-color: #2d6936;
-            --secondary-color: #1e40af;
-            --background-color: #f4f6f8;
-            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
+<style>
+    :root {
+        --primary-color: #2d6936;
+        --secondary-color: #1e40af;
+        --background-color: #f4f6f8;
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
 
-        body {
-            background: var(--background-color);
-            min-height: 100vh;
-            padding: 10px;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        }
+    body {
+        background: var(--background-color);
+        min-height: 100vh;
+        padding: 10px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
 
-        .unique-alumni-id-form {
-            background: white;
-            border-radius: 8px;
-            box-shadow: var(--shadow-md);
-            overflow: hidden;
-            margin: 20px auto;
-            max-width: auto;
+    .unique-alumni-id-form {
+        background: white;
+        border-radius: 8px;
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+        margin: 20px auto;
+        max-width: auto;
+    }
+
+    .unique-alumni-id-header-container {
+        display: flex;
+        align-items: center;
+        padding: 20px;
+        background-color: #f9fafb;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .unique-alumni-id-logo-container {
+        width: 80px;
+        margin-right: 20px;
+    }
+
+    .unique-alumni-id-logo {
+        width: 100%;
+        height: auto;
+    }
+
+    .unique-alumni-id-text-container {
+        flex: 1;
+    }
+
+    .unique-alumni-id-text-container p {
+        margin: 0;
+        line-height: 1.4;
+    }
+
+    .unique-alumni-id-university-name {
+        font-size: 18px;
+        font-weight: 600;
+        color: #111827;
+    }
+
+    .unique-alumni-id-campus-name,
+    .unique-alumni-id-alumni-association,
+    .unique-alumni-id-sec-registration,
+    .unique-alumni-id-location {
+        font-size: 14px;
+        color: #6b7280;
+    }
+
+    h2 {
+        font-size: 24px;
+        color: #111827;
+        margin: 0;
+        padding: 24px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .unique-form-row {
+        display: flex;
+        gap: 24px;
+        padding: 24px;
+    }
+
+    .unique-form-column {
+        flex: 1;
+        min-width: 0;
+    }
+
+    label {
+        display: block;
+        color: #111827;
+        font-size: 16px;
+        font-weight: 500;
+        margin-bottom: 8px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="number"],
+    select {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        font-size: 14px;
+        color: #374151;
+        margin-bottom: 16px;
+        transition: border-color 0.2s ease;
+    }
+
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="number"]:focus,
+    select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px rgba(45, 105, 54, 0.1);
+    }
+
+    button[type="submit"] {
+        display: block;
+        width: calc(100% - 48px);
+        margin: 0 24px 24px;
+        padding: 12px;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+
+    button[type="submit"]:hover {
+        background-color: #235329;
+    }
+
+    .alumni-details {
+        background: white;
+        border-radius: 8px;
+        box-shadow: var(--shadow-md);
+        margin: 20px auto;
+        max-width: auto;
+    }
+
+    .details-container {
+        display: flex;
+        gap: 24px;
+        padding: 24px;
+    }
+
+    .details-column {
+        flex: 1;
+    }
+
+    .detail-item {
+        margin-bottom: 16px;
+    }
+
+    .detail-item label {
+        font-weight: 600;
+        color: #111827;
+        margin-right: 8px;
+    }
+
+    .status-message {
+        padding: 24px;
+        border-top: 1px solid #e5e7eb;
+        text-align: center;
+    }
+
+    .application-status {
+        display: inline-block;
+        padding: 8px 16px;
+        border-radius: 4px;
+        font-weight: 500;
+        margin-top: 12px;
+    }
+
+    .application-status.pending {
+        background-color: #fef3c7;
+        color: #92400e;
+    }
+
+    .application-status.approved {
+        background-color: #d1fae5;
+        color: #065f46;
+    }
+
+    .application-status.rejected {
+        background-color: #fee2e2;
+        color: #991b1b;
+    }
+
+    .action-buttons {
+        padding: 0 24px 24px;
+        text-align: center;
+    }
+
+    .cancel-button {
+        padding: 8px 16px;
+        background-color: #ef4444;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+
+    .cancel-button:hover {
+        background-color: #dc2626;
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+    }
+
+    .modal-content {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        max-width: 400px;
+        width: 90%;
+        text-align: center;
+        position: relative;
+        z-index: 2001;
+    }
+
+    .modal-content h3 {
+        margin: 0 0 16px;
+        color: #111827;
+    }
+
+    .modal-content textarea {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        margin-bottom: 16px;
+        resize: vertical;
+    }
+
+    .modal-buttons {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+    }
+
+    .back-button,
+    .confirm-button {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+
+    .back-button {
+        background-color: #9ca3af;
+        color: white;
+    }
+
+    .confirm-button {
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+    @media (max-width: 640px) {
+        .unique-form-row {
+            flex-direction: column;
+            gap: 0;
         }
 
         .unique-alumni-id-header-container {
-            display: flex;
-            align-items: center;
-            padding: 20px;
-            background-color: #f9fafb;
-            border-bottom: 1px solid #e5e7eb;
+            flex-direction: column;
+            text-align: center;
         }
 
         .unique-alumni-id-logo-container {
-            width: 80px;
-            margin-right: 20px;
-        }
-
-        .unique-alumni-id-logo {
-            width: 100%;
-            height: auto;
-        }
-
-        .unique-alumni-id-text-container {
-            flex: 1;
-        }
-
-        .unique-alumni-id-text-container p {
-            margin: 0;
-            line-height: 1.4;
-        }
-
-        .unique-alumni-id-university-name {
-            font-size: 18px;
-            font-weight: 600;
-            color: #111827;
-        }
-
-        .unique-alumni-id-campus-name,
-        .unique-alumni-id-alumni-association,
-        .unique-alumni-id-sec-registration,
-        .unique-alumni-id-location {
-            font-size: 14px;
-            color: #6b7280;
-        }
-
-        h2 {
-            font-size: 24px;
-            color: #111827;
-            margin: 0;
-            padding: 24px;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        .unique-form-row {
-            display: flex;
-            gap: 24px;
-            padding: 24px;
-        }
-
-        .unique-form-column {
-            flex: 1;
-            min-width: 0;
-        }
-
-        label {
-            display: block;
-            color: #111827;
-            font-size: 16px;
-            font-weight: 500;
-            margin-bottom: 8px;
-        }
-
-        input[type="text"],
-        input[type="email"],
-        input[type="number"],
-        select {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid #e5e7eb;
-            border-radius: 6px;
-            font-size: 14px;
-            color: #374151;
-            margin-bottom: 16px;
-            transition: border-color 0.2s ease;
-        }
-
-        input[type="text"]:focus,
-        input[type="email"]:focus,
-        input[type="number"]:focus,
-        select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(45, 105, 54, 0.1);
-        }
-
-        button[type="submit"] {
-            display: block;
-            width: calc(100% - 48px);
-            margin: 0 24px 24px;
-            padding: 12px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-
-        button[type="submit"]:hover {
-            background-color: #235329;
-        }
-
-        .alumni-details {
-            background: white;
-            border-radius: 8px;
-            box-shadow: var(--shadow-md);
-            margin: 20px auto;
-            max-width: auto;
+            margin: 0 0 16px 0;
         }
 
         .details-container {
-            display: flex;
-            gap: 24px;
-            padding: 24px;
-        }
-
-        .details-column {
-            flex: 1;
-        }
-
-        .detail-item {
-            margin-bottom: 16px;
-        }
-
-        .detail-item label {
-            font-weight: 600;
-            color: #111827;
-            margin-right: 8px;
-        }
-
-        .status-message {
-            padding: 24px;
-            border-top: 1px solid #e5e7eb;
-            text-align: center;
-        }
-
-        .application-status {
-            display: inline-block;
-            padding: 8px 16px;
-            border-radius: 4px;
-            font-weight: 500;
-            margin-top: 12px;
-        }
-
-        .application-status.pending {
-            background-color: #fef3c7;
-            color: #92400e;
-        }
-
-        .application-status.approved {
-            background-color: #d1fae5;
-            color: #065f46;
-        }
-
-        .application-status.rejected {
-            background-color: #fee2e2;
-            color: #991b1b;
-        }
-
-        .action-buttons {
-            padding: 0 24px 24px;
-            text-align: center;
-        }
-
-        .cancel-button {
-            padding: 8px 16px;
-            background-color: #ef4444;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-
-        .cancel-button:hover {
-            background-color: #dc2626;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            max-width: 400px;
-            width: 90%;
-            text-align: center;
-            position: relative; 
-            z-index: 2001; 
-        }
-
-        .modal-content h3 {
-            margin: 0 0 16px;
-            color: #111827;
-        }
-
-        .modal-content textarea {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #e5e7eb;
-            border-radius: 6px;
-            margin-bottom: 16px;
-            resize: vertical;
-        }
-
-        .modal-buttons {
-            display: flex;
-            gap: 12px;
-            justify-content: flex-end;
-        }
-
-        .back-button,
-        .confirm-button {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-
-        .back-button {
-            background-color: #9ca3af;
-            color: white;
-        }
-
-        .confirm-button {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        @media (max-width: 640px) {
-            .unique-form-row {
-                flex-direction: column;
-                gap: 0;
-            }
-
-            .unique-alumni-id-header-container {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .unique-alumni-id-logo-container {
-                margin: 0 0 16px 0;
-            }
-
-            .details-container {
-                flex-direction: column;
-                gap: 0;
-            }
-
-            button[type="submit"] {
-                width: calc(100% - 32px);
-                margin: 0 16px 16px;
-            }
-        }
-
-        #loadingOverlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-        }
-
-        .loading-content {
-            text-align: center;
-            display: flex;
             flex-direction: column;
-            align-items: center;
-            gap: 15px;
+            gap: 0;
         }
 
-        .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid var(--primary-color);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+        button[type="submit"] {
+            width: calc(100% - 32px);
+            margin: 0 16px 16px;
+        }
+    }
+
+    #loadingOverlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+    }
+
+    .loading-content {
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid var(--primary-color);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    .loading-text {
+        color: white;
+        font-size: 14px;
+        font-weight: 500;
+        animation: pulse 1.5s ease-in-out infinite;
+        margin: 0;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
         }
 
-        .loading-text {
-            color: white;
-            font-size: 14px;
-            font-weight: 500;
-            animation: pulse 1.5s ease-in-out infinite;
-            margin: 0;
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    @keyframes pulse {
+        0% {
+            opacity: 0.6;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        50% {
+            opacity: 1;
         }
 
-        @keyframes pulse {
-            0% { opacity: 0.6; }
-            50% { opacity: 1; }
-            100% { opacity: 0.6; }
+        100% {
+            opacity: 0.6;
         }
+    }
 
-        .loading-overlay-show {
-            animation: fadeIn 0.3s ease-in-out forwards;
-        }
+    .loading-overlay-show {
+        animation: fadeIn 0.3s ease-in-out forwards;
+    }
 
-        .loading-overlay-hide {
-            animation: fadeOut 0.3s ease-in-out forwards;
-        }
+    .loading-overlay-hide {
+        animation: fadeOut 0.3s ease-in-out forwards;
+    }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
-        }
-        .notification-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-        }
-
-        .notification {
-            background: white;
-            padding: 15px 20px;
-            border-radius: 6px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            min-width: 300px;
-            max-width: 450px;
-            transform: translateX(120%);
+    @keyframes fadeIn {
+        from {
             opacity: 0;
-            transition: all 0.3s ease-in-out;
         }
 
-        .notification.visible {
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes fadeOut {
+        from {
+            opacity: 1;
+        }
+
+        to {
+            opacity: 0;
+        }
+    }
+
+    .notification-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+    }
+
+    /* Notification styles */
+    #notificationContainer {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1050;
+        max-width: 400px;
+        width: 100%;
+    }
+
+    .notification {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        margin-bottom: 10px;
+        animation: slideIn 0.3s ease-out forwards;
+        min-width: 300px;
+        max-width: 400px;
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideOut {
+        from {
             transform: translateX(0);
             opacity: 1;
         }
 
-        .notification.success {
-            background: #2d6936;
-            color: white;
-            border-left: 4px solid #1a4721;
+        to {
+            transform: translateX(100%);
+            opacity: 0;
         }
+    }
 
-        .notification.error {
-            background: #dc2626;
-            color: white;
-            border-left: 4px solid #991b1b;
-        }
+    .notification.error {
+        border-left: 4px solid #ef4444;
+    }
 
-        .notification.warning {
-            background: #f59e0b;
-            color: white;
-            border-left: 4px solid #b45309;
-        }
+    .notification.success {
+        border-left: 4px solid #10b981;
+    }
 
-        .notification-close {
-            background: none;
-            border: none;
-            color: currentColor;
-            cursor: pointer;
-            padding: 0 5px;
-            margin-left: 10px;
-            font-size: 20px;
-            opacity: 0.8;
-            transition: opacity 0.2s;
-        }
+    .notification.warning {
+        border-left: 4px solid #f59e0b;
+    }
 
-        .notification-close:hover {
-            opacity: 1;
-        }
-        .application-status {
-            display: inline-block;
-            padding: 8px 16px;
-            border-radius: 4px;
-            font-weight: 500;
-            margin-top: 12px;
-        }
+    .notification.info {
+        border-left: 4px solid #3b82f6;
+    }
 
-        .application-status.pending {
-            background-color: #fef3c7;
-            color: #92400e;
-        }
+    .notification-close {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        padding: 4px;
+        color: #64748b;
+    }
 
-        .application-status.declined {
-            background-color: #fee2e2;
-            color: #991b1b;
-        }
+    .notification-close:hover {
+        color: #1e293b;
+    }f
 
-        .application-status.paid {
-            background-color: #dbeafe;
-            color: #1e40af;
-        }
+    .application-status {
+        display: inline-block;
+        padding: 8px 16px;
+        border-radius: 4px;
+        font-weight: 500;
+        margin-top: 12px;
+    }
 
-        .application-status.confirmed {
-            background-color: #d1fae5;
-            color: #065f46;
-        }
-        .download-button {
-            padding: 8px 16px;
-            background-color: var(--secondary-color);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-            margin-left: 10px;
-        }
+    .application-status.pending {
+        background-color: #fef3c7;
+        color: #92400e;
+    }
 
-        .download-button:hover {
-            background-color: #1e3a8a;
-        }
+    .application-status.declined {
+        background-color: #fee2e2;
+        color: #991b1b;
+    }
 
-        .action-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            padding: 0 24px 24px;
-        }
-        .apply-alumni-button {
-            padding: 8px 16px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-            margin-left: 10px;
-        }
+    .application-status.paid {
+        background-color: #dbeafe;
+        color: #1e40af;
+    }
 
-        .apply-alumni-button:hover {
-            background-color: #235329;
-        }
-    </style>
+    .application-status.confirmed {
+        background-color: #d1fae5;
+        color: #065f46;
+    }
+
+    .download-button {
+        padding: 8px 16px;
+        background-color: var(--secondary-color);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        margin-left: 10px;
+    }
+
+    .download-button:hover {
+        background-color: #1e3a8a;
+    }
+
+    .action-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        padding: 0 24px 24px;
+    }
+
+    .apply-alumni-button {
+        padding: 8px 16px;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        margin-left: 10px;
+    }
+
+    .apply-alumni-button:hover {
+        background-color: #235329;
+    }
+</style>
+
 <body>
     <div id="loadingOverlay">
         <div class="loading-content">
@@ -555,10 +606,10 @@ $check_existing->close();
 
         <div class="unique-form-row">
             <div class="unique-form-column">
-                <label for="unique-last-name">Last Name</label>
+                <label for="unique-last-name">Last Name<span style="color: red;">*</span></label>
                 <input type="text" id="unique-last-name" name="last_name" required>
 
-                <label for="unique-first-name">First Name</label>
+                <label for="unique-first-name">First Name<span style="color: red;">*</span></label>
                 <input type="text" id="unique-first-name" name="first_name" required>
 
                 <label for="unique-middle-name">Middle Name</label>
@@ -569,21 +620,21 @@ $check_existing->close();
             </div>
 
             <div class="unique-form-column">
-                <label for="unique-course-name">Course</label>
+                <label for="unique-course-name">Course<span style="color: red;">*</span></label>
                 <input type="text" id="unique-course-name" name="course" required>
 
-                <label for="unique-year-graduated">Year Graduated</label>
+                <label for="unique-year-graduated">Year Graduated<span style="color: red;">*</span></label>
                 <input type="number" id="unique-year-graduated" name="year_graduated" required>
 
-                <label for="unique-highschool-graduated">High School Graduated</label>
+                <label for="unique-highschool-graduated">High School Graduated<span style="color: red;">*</span></label>
                 <input type="text" id="unique-highschool-graduated" name="highschool_graduated" required>
 
-                <label for="unique-membership-type">Membership Type</label>
+                <label for="unique-membership-type">Membership Type<span style="color: red;">*</span></label>
                 <select id="unique-membership-type" name="membership_type" required onchange="updatePrice()">
                     <option value="5_years">5 Years (₱500.00)</option>
                     <option value="lifetime">Lifetime (₱1,500.00)</option>
                 </select>
-                
+
                 <div class="price-display" style="margin-bottom: 16px;">
                     <label>Membership Fee:</label>
                     <span id="membership-price" style="font-weight: bold; color: #2d6936;">₱500.00</span>
@@ -591,6 +642,7 @@ $check_existing->close();
                 </div>
             </div>
         </div>
+
 
         <button type="submit">Submit</button>
     </form>
@@ -611,7 +663,7 @@ $check_existing->close();
         </div>
 
         <h2>Alumni ID Application Details</h2>
-        
+
         <div class="details-container">
             <div class="details-column">
                 <div class="detail-item">
@@ -631,7 +683,7 @@ $check_existing->close();
                     <span id="display-email"></span>
                 </div>
             </div>
-            
+
             <div class="details-column">
                 <div class="detail-item">
                     <label>Course:</label>
@@ -690,7 +742,7 @@ $check_existing->close();
                 <button type="button" class="apply-alumni-button" onclick="window.location.href='?section=re-apply-account'">Apply for Alumni User Account</button>
             <?php endif; ?>
         </div>
-        
+
         <div id="cancelModal" class="modal">
             <div class="modal-content">
                 <h3>Cancel Application</h3>
@@ -732,7 +784,7 @@ $check_existing->close();
             const membershipType = document.getElementById('unique-membership-type').value;
             const priceDisplay = document.getElementById('membership-price');
             const priceInput = document.getElementById('price-input');
-            
+
             const price = membershipType === 'lifetime' ? 1500.00 : 500.00;
             priceDisplay.textContent = `₱${price.toFixed(2)}`;
             priceInput.value = price.toFixed(2);
@@ -741,17 +793,17 @@ $check_existing->close();
         function showLoading(message = 'Loading...') {
             const overlay = document.getElementById('loadingOverlay');
             const loadingText = overlay.querySelector('.loading-text');
-            
+
             loadingText.textContent = message;
             overlay.style.display = 'flex';
-            overlay.offsetHeight; 
+            overlay.offsetHeight;
             overlay.classList.add('loading-overlay-show');
         }
 
         function hideLoading() {
             const overlay = document.getElementById('loadingOverlay');
             overlay.classList.add('loading-overlay-hide');
-            
+
             setTimeout(() => {
                 overlay.style.display = 'none';
                 overlay.classList.remove('loading-overlay-show', 'loading-overlay-hide');
@@ -762,10 +814,10 @@ $check_existing->close();
             const container = document.getElementById('notificationContainer');
             const notification = document.createElement('div');
             notification.className = `notification ${type}`;
-            
+
             const messageSpan = document.createElement('span');
             messageSpan.textContent = message;
-            
+
             const closeButton = document.createElement('button');
             closeButton.className = 'notification-close';
             closeButton.innerHTML = '×';
@@ -775,13 +827,13 @@ $check_existing->close();
                     container.removeChild(notification);
                 }, 300);
             };
-            
+
             notification.appendChild(messageSpan);
             notification.appendChild(closeButton);
             container.appendChild(notification);
-            
+
             notification.offsetHeight;
-            
+
             notification.classList.add('visible');
 
             setTimeout(() => {
@@ -843,11 +895,6 @@ $check_existing->close();
                         errorMessage = 'Please enter a valid email address';
                     }
                     break;
-                default:
-                    if (!value && input.hasAttribute('required')) {
-                        isValid = false;
-                        errorMessage = 'This field is required';
-                    }
             }
 
             if (!isValid) {
@@ -887,7 +934,7 @@ $check_existing->close();
             document.getElementById('display-course').textContent = formData.course;
             document.getElementById('display-year-graduated').textContent = formData.year_graduated;
             document.getElementById('display-highschool-graduated').textContent = formData.highschool_graduated;
-            document.getElementById('display-membership-type').textContent = 
+            document.getElementById('display-membership-type').textContent =
                 `${formData.membership_type === 'lifetime' ? 'Lifetime' : '5 Years'} (${parseFloat(formData.price).toFixed(2)})`;
 
             let statusMessage = '';
@@ -944,7 +991,7 @@ $check_existing->close();
 
         function confirmCancellation() {
             const reason = document.getElementById('cancellationReason').value.trim();
-            
+
             if (!reason) {
                 showNotification('Please provide a reason for cancellation', 'warning');
                 return;
@@ -952,37 +999,37 @@ $check_existing->close();
 
             showLoading('Processing cancellation...');
             hideCancelModal();
-            
+
             fetch('/Alumni-CvSU/user/cancel_alumni_id.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    reason: reason
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        reason: reason
+                    })
                 })
-            })
-            .then(response => response.json())
-            .then(data => {
-                setTimeout(() => {
-                    hideLoading();
-                    if (data.success) {
-                        showNotification('Application cancelled successfully', 'success');
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 2000);
-                    } else {
-                        showNotification(data.message || 'Error cancelling application', 'error');
-                    }
-                }, 1000);
-            })
-            .catch(error => {
-                setTimeout(() => {
-                    hideLoading();
-                    showNotification('An error occurred. Please try again.', 'error');
-                    console.error('Error:', error);
-                }, 1000);
-            });
+                .then(response => response.json())
+                .then(data => {
+                    setTimeout(() => {
+                        hideLoading();
+                        if (data.success) {
+                            showNotification('Application cancelled successfully', 'success');
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 2000);
+                        } else {
+                            showNotification(data.message || 'Error cancelling application', 'error');
+                        }
+                    }, 1000);
+                })
+                .catch(error => {
+                    setTimeout(() => {
+                        hideLoading();
+                        showNotification('An error occurred. Please try again.', 'error');
+                        console.error('Error:', error);
+                    }, 1000);
+                });
         }
 
         window.jsPDF = window.jspdf.jsPDF;
@@ -1010,7 +1057,7 @@ $check_existing->close();
         async function generatePDF() {
             try {
                 showLoading('Generating PDF...');
-                
+
                 const details = {
                     lastName: document.getElementById('display-last-name').textContent,
                     firstName: document.getElementById('display-first-name').textContent,
@@ -1041,21 +1088,33 @@ $check_existing->close();
 
                 doc.setFontSize(16);
                 doc.setFont('helvetica', 'bold');
-                doc.text('CAVITE STATE UNIVERSITY', pageWidth / 2, yPos + 10, { align: 'center' });
-                
+                doc.text('CAVITE STATE UNIVERSITY', pageWidth / 2, yPos + 10, {
+                    align: 'center'
+                });
+
                 yPos += 15;
                 doc.setFontSize(12);
                 doc.setFont('helvetica', 'normal');
-                doc.text('DON SEVERINO DELAS ALAS CAMPUS', pageWidth / 2, yPos + 10, { align: 'center' });
-                doc.text('ALUMNI ASSOCIATION, INC.', pageWidth / 2, yPos + 15, { align: 'center' });
-                doc.text('SEC Registration No. 2023110126538-08', pageWidth / 2, yPos + 20, { align: 'center' });
-                doc.text('Indang, Cavite, Philippines', pageWidth / 2, yPos + 25, { align: 'center' });
+                doc.text('DON SEVERINO DELAS ALAS CAMPUS', pageWidth / 2, yPos + 10, {
+                    align: 'center'
+                });
+                doc.text('ALUMNI ASSOCIATION, INC.', pageWidth / 2, yPos + 15, {
+                    align: 'center'
+                });
+                doc.text('SEC Registration No. 2023110126538-08', pageWidth / 2, yPos + 20, {
+                    align: 'center'
+                });
+                doc.text('Indang, Cavite, Philippines', pageWidth / 2, yPos + 25, {
+                    align: 'center'
+                });
 
                 yPos += 45;
 
                 doc.setFontSize(14);
                 doc.setFont('helvetica', 'bold');
-                doc.text('ALUMNI ID APPLICATION', pageWidth / 2, yPos, { align: 'center' });
+                doc.text('ALUMNI ID APPLICATION', pageWidth / 2, yPos, {
+                    align: 'center'
+                });
 
                 yPos += 5;
                 doc.setDrawColor(70, 70, 70);
@@ -1067,7 +1126,7 @@ $check_existing->close();
                 doc.setFont('helvetica', 'bold');
                 doc.setTextColor(0, 0, 150);
                 doc.text('Application Status: CONFIRMED', leftMargin, yPos);
-                doc.setTextColor(0, 0, 0); 
+                doc.setTextColor(0, 0, 0);
 
                 yPos += 15;
                 doc.setFontSize(12);
@@ -1097,13 +1156,13 @@ $check_existing->close();
                 doc.setFontSize(12);
                 doc.setFont('helvetica', 'bold');
                 doc.text('Next Steps:', leftMargin, yPos);
-                
+
                 yPos += 8;
                 doc.setFontSize(10);
                 doc.setFont('helvetica', 'normal');
                 doc.setFillColor(248, 248, 248);
-                doc.rect(leftMargin - 3, yPos - 3, pageWidth - (2 * (leftMargin - 3)), 45, 'F'); 
-                
+                doc.rect(leftMargin - 3, yPos - 3, pageWidth - (2 * (leftMargin - 3)), 45, 'F');
+
                 const instructions = [
                     'Please follow these steps to complete your Alumni ID application:',
                     '1. Print this application summary',
@@ -1122,7 +1181,7 @@ $check_existing->close();
                 doc.setFontSize(12);
                 doc.setFont('helvetica', 'bold');
                 doc.text('Alumni Benefits:', leftMargin, yPos);
-                
+
                 yPos += 8;
                 doc.setFontSize(10);
                 doc.setFont('helvetica', 'normal');
@@ -1154,7 +1213,7 @@ $check_existing->close();
         document.querySelector('.unique-alumni-id-form')?.addEventListener('submit', function(e) {
             e.preventDefault();
             showLoading('Processing. Please Wait...');
-            
+
             const formData = new FormData(this);
             const formValues = {};
             formData.forEach((value, key) => {
@@ -1169,38 +1228,39 @@ $check_existing->close();
             }
 
             fetch('/Alumni-CvSU/user/process_alumni_id.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                setTimeout(() => {
-                    hideLoading();
-                    if (data.success) {
-                        showNotification(data.message, 'success');
-                        this.style.display = 'none';
-                        formValues.status = 'pending';
-                        displayAlumniDetails(formValues);
-                    } else {
-                        showNotification(data.message || 'An error occurred', 'error');
-                    }
-                }, 2000);
-            })
-            .catch(error => {
-                setTimeout(() => {
-                    hideLoading();
-                    showNotification('An error occurred. Please try again.', 'error');
-                    console.error('Error:', error);
-                }, 1000);
-            });
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    setTimeout(() => {
+                        hideLoading();
+                        if (data.success) {
+                            showNotification(data.message, 'success');
+                            this.style.display = 'none';
+                            formValues.status = 'pending';
+                            displayAlumniDetails(formValues);
+                        } else {
+                            showNotification(data.message || 'An error occurred', 'error');
+                        }
+                    }, 2000);
+                })
+                .catch(error => {
+                    setTimeout(() => {
+                        hideLoading();
+                        showNotification('An error occurred. Please try again.', 'error');
+                        console.error('Error:', error);
+                    }, 1000);
+                });
         });
 
         <?php if ($existing_application): ?>
-        document.addEventListener('DOMContentLoaded', function() {
-            const applicationData = <?php echo json_encode($existing_application); ?>;
-            displayAlumniDetails(applicationData);
-        });
+            document.addEventListener('DOMContentLoaded', function() {
+                const applicationData = <?php echo json_encode($existing_application); ?>;
+                displayAlumniDetails(applicationData);
+            });
         <?php endif; ?>
     </script>
 </body>
+
 </html>

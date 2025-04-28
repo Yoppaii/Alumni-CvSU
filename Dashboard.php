@@ -884,6 +884,9 @@ if (!isset($_SESSION['admin_id'])) {
                         <a href="?section=paid-alumni-id" class="dropdown-item">
                             <i class="fas fa-plus-circle"></i>Paid Alumni ID
                         </a>
+                        <a href="?section=cancelled-alumni-id" class="dropdown-item">
+                            <i class="fas fa-plus-circle"></i>Cancelled Alumni ID
+                        </a>
                         <a href="?section=alumni-id" class="dropdown-item">
                             <i class="fas fa-plus-circle"></i>Add Alumni ID
                         </a>
@@ -1089,6 +1092,9 @@ if (!isset($_SESSION['admin_id'])) {
                     break;
                 case 'paid-alumni-id':
                     include 'admin/alumni/paid-user.php';
+                    break;
+                case 'cancelled-alumni-id':
+                    include 'admin/alumni/cancelled-user.php';
                     break;
                 case 'update-alumni-status':
                     include 'admin/update-status.php';

@@ -594,6 +594,9 @@ if (session_status() === PHP_SESSION_NONE) {
             case 'room-details':
                 include 'admin/website/components/home/room-features.php';
                 break;
+            case 'all-rooms':
+                include 'admin/website/rooms.php';
+                break;
             case 'satellite-campus':
                 include 'admin/website/Campus-Satellite.php';
                 break;

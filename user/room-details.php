@@ -106,13 +106,6 @@ $book_rooms = [
         'description' => 'Spacious and elegant lobby area perfect for receptions, networking events, and social gatherings. Features modern décor and flexible layout options.',
         'amenities' => ['Free Wi-Fi', 'Reception Desk', 'Lounge Seating', 'Air Conditioning', 'Coffee Service', 'Water Service', 'Background Music System', 'Display Screens', 'Security Service']
     ],
-    [
-        'id' => 12,
-        'name' => 'Building',
-        'max_occupancy' => 500,
-        'description' => 'Entire building rental for large-scale events, corporate functions, or private celebrations. Full access to all facilities and amenities.',
-        'amenities' => ['All Rooms Access', 'Free Wi-Fi', 'Full Security Service', 'Parking Area', 'Reception Services', 'Cleaning Services', 'All Utilities Included', 'Event Planning Support', 'Technical Support']
-    ]
 ];
 
 $room_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
