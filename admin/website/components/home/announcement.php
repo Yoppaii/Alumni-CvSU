@@ -71,6 +71,29 @@ $result = $mysqli->query($query);
 </section>
 
 <style>
+    :root {
+        --primary-color: #10b981;
+        --primary-dark: #059669;
+        --secondary-color: #64748b;
+        --secondary-hover: #4b5563;
+        --border-color: #e2e8f0;
+        --danger-color: #ef4444;
+        --danger-hover: #dc2626;
+        --success-color: #10b981;
+        --success-hover: #059669;
+        --warning-color: #f59e0b;
+        --text-primary: #1e293b;
+        --text-secondary: #64748b;
+        --bg-primary: #ffffff;
+        --bg-secondary: #f8fafc;
+        --white: #ffffff;
+        --radius-sm: 4px;
+        --radius-md: 6px;
+        --radius-lg: 8px;
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --transition: all 0.2s ease;
+    }
+
     /* Enhanced Announcement Section Styles */
     #announcement-section {
         width: 100%;
@@ -190,7 +213,7 @@ $result = $mysqli->query($query);
         font-size: 0.9rem;
         font-weight: 600;
         text-decoration: none;
-        color: #0d6efd;
+        color: var(--primay-dark);
         transition: all 0.3s ease;
         position: relative;
     }
@@ -202,16 +225,18 @@ $result = $mysqli->query($query);
         left: 0;
         width: 0;
         height: 2px;
-        background-color: #0a58ca;
+        background-color: var(--primay-dark);
         transition: width 0.3s ease;
     }
 
     .announcement-link:hover:after {
         width: 100%;
+        color: var(--primay-dark);
+
     }
 
     .announcement-link:hover {
-        color: #0a58ca;
+        color: var(--primary-dark);
     }
 
     .announcement-view-all {
@@ -222,7 +247,7 @@ $result = $mysqli->query($query);
         border-radius: 6px;
         font-weight: 600;
         text-decoration: none;
-        color: #0d6efd;
+        color: var(--primay-dark);
         transition: all 0.3s ease;
         position: relative;
         overflow: hidden;

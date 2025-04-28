@@ -19,96 +19,92 @@ $today = date('Y-m-d');
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         :root {
-            --primary: #10b981;
-            /* Green for primary actions */
-            --danger: #dc3545;
-            /* Red for destructive actions */
-            --neutral-gray: #6c757d;
-            /* Neutral gray for reset */
-            --medium-gray: #e9ecef;
-            /* Light gray for inputs */
-            --dark-gray: #495057;
-            /* Darker gray for text */
+            --primary-color: #10b981;
+            --primary-dark: #059669;
+            --secondary-color: #64748b;
+            --secondary-hover: #4b5563;
+            --border-color: #e2e8f0;
+            --danger-color: #ef4444;
+            --danger-hover: #dc2626;
+            --success-color: #10b981;
+            --success-hover: #059669;
+            --warning-color: #f59e0b;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --white: #ffffff;
+            --radius-sm: 4px;
+            --radius-md: 6px;
+            --radius-lg: 8px;
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --transition: all 0.2s ease;
         }
 
         .dashboard-container {
-            background: white;
-            border-radius: 8px;
+            background: var(--bg-primary);
+            border-radius: var(--radius-lg);
             box-shadow: var(--shadow-md);
             overflow: hidden;
             margin-bottom: 20px;
-
         }
 
-        /* Report Controls */
         .report-controls {
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        .report-checkbox-container {
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            font-size: 0.85rem;
-        }
-
-        /* Button Styling */
         .select-all-btn,
         .select-none-btn,
         .reset-filter-btn {
             padding: 8px 12px;
             font-size: 14px;
             font-weight: bold;
-            color: white;
+            color: var(--white);
             border: none;
-            border-radius: 5px;
+            border-radius: var(--radius-sm);
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: var(--transition);
         }
 
         .select-all-btn {
-            background-color: var(--primary);
+            background-color: var(--primary-color);
         }
 
         .select-none-btn {
-            background-color: var(--danger);
+            background-color: var(--danger-color);
         }
 
         .reset-filter-btn {
-            background-color: var(--neutral-gray);
+            background-color: var(--secondary-color);
         }
 
-        /* Hover Effects */
         .select-all-btn:hover {
-            background-color: #0d8c65;
-            /* Darker green */
+            background-color: var(--primary-dark);
         }
 
         .select-none-btn:hover {
-            background-color: #c82333;
-            /* Darker red */
+            background-color: var(--danger-hover);
         }
 
         .reset-filter-btn:hover {
-            background-color: var(--dark-gray);
-            /* Darker gray */
+            background-color: var(--secondary-hover);
         }
 
-        /* Toggle Switch */
         .toggle-report {
             display: flex;
             align-items: center;
             gap: 8px;
             cursor: pointer;
+            color: var(--text-primary);
         }
 
         .toggle-input {
             appearance: none;
             width: 36px;
             height: 20px;
-            background-color: var(--medium-gray);
+            background-color: var(--bg-secondary);
             border-radius: 20px;
             position: relative;
             cursor: pointer;
@@ -116,7 +112,7 @@ $today = date('Y-m-d');
         }
 
         .toggle-input:checked {
-            background-color: var(--primary);
+            background-color: var(--primary-color);
         }
 
         .toggle-input:before {
@@ -125,7 +121,7 @@ $today = date('Y-m-d');
             width: 16px;
             height: 16px;
             border-radius: 50%;
-            background-color: white;
+            background-color: var(--white);
             top: 2px;
             left: 2px;
             transition: transform 0.2s ease;
@@ -136,12 +132,11 @@ $today = date('Y-m-d');
             transform: translateX(16px);
         }
 
-        /* Filters & Dashboard */
         .filter-bar {
-            background-color: white;
-            border-radius: 8px;
+            background-color: var(--bg-primary);
+            border-radius: var(--radius-lg);
             padding: 16px 24px;
-            box-shadow: var(--shadow);
+            box-shadow: var(--shadow-md);
             margin-bottom: 24px;
             display: flex;
             flex-wrap: wrap;
@@ -157,65 +152,39 @@ $today = date('Y-m-d');
 
         .dashboard-header {
             padding: 24px;
-            border-bottom: 1px solid #e5e7eb;
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-
         .dashboard-title {
             font-size: 24px;
-            color: #111827;
+            color: var(--text-primary);
             margin: 0;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        /* Button Reusability */
         .button {
             padding: 10px 16px;
-            border-radius: 8px;
+            border-radius: var(--radius-lg);
             font-size: 14px;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: var(--transition);
             border: none;
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .button-primary {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        .button-primary:hover {
-            background-color: #0d8c65;
-        }
-
-        .button-secondary {
-            background-color: white;
-            color: var(--dark-gray);
-            border: 1px solid var(--medium-gray);
-        }
-
-        .button-secondary:hover {
-            background-color: var(--medium-gray);
-        }
-
-        /* Mobile Responsiveness */
         @media (max-width: 768px) {
 
             .dashboard-header,
             .dashboard-content {
                 padding: 16px;
-            }
-
-            .charts-container {
-                grid-template-columns: 1fr;
             }
 
             .filter-bar {

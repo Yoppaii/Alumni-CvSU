@@ -19,10 +19,10 @@
             <p class="info-portrait-text">
                 Cavite State University shall provide excellent, equitable, and relevant educational opportunities in the arts, sciences, and technology through quality instruction and responsive research and development activities. It shall produce professional, skilled, and morally upright individuals for global competitiveness.
             </p>
-            <p class="info-portrait-text">
+            <blockquote class="info-blockquote">
                 <strong class="info-lang-label">Hangarin ng Pamantasan:</strong>
                 "Ang Cavite State University ay makapagbigay ng mahusay, pantay at makabuluhang edukasyon sa sining, agham at teknolohiya sa pamamagitan ng may kalidad na pagtuturo at tumutugon sa pangangailangang pananaliksik at mga gawaing pangkaunlaran. Makalikha ito ng mga indibidwal ng dalubhasa, may kasaysayan at kagandahan-asal sa pandaigdigang kakayahan."
-            </p>
+            </blockquote>
         </div>
 
         <!-- Vision Card -->
@@ -31,10 +31,10 @@
             <p class="info-portrait-text">
                 The premier university in historic Cavite, globally recognized for excellence in character development, academics, research, innovation, and sustainable community engagement.
             </p>
-            <p class="info-portrait-text">
+            <blockquote class="info-blockquote">
                 <strong class="info-lang-label">Mithiin ng Pamantasan:</strong>
                 "Ang nangungunang pamantasan sa makasaysayang Kabite na kinikilala sa kahusayan sa paghubog ng mga indibidwal na may pandaigdigang kakayahan at kagandahang asal."
-            </p>
+            </blockquote>
         </div>
     </div>
 
@@ -68,203 +68,3 @@
         </p>
     </section>
 </div>
-
-<style>
-    .info-area {
-        max-width: auto;
-        margin: 2rem auto;
-        padding: 0 1.5rem;
-
-    }
-
-    .info-heading {
-        color: var(--cvsu-primary-green);
-        font-size: 2rem;
-        text-align: center;
-        margin-bottom: 2rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 3px solid var(--cvsu-primary-green);
-    }
-
-    /* Top section grid layout */
-    .info-top-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1.5rem;
-        margin-bottom: 2rem;
-    }
-
-    .info-portrait-card {
-        background: white;
-        padding: 1.5rem;
-        border-radius: 8px;
-        box-shadow: var(--cvsu-shadow-sm);
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        border: 1px solid var(--cvsu-light-green);
-    }
-
-    .info-portrait-card:hover {
-        transform: translateY(-5px);
-        transition: transform 0.3s ease;
-        box-shadow: var(--cvsu-shadow-md);
-    }
-
-    .info-portrait-title {
-        color: var(--cvsu-primary-green);
-        font-size: 1.5rem;
-        margin-bottom: 1rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid var(--cvsu-light-green);
-        text-align: center;
-    }
-
-    .info-portrait-text {
-        color: var(--cvsu-text-dark);
-        line-height: 1.6;
-        margin-bottom: 1rem;
-        flex-grow: 1;
-    }
-
-    .info-section {
-        margin-bottom: 2.5rem;
-        background: white;
-        padding: 1.5rem;
-        border-radius: 8px;
-        box-shadow: var(--cvsu-shadow-sm);
-    }
-
-    .info-section-title {
-        color: var(--cvsu-primary-green);
-        font-size: 1.5rem;
-        margin-bottom: 1rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid var(--cvsu-light-green);
-    }
-
-    .info-text {
-        color: var(--cvsu-text-dark);
-        line-height: 1.6;
-        margin-bottom: 1rem;
-    }
-
-    .info-blockquote {
-        margin: 1rem 0;
-        padding: 1rem 1.5rem;
-        background-color: rgba(0, 100, 0, 0.05);
-        border-left: 4px solid var(--cvsu-primary-green);
-        font-style: italic;
-        color: var(--cvsu-text-dark);
-        font-size: 0.95rem;
-    }
-
-    .info-lang-label {
-        color: var(--cvsu-primary-green);
-        display: block;
-        margin-top: 1rem;
-        font-weight: bold;
-    }
-
-    /* Core Values Styling */
-    .info-values-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1.5rem;
-        margin-top: 1.5rem;
-    }
-
-    .info-value-card {
-        background: white;
-        padding: 1.5rem;
-        border-radius: 8px;
-        text-align: center;
-        transition: transform 0.3s ease;
-        border: 1px solid var(--cvsu-light-green);
-    }
-
-    .info-value-card:hover {
-        transform: translateY(-5px);
-        box-shadow: var(--cvsu-shadow-md);
-    }
-
-    .info-value-icon {
-        color: var(--cvsu-primary-green);
-        font-size: 2rem;
-        margin-bottom: 1rem;
-    }
-
-    .info-value-title {
-        color: var(--cvsu-primary-green);
-        font-size: 1.2rem;
-        margin-bottom: 0.5rem;
-    }
-
-    .info-value-text {
-        font-size: 0.9rem;
-        margin-bottom: 0;
-    }
-
-    /* Quality Policy Section */
-    .info-quality-section {
-        background-color: var(--cvsu-primary-green);
-        color: white;
-    }
-
-    .info-quality-section .info-section-title {
-        color: white;
-        border-bottom-color: rgba(255, 255, 255, 0.2);
-    }
-
-    .info-quality-section .info-text {
-        color: white;
-        margin-bottom: 0;
-    }
-
-    /* Responsive Design */
-    @media (max-width: 992px) {
-        .info-top-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-
-    @media (max-width: 768px) {
-        .info-heading {
-            font-size: 1.75rem;
-        }
-
-        .info-top-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .info-section,
-        .info-portrait-card {
-            padding: 1rem;
-        }
-
-        .info-section-title,
-        .info-portrait-title {
-            font-size: 1.25rem;
-        }
-
-        .info-values-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    /* Print-friendly styles */
-    @media print {
-        .info-area {
-            max-width: 100%;
-            margin: 0;
-            padding: 0;
-        }
-
-        .info-section,
-        .info-portrait-card {
-            break-inside: avoid;
-            box-shadow: none;
-            border: 1px solid #ddd;
-        }
-    }
-</style>
