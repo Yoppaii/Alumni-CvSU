@@ -1,70 +1,136 @@
+<?php
+require_once 'main_db.php';
+
+function getInstitutionalInfo()
+{
+    global $mysqli; // Use the existing mysqli connection from main_db.php
+
+    $query = "SELECT * FROM institutional_info ORDER BY display_order";
+    $stmt = $mysqli->prepare($query);
+    if (!$stmt) {
+        die("Prepare failed: " . $mysqli->error);
+    }
+
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $data = [];
+    while ($row = $result->fetch_assoc()) {
+        $data[$row['category']] = $row;
+    }
+
+    $stmt->close();
+    return $data;
+}
+
+function getCoreValues()
+{
+    global $mysqli; // Use the existing mysqli connection from main_db.php
+
+    $query = "SELECT * FROM core_values ORDER BY display_order";
+    $stmt = $mysqli->prepare($query);
+    if (!$stmt) {
+        die("Prepare failed: " . $mysqli->error);
+    }
+
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $data = [];
+    while ($row = $result->fetch_assoc()) {
+        $data[] = $row;
+    }
+
+    $stmt->close();
+    return $data;
+}
+
+$institutionalInfo = getInstitutionalInfo();
+$coreValues = getCoreValues();
+?>
+
 <div class="info-area">
     <h2 class="info-heading">Mandate, Mission, and Vision</h2>
 
     <div class="info-top-grid">
         <!-- Mandate Card -->
-        <div class="info-portrait-card">
-            <h3 class="info-portrait-title">Mandate</h3>
-            <p class="info-portrait-text">
-                Section 2 of Republic Act No. 8468, "An Act Converting the Don Severino Agricultural College in the Municipality of Indang, Province of Cavite into a State University, to be Known as the Cavite State University" states that:
-            </p>
-            <blockquote class="info-blockquote">
-                "The University shall primarily provide advanced instruction and professional training in agriculture, science and technology, education and other related fields, undertake research and extension services, and provide progressive leadership in these areas."
-            </blockquote>
-        </div>
+        <?php if (isset($institutionalInfo['mandate'])): ?>
+            <div class="info-portrait-card">
+                <h3 class="info-portrait-title"><?= htmlspecialchars($institutionalInfo['mandate']['title']) ?></h3>
+                <p class="info-portrait-text">
+                    <?= htmlspecialchars($institutionalInfo['mandate']['content']) ?>
+                </p>
+                <?php if (!empty($institutionalInfo['mandate']['translation_content'])): ?>
+                    <blockquote class="info-blockquote">
+                        <?php if (!empty($institutionalInfo['mandate']['translation_title'])): ?>
+                            <strong class="info-lang-label"><?= htmlspecialchars($institutionalInfo['mandate']['translation_title']) ?>:</strong>
+                        <?php endif; ?>
+                        "<?= htmlspecialchars($institutionalInfo['mandate']['translation_content']) ?>"
+                    </blockquote>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
 
         <!-- Mission Card -->
-        <div class="info-portrait-card">
-            <h3 class="info-portrait-title">Mission</h3>
-            <p class="info-portrait-text">
-                Cavite State University shall provide excellent, equitable, and relevant educational opportunities in the arts, sciences, and technology through quality instruction and responsive research and development activities. It shall produce professional, skilled, and morally upright individuals for global competitiveness.
-            </p>
-            <blockquote class="info-blockquote">
-                <strong class="info-lang-label">Hangarin ng Pamantasan:</strong>
-                "Ang Cavite State University ay makapagbigay ng mahusay, pantay at makabuluhang edukasyon sa sining, agham at teknolohiya sa pamamagitan ng may kalidad na pagtuturo at tumutugon sa pangangailangang pananaliksik at mga gawaing pangkaunlaran. Makalikha ito ng mga indibidwal ng dalubhasa, may kasaysayan at kagandahan-asal sa pandaigdigang kakayahan."
-            </blockquote>
-        </div>
+        <?php if (isset($institutionalInfo['mission'])): ?>
+            <div class="info-portrait-card">
+                <h3 class="info-portrait-title"><?= htmlspecialchars($institutionalInfo['mission']['title']) ?></h3>
+                <p class="info-portrait-text">
+                    <?= htmlspecialchars($institutionalInfo['mission']['content']) ?>
+                </p>
+                <?php if (!empty($institutionalInfo['mission']['translation_content'])): ?>
+                    <blockquote class="info-blockquote">
+                        <?php if (!empty($institutionalInfo['mission']['translation_title'])): ?>
+                            <strong class="info-lang-label"><?= htmlspecialchars($institutionalInfo['mission']['translation_title']) ?>:</strong>
+                        <?php endif; ?>
+                        "<?= htmlspecialchars($institutionalInfo['mission']['translation_content']) ?>"
+                    </blockquote>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
 
         <!-- Vision Card -->
-        <div class="info-portrait-card">
-            <h3 class="info-portrait-title">Vision</h3>
-            <p class="info-portrait-text">
-                The premier university in historic Cavite, globally recognized for excellence in character development, academics, research, innovation, and sustainable community engagement.
-            </p>
-            <blockquote class="info-blockquote">
-                <strong class="info-lang-label">Mithiin ng Pamantasan:</strong>
-                "Ang nangungunang pamantasan sa makasaysayang Kabite na kinikilala sa kahusayan sa paghubog ng mga indibidwal na may pandaigdigang kakayahan at kagandahang asal."
-            </blockquote>
-        </div>
+        <?php if (isset($institutionalInfo['vision'])): ?>
+            <div class="info-portrait-card">
+                <h3 class="info-portrait-title"><?= htmlspecialchars($institutionalInfo['vision']['title']) ?></h3>
+                <p class="info-portrait-text">
+                    <?= htmlspecialchars($institutionalInfo['vision']['content']) ?>
+                </p>
+                <?php if (!empty($institutionalInfo['vision']['translation_content'])): ?>
+                    <blockquote class="info-blockquote">
+                        <?php if (!empty($institutionalInfo['vision']['translation_title'])): ?>
+                            <strong class="info-lang-label"><?= htmlspecialchars($institutionalInfo['vision']['translation_title']) ?>:</strong>
+                        <?php endif; ?>
+                        "<?= htmlspecialchars($institutionalInfo['vision']['translation_content']) ?>"
+                    </blockquote>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
     </div>
 
     <!-- Core Values Section -->
-    <section class="info-section">
-        <h3 class="info-section-title">Core Values</h3>
-        <div class="info-values-grid">
-            <div class="info-value-card">
-                <i class="fas fa-balance-scale info-value-icon"></i>
-                <h4 class="info-value-title">Truth</h4>
-                <p class="info-value-text">We value integrity, transparency, and honesty in all our endeavors.</p>
+    <?php if (!empty($coreValues)): ?>
+        <section class="info-section">
+            <h3 class="info-section-title">Core Values</h3>
+            <div class="info-values-grid">
+                <?php foreach ($coreValues as $value): ?>
+                    <div class="info-value-card">
+                        <i class="<?= htmlspecialchars($value['icon_class']) ?> info-value-icon"></i>
+                        <h4 class="info-value-title"><?= htmlspecialchars($value['title']) ?></h4>
+                        <p class="info-value-text"><?= htmlspecialchars($value['description']) ?></p>
+                    </div>
+                <?php endforeach; ?>
             </div>
-            <div class="info-value-card">
-                <i class="fas fa-trophy info-value-icon"></i>
-                <h4 class="info-value-title">Excellence</h4>
-                <p class="info-value-text">We strive for excellence in all aspects of education, research, and community service.</p>
-            </div>
-            <div class="info-value-card">
-                <i class="fas fa-hands-helping info-value-icon"></i>
-                <h4 class="info-value-title">Service</h4>
-                <p class="info-value-text">We commit to serve our stakeholders through meaningful contributions and sustainable programs.</p>
-            </div>
-        </div>
-    </section>
+        </section>
+    <?php endif; ?>
 
     <!-- Quality Policy Section -->
-    <section class="info-section info-quality-section">
-        <h3 class="info-section-title">Quality Policy</h3>
-        <p class="info-text">
-            We commit to the highest standards of education, value our stakeholders, strive for continual improvement of our products and services, and uphold the University's tenets of Truth, Excellence, and Service to produce globally competitive and morally upright individuals.
-        </p>
-    </section>
+    <?php if (isset($institutionalInfo['quality_policy'])): ?>
+        <section class="info-section info-quality-section">
+            <h3 class="info-section-title"><?= htmlspecialchars($institutionalInfo['quality_policy']['title']) ?></h3>
+            <p class="info-text">
+                <?= htmlspecialchars($institutionalInfo['quality_policy']['content']) ?>
+            </p>
+        </section>
+    <?php endif; ?>
 </div>

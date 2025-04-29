@@ -7,36 +7,13 @@
     <title>Alumni Cavite State University</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
     <link rel="stylesheet" href="admin/website/components/home/home-styles.css">
+    <link rel="stylesheet" href="admin/website/root.css">
 
     <!-- Add animation library -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 
 </head>
 <style>
-    
-    :root {
-        --primary-color: #10b981;
-        --primary-dark: #059669;
-        --secondary-color: #64748b;
-        --secondary-hover: #4b5563;
-        --border-color: #e2e8f0;
-        --danger-color: #ef4444;
-        --danger-hover: #dc2626;
-        --success-color: #10b981;
-        --success-hover: #059669;
-        --warning-color: #f59e0b;
-        --text-primary: #1e293b;
-        --text-secondary: #64748b;
-        --bg-primary: #ffffff;
-        --bg-secondary: #f8fafc;
-        --white: #ffffff;
-        --radius-sm: 4px;
-        --radius-md: 6px;
-        --radius-lg: 8px;
-        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        --transition: all 0.2s ease;
-    }
-
     /* Hero Swiper Styles */
     .hero-swiper-container {
         width: 100%;

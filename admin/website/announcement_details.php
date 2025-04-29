@@ -176,28 +176,27 @@ if ($is_detail_view) {
         </div>
     </div>
 <?php endif; ?>
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alumni Cavite State University</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="admin/website/root.css">
+
+    <!-- Add animation library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+</head>
 <style>
-    :root {
-        --cvsu-gold: #D4AF37;
-        --cvsu-primary-green: #006400;
-        --cvsu-hover-green: #004d00;
-        --cvsu-light-green: #e8f5e8;
-        --cvsu-text-dark: #333;
-        --cvsu-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
-        --cvsu-shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
-        --cvsu-badge-gradient: linear-gradient(135deg, #D4AF37, #FFD700);
-        --cvsu-btn-gradient: linear-gradient(135deg, #006400, #008000);
-        --cvsu-transition: all 0.3s ease;
-        --font-primary: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
-    }
-
     /* Global styles */
     .announcement-page-layout {
         padding: 2rem 1rem 10rem 1rem;
         max-width: 1200px;
         margin: 0 auto;
-        font-family: var(--font-primary);
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
     }
 
     /* DETAIL VIEW STYLES */
@@ -212,37 +211,37 @@ if ($is_detail_view) {
     }
 
     .announcement-details-container {
-        background-color: white;
+        background-color: var(--bg-primary);
         border-radius: 12px;
-        box-shadow: var(--cvsu-shadow-md);
+        box-shadow: var(--shadow-md);
         padding: 2.5rem;
-        transition: var(--cvsu-transition);
-        border-top: 4px solid var(--cvsu-primary-green);
+        transition: var(--transition);
+        border-top: 4px solid var(--primary-color);
     }
 
     .back-button {
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        color: var(--cvsu-primary-green);
+        color: var(--primary-color);
         text-decoration: none;
         font-weight: 600;
         margin-bottom: 1.5rem;
-        transition: var(--cvsu-transition);
+        transition: var(--transition);
         padding: 0.5rem 0.75rem;
-        border-radius: 6px;
-        background-color: var(--cvsu-light-green);
+        border-radius: var(--radius-md);
+        background-color: var(--bg-secondary);
         font-size: 0.9rem;
     }
 
     .back-button:hover {
-        color: white;
-        background-color: var(--cvsu-primary-green);
+        color: var(--white);
+        background-color: var(--primary-color);
         transform: translateX(-3px);
     }
 
     .back-button i {
-        transition: var(--cvsu-transition);
+        transition: var(--transition);
     }
 
     .back-button:hover i {
@@ -252,12 +251,12 @@ if ($is_detail_view) {
     .announcement-details-header {
         margin-bottom: 2rem;
         padding-bottom: 1.5rem;
-        border-bottom: 2px solid var(--cvsu-light-green);
+        border-bottom: 2px solid var(--bg-secondary);
         position: relative;
     }
 
     .announcement-details-header h1 {
-        color: var(--cvsu-primary-green);
+        color: var(--primary-color);
         font-size: 2.2rem;
         margin: 1rem 0;
         line-height: 1.3;
@@ -266,7 +265,7 @@ if ($is_detail_view) {
 
     .announcement-details-content {
         line-height: 1.8;
-        color: var(--cvsu-text-dark);
+        color: var(--text-primary);
         font-size: 1.05rem;
     }
 
@@ -277,27 +276,29 @@ if ($is_detail_view) {
     }
 
     .announcement-container {
-        background-color: white;
+        background-color: var(--bg-primary);
         border-radius: 12px;
-        box-shadow: var(--cvsu-shadow-md);
+        box-shadow: var(--shadow-md);
         padding: 1.75rem;
-        border-top: 4px solid var(--cvsu-gold);
+        border-top: 4px solid var(--warning-color);
+        /* gold replacement */
     }
 
     .announcement-heading {
-        color: var(--cvsu-primary-green);
+        color: var(--primary-color);
         font-size: 1.6rem;
         margin-bottom: 1.5rem;
         display: flex;
         align-items: center;
         gap: 0.75rem;
         padding-bottom: 1rem;
-        border-bottom: 2px solid var(--cvsu-light-green);
+        border-bottom: 2px solid var(--bg-secondary);
         font-weight: 700;
     }
 
     .announcement-heading i {
-        color: var(--cvsu-gold);
+        color: var(--warning-color);
+        /* gold replacement */
     }
 
     /* Carousel Styles */
@@ -317,11 +318,11 @@ if ($is_detail_view) {
     }
 
     .announcement-item {
-        background: white;
+        background: var(--bg-primary);
         border: 1px solid rgba(0, 100, 0, 0.1);
         border-radius: 10px;
         padding: 1.5rem;
-        transition: var(--cvsu-transition);
+        transition: var(--transition);
         display: flex;
         flex-direction: column;
         min-width: 100%;
@@ -334,13 +335,13 @@ if ($is_detail_view) {
     .announcement-item:hover {
         transform: translateY(-4px);
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-        border-color: var(--cvsu-primary-green);
+        border-color: var(--primary-color);
     }
 
     #selected-announcement-badge,
     .announcement-badge {
-        background: var(--cvsu-badge-gradient);
-        color: white;
+        background: var(--primary-color);
+        color: var(--white);
         padding: 0.25rem 0.75rem;
         border-radius: 999px;
         font-size: 0.8rem;
@@ -350,11 +351,12 @@ if ($is_detail_view) {
         display: inline-block;
         letter-spacing: 0.5px;
         box-shadow: 0 2px 4px rgba(212, 175, 55, 0.3);
+        /* gold shadow */
         text-transform: uppercase;
     }
 
     .announcement-title {
-        color: var(--cvsu-primary-green);
+        color: var(--primary-color);
         font-size: 1.2rem;
         margin: 0.75rem 0;
         display: -webkit-box;
@@ -367,7 +369,7 @@ if ($is_detail_view) {
     }
 
     .announcement-content {
-        color: var(--cvsu-text-dark);
+        color: var(--text-primary);
         line-height: 1.6;
         font-size: 0.95rem;
         display: -webkit-box;
@@ -379,13 +381,13 @@ if ($is_detail_view) {
     }
 
     .announcement-footer {
-        border-top: 1px solid var(--cvsu-light-green);
+        border-top: 1px solid var(--bg-secondary);
         padding-top: 0.75rem;
         position: absolute;
         bottom: 1.5rem;
         left: 1.5rem;
         right: 1.5rem;
-        background: white;
+        background: var(--bg-primary);
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -402,29 +404,30 @@ if ($is_detail_view) {
     }
 
     .announcement-date i {
-        color: var(--cvsu-gold);
+        color: var(--warning-color);
+        /* gold replacement */
     }
 
     .announcement-link {
-        color: var(--cvsu-primary-green);
+        color: var(--primary-color);
         text-decoration: none;
         font-weight: 600;
         font-size: 0.9rem;
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        transition: var(--cvsu-transition);
+        transition: var(--transition);
         padding: 0.5rem 0.75rem;
-        border-radius: 6px;
+        border-radius: var(--radius-md);
     }
 
     .announcement-link:hover {
-        color: white;
-        background-color: var(--cvsu-primary-green);
+        color: var(--white);
+        background-color: var(--primary-color);
     }
 
     .announcement-link i {
-        transition: var(--cvsu-transition);
+        transition: var(--transition);
     }
 
     .announcement-link:hover i {
@@ -436,7 +439,7 @@ if ($is_detail_view) {
         padding: 2.5rem;
         color: #666;
         font-size: 1rem;
-        background: var(--cvsu-light-green);
+        background: var(--bg-secondary);
         border-radius: 10px;
         font-weight: 500;
     }
@@ -452,8 +455,8 @@ if ($is_detail_view) {
 
     .carousel-prev-btn,
     .carousel-next-btn {
-        background: var(--cvsu-btn-gradient);
-        color: white;
+        background: var(--primary-color);
+        color: var(--white);
         border: none;
         border-radius: 50%;
         width: 38px;
@@ -462,7 +465,7 @@ if ($is_detail_view) {
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        transition: var(--cvsu-transition);
+        transition: var(--transition);
         box-shadow: 0 2px 6px rgba(0, 100, 0, 0.3);
     }
 
@@ -482,11 +485,11 @@ if ($is_detail_view) {
         border-radius: 50%;
         background-color: #ddd;
         cursor: pointer;
-        transition: var(--cvsu-transition);
+        transition: var(--transition);
     }
 
     .carousel-indicator.active {
-        background-color: var(--cvsu-primary-green);
+        background-color: var(--primary-color);
         transform: scale(1.2);
     }
 
@@ -499,11 +502,11 @@ if ($is_detail_view) {
         text-align: center;
         margin-bottom: 2.5rem;
         padding-bottom: 1.5rem;
-        border-bottom: 2px solid var(--cvsu-light-green);
+        border-bottom: 2px solid var(--bg-secondary);
     }
 
     .announcements-title {
-        color: var(--cvsu-primary-green);
+        color: var(--primary-color);
         font-size: 2.4rem;
         margin-bottom: 0.5rem;
         display: flex;
@@ -513,7 +516,8 @@ if ($is_detail_view) {
     }
 
     .announcements-title i {
-        color: var(--cvsu-gold);
+        color: var(--warning-color);
+        /* gold replacement */
     }
 
     .announcements-subtitle {
@@ -528,16 +532,16 @@ if ($is_detail_view) {
     }
 
     .announcement-card {
-        background: white;
+        background: var(--bg-primary);
         border-radius: 12px;
-        box-shadow: var(--cvsu-shadow-md);
-        border-top: 4px solid var(--cvsu-primary-green);
+        box-shadow: var(--shadow-md);
+        border-top: 4px solid var(--primary-color);
         padding: 1.75rem;
         display: flex;
         flex-direction: column;
         height: 380px;
         position: relative;
-        transition: var(--cvsu-transition);
+        transition: var(--transition);
     }
 
     .announcement-card:hover {
@@ -546,15 +550,17 @@ if ($is_detail_view) {
     }
 
     .announcement-card:nth-child(3n+1) {
-        border-top-color: var(--cvsu-primary-green);
+        border-top-color: var(--primary-color);
     }
 
     .announcement-card:nth-child(3n+2) {
-        border-top-color: var(--cvsu-gold);
+        border-top-color: var(--warning-color);
+        /* gold replacement */
     }
 
     .announcement-card:nth-child(3n) {
         border-top-color: #3498db;
+        /* blue, left as-is */
     }
 
     .announcement-card-header {
@@ -562,7 +568,7 @@ if ($is_detail_view) {
     }
 
     .announcement-card-title {
-        color: var(--cvsu-primary-green);
+        color: var(--primary-color);
         font-size: 1.4rem;
         margin: 0.75rem 0;
         line-height: 1.4;
@@ -579,7 +585,7 @@ if ($is_detail_view) {
     }
 
     .announcement-card-content p {
-        color: var(--cvsu-text-dark);
+        color: var(--text-primary);
         line-height: 1.7;
         font-size: 1rem;
         display: -webkit-box;
@@ -590,7 +596,7 @@ if ($is_detail_view) {
     }
 
     .announcement-card-footer {
-        border-top: 1px solid var(--cvsu-light-green);
+        border-top: 1px solid var(--bg-secondary);
         padding-top: 1rem;
         margin-top: 1rem;
         display: flex;

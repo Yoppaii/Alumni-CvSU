@@ -1,3 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alumni Cavite State University</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="admin/website/components/home/home-styles.css">
+    <link rel="stylesheet" href="admin/website/root.css">
+
+    <!-- Add animation library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+</head>
 <?php
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -333,26 +348,11 @@ if ($is_detail_view) {
 </script>
 
 <style>
-    :root {
-        --room-primary: #0d6efd;
-        --room-primary-hover: #0a58ca;
-        --room-light: #f0f4ff;
-        --room-dark: #212529;
-        --room-border: #eaeaea;
-        --room-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
-        --room-shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
-        --room-badge-gradient: linear-gradient(135deg, #0d6efd, #0a58ca);
-        --room-btn-gradient: linear-gradient(135deg, #0d6efd, #0a58ca);
-        --room-transition: all 0.3s ease;
-        --font-primary: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
-    }
-
     /* Global styles */
     .room-page-layout {
         padding: 2rem 1rem 6rem 1rem;
         max-width: 1200px;
         margin: 0 auto;
-        font-family: var(--font-primary);
     }
 
     /* DETAIL VIEW STYLES */
@@ -367,37 +367,37 @@ if ($is_detail_view) {
     }
 
     .room-details-container {
-        background-color: white;
-        border-radius: 12px;
-        box-shadow: var(--room-shadow-md);
+        background-color: var(--bg-primary);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
         overflow: hidden;
-        transition: var(--room-transition);
-        border-top: 4px solid var(--room-primary);
+        transition: var(--transition);
+        border-top: 4px solid var(--primary-dark);
     }
 
     .back-button {
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        color: var(--room-primary);
+        color: var(--primary-color);
         text-decoration: none;
         font-weight: 600;
         margin: 1.5rem;
-        transition: var(--room-transition);
+        transition: var(--transition);
         padding: 0.5rem 0.75rem;
-        border-radius: 6px;
-        background-color: var(--room-light);
+        border-radius: var(--radius-md);
+        background-color: var(--bg-secondary);
         font-size: 0.9rem;
     }
 
     .back-button:hover {
-        color: white;
-        background-color: var(--room-primary);
+        color: var(--white);
+        background-color: var(--primary-color);
         transform: translateX(-3px);
     }
 
     .back-button i {
-        transition: var(--room-transition);
+        transition: var(--transition);
     }
 
     .back-button:hover i {
@@ -424,12 +424,12 @@ if ($is_detail_view) {
     .room-details-header {
         margin: 0 2rem;
         padding: 1.5rem 0;
-        border-bottom: 2px solid var(--room-light);
+        border-bottom: 2px solid var(--bg-secondary);
         position: relative;
     }
 
     .room-details-header h1 {
-        color: var(--room-primary);
+        color: var(--primary-color);
         font-size: 2.2rem;
         margin: 1rem 0;
         line-height: 1.3;
@@ -438,8 +438,8 @@ if ($is_detail_view) {
 
     #selected-room-badge,
     .room-status-badge {
-        background: var(--room-badge-gradient);
-        color: white;
+        background: linear-gradient(to right, var(--primary-color), var(--primary-dark));
+        color: var(--white);
         padding: 0.25rem 0.75rem;
         border-radius: 999px;
         font-size: 0.8rem;
@@ -448,7 +448,7 @@ if ($is_detail_view) {
         align-self: flex-start;
         display: inline-block;
         letter-spacing: 0.5px;
-        box-shadow: 0 2px 4px rgba(13, 110, 253, 0.3);
+        box-shadow: 0 2px 4px rgba(0, 100, 0, 0.3);
         text-transform: uppercase;
     }
 
@@ -458,7 +458,7 @@ if ($is_detail_view) {
 
     .room-description {
         line-height: 1.8;
-        color: var(--room-dark);
+        color: var(--text-primary);
         font-size: 1.05rem;
         margin-bottom: 2rem;
     }
@@ -472,20 +472,20 @@ if ($is_detail_view) {
         display: inline-flex;
         align-items: center;
         gap: 0.75rem;
-        background: var(--room-btn-gradient);
-        color: white;
+        background: linear-gradient(to right, var(--primary-color), var(--primary-dark));
+        color: var(--white);
         text-decoration: none;
         padding: 0.875rem 2rem;
-        border-radius: 8px;
+        border-radius: var(--radius-lg);
         font-weight: 600;
         font-size: 1.1rem;
-        transition: var(--room-transition);
-        box-shadow: 0 4px 8px rgba(13, 110, 253, 0.25);
+        transition: var(--transition);
+        box-shadow: 0 4px 8px rgba(0, 100, 0, 0.25);
     }
 
     .book-now-btn:hover {
         transform: translateY(-3px);
-        box-shadow: 0 6px 12px rgba(13, 110, 253, 0.3);
+        box-shadow: 0 6px 12px rgba(0, 100, 0, 0.3);
     }
 
     /* Sidebar with other rooms */
@@ -495,27 +495,27 @@ if ($is_detail_view) {
     }
 
     .other-rooms-container {
-        background-color: white;
-        border-radius: 12px;
-        box-shadow: var(--room-shadow-md);
+        background-color: var(--bg-primary);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
         padding: 1.75rem;
-        border-top: 4px solid #6c757d;
+        border-top: 4px solid var(--secondary-color);
     }
 
     .other-rooms-heading {
-        color: var(--room-primary);
+        color: var(--text-primary);
         font-size: 1.6rem;
         margin-bottom: 1.5rem;
         display: flex;
         align-items: center;
         gap: 0.75rem;
         padding-bottom: 1rem;
-        border-bottom: 2px solid var(--room-light);
+        border-bottom: 2px solid var(--bg-secondary);
         font-weight: 700;
     }
 
     .other-rooms-heading i {
-        color: #6c757d;
+        color: var(--text-primary);
     }
 
     /* Carousel Styles */
@@ -535,10 +535,10 @@ if ($is_detail_view) {
     }
 
     .room-carousel-item {
-        background: white;
-        border: 1px solid rgba(13, 110, 253, 0.1);
-        border-radius: 10px;
-        transition: var(--room-transition);
+        background: var(--bg-primary);
+        border: 1px solid rgba(0, 100, 0, 0.1);
+        border-radius: var(--radius-lg);
+        transition: var(--transition);
         display: flex;
         flex-direction: column;
         min-width: 100%;
@@ -552,7 +552,7 @@ if ($is_detail_view) {
     .room-carousel-item:hover {
         transform: translateY(-4px);
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-        border-color: var(--room-primary);
+        border-color: var(--primary-color);
     }
 
     .carousel-room-image {
@@ -576,7 +576,7 @@ if ($is_detail_view) {
     }
 
     .carousel-room-title {
-        color: var(--room-primary);
+        color: var(--primary-color);
         font-size: 1.2rem;
         margin: 0.5rem 0;
         display: -webkit-box;
@@ -590,7 +590,7 @@ if ($is_detail_view) {
 
     .carousel-room-content {
         padding: 0 1.25rem;
-        color: var(--room-dark);
+        color: var(--text-primary);
         line-height: 1.6;
         font-size: 0.95rem;
         display: -webkit-box;
@@ -601,13 +601,13 @@ if ($is_detail_view) {
     }
 
     .carousel-room-footer {
-        border-top: 1px solid var(--room-light);
-        padding: 0.75rem 1.25rem;
+        border-top: 1px solid var(--bg-secondary);
+        padding: 1.5rem 1.25rem;
         position: absolute;
         bottom: 0;
         left: 0;
         right: 0;
-        background: white;
+        background: var(--bg-primary);
         display: flex;
         justify-content: flex-end;
         align-items: center;
@@ -622,11 +622,11 @@ if ($is_detail_view) {
         text-align: center;
         margin-bottom: 2.5rem;
         padding-bottom: 1.5rem;
-        border-bottom: 2px solid var(--room-light);
+        border-bottom: 2px solid var(--bg-secondary);
     }
 
     .all-rooms-title {
-        color: var(--room-primary);
+        color: var(--text-primary);
         font-size: 2.4rem;
         margin-bottom: 0.5rem;
         display: flex;
@@ -636,11 +636,11 @@ if ($is_detail_view) {
     }
 
     .all-rooms-title i {
-        color: #6c757d;
+        color: var(--text-primary);
     }
 
     .all-rooms-subtitle {
-        color: #666;
+        color: var(--text-secondary);
         font-size: 1.1rem;
     }
 
@@ -651,15 +651,15 @@ if ($is_detail_view) {
     }
 
     .room-card {
-        background: white;
-        border-radius: 12px;
-        box-shadow: var(--room-shadow-md);
+        background: var(--bg-primary);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
         overflow: hidden;
         display: flex;
         flex-direction: column;
         height: 400px;
         position: relative;
-        transition: var(--room-transition);
+        transition: var(--transition);
     }
 
     .room-card:hover {
@@ -688,7 +688,7 @@ if ($is_detail_view) {
     }
 
     .room-title {
-        color: var(--room-primary);
+        color: var(--primary-color);
         font-size: 1.4rem;
         margin: 0.75rem 0;
         line-height: 1.4;
@@ -702,7 +702,7 @@ if ($is_detail_view) {
     .room-content {
         padding: 0 1.25rem;
         flex-grow: 1;
-        color: var(--room-dark);
+        color: var(--text-primary);
         line-height: 1.7;
         font-size: 1rem;
         display: -webkit-box;
@@ -713,16 +713,16 @@ if ($is_detail_view) {
     }
 
     .room-footer {
-        border-top: 1px solid var(--room-light);
+        border-top: 1px solid var(--bg-secondary);
         padding: 1rem 1.25rem;
-        background: #f8f9fa;
+        background: var(--bg-secondary);
         display: flex;
         justify-content: space-between;
         align-items: center;
     }
 
     .room-capacity {
-        color: #666;
+        color: var(--text-secondary);
         font-size: 0.9rem;
         display: flex;
         align-items: center;
@@ -730,29 +730,30 @@ if ($is_detail_view) {
     }
 
     .room-capacity i {
-        color: var(--room-primary);
+        color: var(--primary-color);
     }
 
     .room-link {
-        color: var(--room-primary);
+        color: var(--text-primary);
         text-decoration: none;
         font-weight: 600;
         font-size: 0.9rem;
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        transition: var(--room-transition);
+        transition: var(--transition);
         padding: 0.5rem 0.75rem;
-        border-radius: 6px;
+        border-radius: var(--radius-md);
     }
 
     .room-link:hover {
-        color: white;
-        background-color: var(--room-primary);
+        color: var(--white);
+        background-color: var(--primary-color);
     }
 
     .room-link i {
-        transition: var(--room-transition);
+        color: var(--text-primary);
+        transition: var(--transition);
     }
 
     .room-link:hover i {
@@ -762,10 +763,10 @@ if ($is_detail_view) {
     .no-rooms {
         text-align: center;
         padding: 2.5rem;
-        color: #666;
+        color: var(--text-secondary);
         font-size: 1rem;
-        background: var(--room-light);
-        border-radius: 10px;
+        background: var(--bg-secondary);
+        border-radius: var(--radius-lg);
         font-weight: 500;
     }
 
@@ -780,8 +781,8 @@ if ($is_detail_view) {
 
     .carousel-prev-btn,
     .carousel-next-btn {
-        background: var(--room-btn-gradient);
-        color: white;
+        background: linear-gradient(to right, var(--primary-color), var(--primary-dark));
+        color: var(--white);
         border: none;
         border-radius: 50%;
         width: 38px;
@@ -790,8 +791,8 @@ if ($is_detail_view) {
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        transition: var(--room-transition);
-        box-shadow: 0 2px 6px rgba(13, 110, 253, 0.3);
+        transition: var(--transition);
+        box-shadow: 0 2px 6px rgba(0, 100, 0, 0.3);
     }
 
     .carousel-prev-btn:hover,
@@ -810,11 +811,11 @@ if ($is_detail_view) {
         border-radius: 50%;
         background-color: #ddd;
         cursor: pointer;
-        transition: var(--room-transition);
+        transition: var(--transition);
     }
 
     .carousel-indicator.active {
-        background-color: var(--room-primary);
+        background-color: var(--primary-color);
         transform: scale(1.2);
     }
 
@@ -827,22 +828,22 @@ if ($is_detail_view) {
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        color: var(--room-primary);
+        color: var(--primary-color);
         text-decoration: none;
         font-weight: 600;
-        transition: var(--room-transition);
+        transition: var(--transition);
         padding: 0.75rem 1.5rem;
-        border-radius: 8px;
-        background-color: var(--room-light);
+        border-radius: var(--radius-lg);
+        background-color: var(--bg-secondary);
     }
 
     .back-to-home:hover {
-        background-color: var(--room-primary);
-        color: white;
+        background-color: var(--primary-color);
+        color: var(--white);
     }
 
     .back-to-home i {
-        transition: var(--room-transition);
+        transition: var(--transition);
     }
 
     .back-to-home:hover i {

@@ -915,6 +915,12 @@ if (!isset($_SESSION['admin_id'])) {
                         <a href="?section=CvSU-Events" class="dropdown-item">
                             <i class="fas fa-calendar-day"></i>Events
                         </a>
+                        <a href="?section=CvSU-Campuses" class="dropdown-item">
+                            <i class="fas fa-calendar-day"></i>Campus
+                        </a>
+                        <a href="?section=Latest-Abouts" class="dropdown-item">
+                            <i class="fas fa-calendar-day"></i>About
+                        </a>
                     </div>
                     <a href="#" class="nav-item has-dropdown">
                         <i class="fas fa-calendar-alt"></i>Room Settings
@@ -1080,6 +1086,12 @@ if (!isset($_SESSION['admin_id'])) {
                     break;
                 case 'Latest-News-and-Features':
                     include 'admin/website-managements/news.php';
+                    break;
+                case 'CvSU-Campuses':
+                    include 'admin/website-managements/campus.php';
+                    break;
+                case 'Latest-Abouts':
+                    include 'admin/website-managements/about.php';
                     break;
                 case 'view-alumni-cards':
                     include 'admin/alumni/alumni-view-all.php';

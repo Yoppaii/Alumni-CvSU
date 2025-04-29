@@ -93,11 +93,8 @@
     }
 
     .rooms-heading {
-        font-size: 1.75rem;
         color: #212529;
-        margin-bottom: 2rem;
-        display: flex;
-        align-items: center;
+        margin-bottom: 1rem;
         gap: 0.75rem;
         border-bottom: 2px solid #eaeaea;
         padding-bottom: 0.75rem;
@@ -156,7 +153,7 @@
     }
 
     .room-item:hover .room-title {
-        color: #0d6efd;
+        color: var(--primary-dark);
     }
 
     .room-content {
@@ -193,7 +190,7 @@
         font-size: 0.9rem;
         font-weight: 600;
         text-decoration: none;
-        color: #0d6efd;
+        color: var(--text-primary);
         transition: all 0.3s ease;
         position: relative;
     }
@@ -205,7 +202,7 @@
         left: 0;
         width: 0;
         height: 2px;
-        background-color: #0a58ca;
+        background-color: var(--primary-dark);
         transition: width 0.3s ease;
     }
 
@@ -214,7 +211,7 @@
     }
 
     .room-link:hover {
-        color: #0a58ca;
+        color: var(--primary-dark);
     }
 
     .rooms-view-all {
@@ -225,10 +222,12 @@
         border-radius: 6px;
         font-weight: 600;
         text-decoration: none;
-        color: #0d6efd;
+        color: var(--text-primary);
         transition: all 0.3s ease;
         position: relative;
         overflow: hidden;
+
+
     }
 
     .rooms-view-all:before {
@@ -248,7 +247,8 @@
     }
 
     .rooms-view-all:hover {
-        background-color: #f0f4ff;
+        background-color: var(--primary-dark);
+        color: var(--white);
     }
 
     .rooms-view-all i {

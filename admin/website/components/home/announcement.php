@@ -59,7 +59,7 @@ $result = $mysqli->query($query);
             }
             ?>
         </div>
-
+ 
         <!-- Removed the conditional check to always show the "See all" link -->
         <div class="announcement-actions">
             <a href="?pages=announcement" class="announcement-view-all">
@@ -71,29 +71,6 @@ $result = $mysqli->query($query);
 </section>
 
 <style>
-    :root {
-        --primary-color: #10b981;
-        --primary-dark: #059669;
-        --secondary-color: #64748b;
-        --secondary-hover: #4b5563;
-        --border-color: #e2e8f0;
-        --danger-color: #ef4444;
-        --danger-hover: #dc2626;
-        --success-color: #10b981;
-        --success-hover: #059669;
-        --warning-color: #f59e0b;
-        --text-primary: #1e293b;
-        --text-secondary: #64748b;
-        --bg-primary: #ffffff;
-        --bg-secondary: #f8fafc;
-        --white: #ffffff;
-        --radius-sm: 4px;
-        --radius-md: 6px;
-        --radius-lg: 8px;
-        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        --transition: all 0.2s ease;
-    }
-
     /* Enhanced Announcement Section Styles */
     #announcement-section {
         width: 100%;
@@ -102,6 +79,10 @@ $result = $mysqli->query($query);
 
     .announcement-container {
         background-color: #f8f9fa;
+    }
+
+    .announcement-heading {
+        color: var(--text-primary);
     }
 
 
@@ -123,7 +104,6 @@ $result = $mysqli->query($query);
         border: 1px solid #eaeaea;
         cursor: pointer;
         opacity: 0;
-
         margin-bottom: auto;
         /* Start invisible for fade-in */
     }
@@ -168,11 +148,12 @@ $result = $mysqli->query($query);
         font-size: 1.25rem;
         margin: 0 0 0.75rem;
         line-height: 1.4;
+        color: var(--text-primary);
         transition: color 0.3s ease;
     }
 
     .announcement-item:hover .announcement-title {
-        color: #0d6efd;
+        color: var(--primary-dark);
     }
 
     .announcement-content {
@@ -187,7 +168,6 @@ $result = $mysqli->query($query);
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 1rem 1.25rem;
         background-color: #f8f9fa;
         border-top: 1px solid #eaeaea;
         transition: background-color 0.3s ease;
@@ -247,7 +227,7 @@ $result = $mysqli->query($query);
         border-radius: 6px;
         font-weight: 600;
         text-decoration: none;
-        color: var(--primay-dark);
+        color: var(--text-primary);
         transition: all 0.3s ease;
         position: relative;
         overflow: hidden;
@@ -270,7 +250,8 @@ $result = $mysqli->query($query);
     }
 
     .announcement-view-all:hover {
-        background-color: #f0f4ff;
+        background-color: var(--primary-color);
+        color: var(--white);
     }
 
     .announcement-view-all i {
@@ -284,7 +265,7 @@ $result = $mysqli->query($query);
     .announcement-actions {
         display: flex;
         justify-content: center;
-        margin-top: 1rem;
+        /* margin-top: 1rem; */
     }
 
     .no-announcements {
