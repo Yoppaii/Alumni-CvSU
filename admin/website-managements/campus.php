@@ -206,19 +206,19 @@ $result = $mysqli->query($query);
     <style>
         .campus-container {
             display: flex;
-            gap: 2rem;
+            gap: 1rem;
             max-width: auto;
             margin: 0 auto;
             flex-wrap: wrap;
         }
 
         .campus-form-section {
-            flex: 1 1 350px;
             background: var(--bg-primary);
             border-radius: var(--radius-lg);
             padding: 2rem;
             box-shadow: var(--shadow-md);
-            min-width: 320px;
+            flex: 1;
+            min-width: 0;
         }
 
         .campus-form {
@@ -277,14 +277,13 @@ $result = $mysqli->query($query);
         }
 
         .campus-recent-section {
-            flex: 1 1 600px;
             background: var(--bg-primary);
             border-radius: var(--radius-lg);
             padding: 1.5rem;
             box-shadow: var(--shadow-md);
             max-height: 80vh;
             overflow-y: auto;
-            min-width: 320px;
+            width: 400px;
         }
 
         .campus-recent-container {

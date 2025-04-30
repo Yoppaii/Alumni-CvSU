@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['delete_id'])) {
     <style>
         .EV-container {
             display: flex;
-            gap: 2rem;
+            gap: 1rem;
             width: 100%;
             margin: 0 auto;
         }
