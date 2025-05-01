@@ -207,18 +207,17 @@ $result = $mysqli->query($query);
         .campus-container {
             display: flex;
             gap: 1rem;
-            max-width: auto;
-            margin: 0 auto;
-            flex-wrap: wrap;
+            width: 100%;
+            margin: auto;
         }
 
         .campus-form-section {
-            background: var(--bg-primary);
-            border-radius: var(--radius-lg);
-            padding: 2rem;
-            box-shadow: var(--shadow-md);
             flex: 1;
             min-width: 0;
+            background-color: var(--bg-primary, #fff);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         .campus-form {
@@ -283,7 +282,8 @@ $result = $mysqli->query($query);
             box-shadow: var(--shadow-md);
             max-height: 80vh;
             overflow-y: auto;
-            width: 400px;
+            width: 600px;
+            min-width: 600px;
         }
 
         .campus-recent-container {
@@ -495,7 +495,7 @@ $result = $mysqli->query($query);
     <div class="campus-container">
 
         <!-- Add Campus Form -->
-        <div class="campus-form-section">
+        <section class="campus-form-section">
             <h2>Add New Campus</h2>
             <form class="campus-form" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="add" />
@@ -513,10 +513,10 @@ $result = $mysqli->query($query);
                 </div>
                 <button class="campus-submit" type="submit">Add Campus</button>
             </form>
-        </div>
+        </section>
 
         <!-- Campus List -->
-        <div class="campus-recent-section">
+        <section class="campus-recent-section">
             <h2>Manage Campuses</h2>
             <div class="campus-recent-container">
                 <?php while ($row = $result->fetch_assoc()): ?>
@@ -537,7 +537,7 @@ $result = $mysqli->query($query);
                     </div>
                 <?php endwhile; ?>
             </div>
-        </div>
+        </section>
     </div>
 
     <!-- Edit Modal -->

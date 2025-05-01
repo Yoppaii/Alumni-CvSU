@@ -6,7 +6,7 @@ if (!isset($_SESSION['admin_id'])) {
     header("Location: admin/portal/login-admin");
     exit();
 }
-
+ 
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -915,6 +915,9 @@ if (!isset($_SESSION['admin_id'])) {
                         <a href="?section=CvSU-Events" class="dropdown-item">
                             <i class="fas fa-calendar-day"></i>Events
                         </a>
+                        <a href="?section=CvSU-Careers" class="dropdown-item">
+                            <i class="fas fa-calendar-day"></i>Careers
+                        </a>
                         <a href="?section=CvSU-Campuses" class="dropdown-item">
                             <i class="fas fa-calendar-day"></i>Campus
                         </a>
@@ -1083,6 +1086,9 @@ if (!isset($_SESSION['admin_id'])) {
                     break;
                 case 'CvSU-Events':
                     include 'admin/website-managements/events.php';
+                    break;
+                case 'CvSU-Careers':
+                    include 'admin/website-managements/careers.php';
                     break;
                 case 'Latest-News-and-Features':
                     include 'admin/website-managements/news.php';

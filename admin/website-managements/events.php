@@ -63,8 +63,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['delete_id'])) {
         }
 
         .EV-recent-section {
-            width: 400px;
-            min-width: 400px;
+            width: 600px;
+            min-width: 600px;
         }
 
         .EV-form {

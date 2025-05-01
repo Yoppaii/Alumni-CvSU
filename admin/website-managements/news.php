@@ -223,8 +223,8 @@ $result = $mysqli->query($query);
         }
 
         .NEWS-recent-section {
-            width: 400px;
-            min-width: 400px;
+            width: 600px;
+            min-width: 600px;
         }
 
         .NEWS-form {

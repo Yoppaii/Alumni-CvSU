@@ -194,6 +194,7 @@ $stmt->close();
             box-shadow: var(--shadow-md);
             margin-bottom: 2rem;
             overflow: hidden;
+
         }
 
         .card-header {
