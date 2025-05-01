@@ -254,7 +254,7 @@
 
     <div class="register-container">
         <div class="logo-section">
-            <img src="/Alumni-CvSU/asset/images/res1.png" alt="Logo">
+            <img src="/Alumni-CvSU/asset/images/1.png" alt="Logo">
             <h2>Create an Account</h2>
             <p>Fill in the details to get started</p>
         </div>

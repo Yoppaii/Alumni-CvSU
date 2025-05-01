@@ -3,6 +3,7 @@ session_start();
 header('Content-Type: application/json');
 require_once '../../../main_db.php';
 
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
     $password = $_POST['password'];

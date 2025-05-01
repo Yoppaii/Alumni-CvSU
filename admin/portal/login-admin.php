@@ -4,6 +4,7 @@ if (isset($_SESSION['admin_id'])) {
     header("Location: ../../dashboard.php");
     exit();
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
