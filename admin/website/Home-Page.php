@@ -21,31 +21,39 @@
         margin: 0;
         position: relative;
         overflow: hidden;
+        /* Apply the fixed background to the container instead of individual slides */
+        background-image: url('asset/images/bground2.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
     }
+
+    .hero-swiper-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.4);
+        z-index: 1;
+    }
+
 
     .swiper-slide {
         text-align: center;
-        background-position: center;
-        background-size: cover;
-        background-repeat: no-repeat;
         position: relative;
         display: flex;
         align-items: center;
         justify-content: center;
+        z-index: 2; 
     }
 
-    /* Individual slide backgrounds */
-    .slide-1 {
-        background-image: url('asset/images/bground2.jpg');
+    /* Remove individual slide backgrounds */
+    .slide-1, .slide-2, .slide-3 {
+        background-image: none;
     }
 
-    .slide-2 {
-        background-image: url('asset/images/bground2.jpg');
-    }
-
-    .slide-3 {
-        background-image: url('asset/images/bground2.jpg');
-    }
 
     .slide-content {
         position: relative;
@@ -59,7 +67,7 @@
 
     .slide-content h2 {
         font-family: 'Times New Roman', Times, serif;
-        font-size: 35px;
+        font-size: 50px;
         margin-bottom: 15px;
         font-weight: 700;
         color: rgb(223, 226, 30);
@@ -73,7 +81,7 @@
 
     .slide-content2 h2 {
         font-family: 'Times New Roman', Times, serif;
-        font-size: 35px;
+        font-size: 50px;
         margin-bottom: 15px;
         font-weight: 700;
         color: rgb(223, 226, 30);
@@ -697,9 +705,9 @@
 
                 <!-- Second slide -->
                 <div class="swiper-slide slide-2">
-                    <img src="asset/images/signup1.png" alt="Support Icon" class="support-icon2">
+                    <img src="asset/images/signup2.png" alt="Support Icon" class="support-icon2">
                     <div class="slide-content2">
-                        <h2 class="animate__animated animate__fadeInDown">REGISTER & UPDATE<br>YOUR ALUMNI PROFILE<br></h2>
+                        <h2 class="animate__animated animate__fadeInDown">REGISTER & UPDATE YOUR ALUMNI PROFILE<br></h2>
                         <p class="animate__animated animate__fadeInUp"> To access exclusive alumni features: <br>
                             <span class="check-icon"> </span> Alumni ID<br>
                             <span class="check-icon"> </span> Alumni Tracer<br>
@@ -735,7 +743,7 @@
         <div class="mobile-hero-content">
             <h2>REGISTER & UPDATE YOUR ALUMNI PROFILE</h2>
             <div class="mobile-image-container">
-                <img src="asset/images/signup1.png" alt="Sign Up Icon">
+                <img src="asset/images/signup2.png" alt="Sign Up Icon">
             </div>
             <p>To access exclusive alumni features:</p>
             <div class="mobile-feature-item">

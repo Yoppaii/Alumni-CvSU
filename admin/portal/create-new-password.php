@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reset Password - CvSU</title>
-    <link rel="icon" href="/RS/CvSU/bg/res1.png" type="image/x-icon">
+    <link rel="icon" href="/RS/CvSU/bg/1.png" type="image/x-icon">
     <link rel="stylesheet" href="/RS/portal/css/create-new-password.css">
 </head>
 <body>
