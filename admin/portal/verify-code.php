@@ -1,31 +1,88 @@
 <?php
 require_once 'main_db.php';
-
 $response = ['status' => 'error', 'message' => ''];
-
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['otp']) && count($_POST['otp']) === 6) {
         $otp = implode('', $_POST['otp']);
-        
         if (isset($_COOKIE['otp']) && $otp === $_COOKIE['otp']) {
-            $username = $_COOKIE['username'];
             $email = $_COOKIE['email'];
             $password = $_COOKIE['password'];
+            // Start a transaction to ensure data consistency
+            $mysqli->begin_transaction();
+            try {
+                // Insert into users table
+                $stmt = $mysqli->prepare("INSERT INTO `users`(`email`, `password`) VALUES (?, ?)");
+                $stmt->bind_param("ss", $email, $password);
+                if ($stmt->execute()) {
+                    $userId = $mysqli->insert_id; // Get the newly inserted user ID
 
-            $stmt = $mysqli->prepare("INSERT INTO `users`(`username`, `email`, `password`) VALUES (?, ?, ?)");
-            $stmt->bind_param("sss", $username, $email, $password);
+                    // Check if user profile data exists in cookies with default values if not set
+                    $first_name = isset($_COOKIE['firstName']) ? $_COOKIE['firstName'] : '';
+                    $last_name = isset($_COOKIE['lastName']) ? $_COOKIE['lastName'] : '';
+                    $middle_name = isset($_COOKIE['middleName']) ? $_COOKIE['middleName'] : '';
+                    $position = isset($_COOKIE['position']) ? $_COOKIE['position'] : '';
+                    $address = isset($_COOKIE['address']) ? $_COOKIE['address'] : '';
+                    $telephone = isset($_COOKIE['telephone']) ? $_COOKIE['telephone'] : '';
+                    $phone_number = isset($_COOKIE['phoneNumber']) ? $_COOKIE['phoneNumber'] : '';
+                    $user_status = isset($_COOKIE['userType']) ? $_COOKIE['userType'] : '';
+                    $verified = 1;
 
-            if ($stmt->execute()) {
-                setcookie('otp', '', time() - 3600, '/');
-                setcookie('username', '', time() - 3600, '/');
-                setcookie('email', '', time() - 3600, '/');
-                setcookie('password', '', time() - 3600, '/');
+                    // For Alumni users, get the alumni ID card number
+                    $alumni_id_card_no = '';
+                    if ($user_status === 'Alumni') {
+                        $alumni_id_card_no = isset($_COOKIE['alumniIdCardNo']) ? $_COOKIE['alumniIdCardNo'] : '';
+                    }
 
-                $response['status'] = 'success';
-                $response['message'] = 'Successfully registered. Redirecting to the homepage.';
-            } else {
+                    // Insert into user table with alumni_id_card_no if applicable
+                    if ($user_status === 'Alumni') {
+                        $sql = "INSERT INTO `user`(`user_id`, `alumni_id_card_no`, `first_name`, `last_name`, `middle_name`, `position`, `address`, `telephone`, `phone_number`, `user_status`, `verified`) 
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                        $stmt = $mysqli->prepare($sql);
+                        $stmt->bind_param("isssssssssi", $userId, $alumni_id_card_no, $first_name, $last_name, $middle_name, $position, $address, $telephone, $phone_number, $user_status, $verified);
+
+                        $update_sql = "UPDATE `alumni` SET `verify` = 'used' WHERE `alumni_id_card_no` = ?";
+                        $update_stmt = $mysqli->prepare($update_sql);
+                        $update_stmt->bind_param("s", $alumni_id_card_no);
+                        $update_stmt->execute();
+                    } else {
+                        // For Guest and other user types, don't include alumni_id_card_no
+                        $sql = "INSERT INTO `user`(`user_id`, `first_name`, `last_name`, `middle_name`, `position`, `address`, `telephone`, `phone_number`, `user_status`, `verified`) 
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                        $stmt = $mysqli->prepare($sql);
+                        $stmt->bind_param("issssssssi", $userId, $first_name, $last_name, $middle_name, $position, $address, $telephone, $phone_number, $user_status, $verified);
+                    }
+
+                    $stmt->execute();
+
+                    $mysqli->commit();
+
+                    // Clear all cookies
+                    setcookie('otp', '', time() - 3600, '/');
+                    setcookie('email', '', time() - 3600, '/');
+                    setcookie('password', '', time() - 3600, '/');
+                    setcookie('firstName', '', time() - 3600, '/');
+                    setcookie('lastName', '', time() - 3600, '/');
+                    setcookie('middleName', '', time() - 3600, '/');
+                    setcookie('position', '', time() - 3600, '/');
+                    setcookie('address', '', time() - 3600, '/');
+                    setcookie('telephone', '', time() - 3600, '/');
+                    setcookie('phoneNumber', '', time() - 3600, '/');
+                    setcookie('userType', '', time() - 3600, '/');
+
+                    // Clear Alumni specific cookie
+                    if ($user_status === 'Alumni') {
+                        setcookie('alumniIdCardNo', '', time() - 3600, '/');
+                    }
+
+                    $response['status'] = 'success';
+                    $response['message'] = 'Successfully registered. Redirecting to the homepage.';
+                } else {
+                    throw new Exception('Failed to register user.');
+                }
+            } catch (Exception $e) {
+                $mysqli->rollback();
                 $response['status'] = 'error';
-                $response['message'] = 'Failed to register user.';
+                $response['message'] = $e->getMessage();
             }
         } else {
             $response['status'] = 'error';
@@ -35,13 +92,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $response['status'] = 'error';
         $response['message'] = 'OTP must be 6 digits long.';
     }
-
     echo json_encode($response);
     exit();
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -105,8 +162,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         body {
@@ -247,13 +309,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
 
         @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
 
         @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+            }
         }
 
         @media (max-width: 768px) {
@@ -289,6 +363,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     </style>
 </head>
+
 <body>
     <div id="loadingOverlay">
         <div class="loading-content">
@@ -321,7 +396,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </form>
         </div>
     </div>
-
     <script>
         const inputs = document.querySelectorAll('.code-input');
         inputs.forEach((input, index) => {
@@ -332,7 +406,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     }
                 }
             });
-
             input.addEventListener('keydown', function(e) {
                 if (e.key === 'Backspace' && !this.value) {
                     if (index > 0) {
@@ -343,16 +416,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         });
 
         function startTimer(duration, display) {
-            let timer = duration, minutes, seconds;
-            let countdown = setInterval(function () {
+            let timer = duration,
+                minutes, seconds;
+            let countdown = setInterval(function() {
                 minutes = parseInt(timer / 60, 10);
                 seconds = parseInt(timer % 60, 10);
-
                 minutes = minutes < 10 ? "0" + minutes : minutes;
                 seconds = seconds < 10 ? "0" + seconds : seconds;
-
                 display.textContent = minutes + ":" + seconds;
-
                 if (--timer < 0) {
                     clearInterval(countdown);
                     display.textContent = "00:00";
@@ -360,8 +431,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 }
             }, 1000);
         }
-
-        window.onload = function () {
+        window.onload = function() {
             let fiveMinutes = 60 * 5,
                 display = document.querySelector('#countdown');
             startTimer(fiveMinutes, display);
@@ -375,27 +445,45 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             const formData = new FormData(this);
 
             fetch('?Cavite-State-University=verify', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                const notificationContainer = document.getElementById('notificationContainer');
-                const notification = document.createElement('div');
-                notification.classList.add('notification');
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const notificationContainer = document.getElementById('notificationContainer');
+                    const notification = document.createElement('div');
+                    notification.classList.add('notification');
 
-                if (data.status === 'success') {
-                    notification.style.borderLeftColor = '#4CAF50';
-                    notification.innerHTML = data.message;
-                    notificationContainer.appendChild(notification);
+                    if (data.status === 'success') {
+                        notification.style.borderLeftColor = '#4CAF50';
+                        notification.innerHTML = data.message;
+                        notificationContainer.appendChild(notification);
 
-                    setTimeout(() => {
-                        window.location.href = '?Cavite-State-University=login';
-                    }, 3000);
-                } else {
+                        setTimeout(() => {
+                            window.location.href = '?Cavite-State-University=login';
+                        }, 3000);
+                    } else {
+                        loadingOverlay.style.display = 'none';
+                        notification.style.borderLeftColor = '#f44336';
+                        notification.innerHTML = data.message;
+                        notificationContainer.appendChild(notification);
+
+                        setTimeout(() => {
+                            notification.style.animation = 'fadeOut 5s forwards';
+                        }, 5000);
+
+                        setTimeout(() => {
+                            notification.remove();
+                        }, 5500);
+                    }
+                })
+                .catch(error => {
                     loadingOverlay.style.display = 'none';
+                    const notificationContainer = document.getElementById('notificationContainer');
+                    const notification = document.createElement('div');
+                    notification.classList.add('notification');
                     notification.style.borderLeftColor = '#f44336';
-                    notification.innerHTML = data.message;
+                    notification.innerHTML = 'An error occurred. Please try again.';
                     notificationContainer.appendChild(notification);
 
                     setTimeout(() => {
@@ -405,26 +493,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     setTimeout(() => {
                         notification.remove();
                     }, 5500);
-                }
-            })
-            .catch(error => {
-                loadingOverlay.style.display = 'none';
-                const notificationContainer = document.getElementById('notificationContainer');
-                const notification = document.createElement('div');
-                notification.classList.add('notification');
-                notification.style.borderLeftColor = '#f44336';
-                notification.innerHTML = 'An error occurred. Please try again.';
-                notificationContainer.appendChild(notification);
-
-                setTimeout(() => {
-                    notification.style.animation = 'fadeOut 5s forwards';
-                }, 5000);
-
-                setTimeout(() => {
-                    notification.remove();
-                }, 5500);
-            });
+                });
         });
     </script>
 </body>
+
 </html>

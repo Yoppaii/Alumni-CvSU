@@ -24,7 +24,7 @@ if (isset($_SESSION['user_id'])) {
     }
     $check_status->close();
 }
-
+ 
 // Get the current URL parameters
 $current_url = '?section=re-apply-account';
 
@@ -522,7 +522,6 @@ if (isset($_GET['update']) && $_GET['update'] == 'submit' && isset($_GET['user_i
                         <label for="last_name">Last Name</label>
                         <input type="text" id="last_name" name="last_name" required>
                     </div>
-
                     <button type="submit" class="submit-button">Verify Alumni Status</button>
                 </form>
             <?php else: ?>

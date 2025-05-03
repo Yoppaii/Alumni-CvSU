@@ -11,7 +11,7 @@ switch ($section) {
         break;
 
     case 'register':
-        include 'admin/portal/register.php';
+        include 'admin/portal/new-register/register.php';
         break;
     case 'register-co-admin':
         include 'admin/portal/it-support-register.php';
@@ -71,4 +71,3 @@ switch ($section) {
         include 'asset/error/404-error.php';
         break;
 }
-?>
