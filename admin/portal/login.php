@@ -483,20 +483,102 @@ function is_mobile($user_agent)
             color: var(--login-secondary);
         }
 
-        .notification {
+        /* Notification styles */
+        #notificationContainer {
             position: fixed;
             top: 20px;
             right: 20px;
-            padding: 12px 20px;
-            background: var(--login-text-light);
-            border-radius: 6px;
-            box-shadow: var(--login-shadow-sm);
+            z-index: 1050;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .notification {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 8px;
-            font-size: 0.9rem;
-            animation: slideIn 0.3s ease-out;
-            z-index: 1000;
+            padding: 16px 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            margin-bottom: 10px;
+            animation: slideIn 0.3s ease-out forwards;
+            min-width: 300px;
+            max-width: 400px;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        .notification.error {
+            border-left: 4px solid #ef4444;
+        }
+
+        .notification.success {
+            border-left: 4px solid #10b981;
+        }
+
+        .notification.warning {
+            border-left: 4px solid #f59e0b;
+        }
+
+        .notification.info {
+            border-left: 4px solid #3b82f6;
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px;
+            color: #64748b;
+        }
+
+        .notification-close:hover {
+            color: #1e293b;
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+                height: auto;
+                padding-top: 12px;
+                /* match your row padding */
+                padding-bottom: 12px;
+            }
+
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+                height: 0;
+                padding-top: 0;
+                padding-bottom: 0;
+                margin: 0;
+                border: 0;
+            }
         }
 
         .legal-links {
@@ -694,34 +776,34 @@ function is_mobile($user_agent)
             }, 500);
         });
 
-        document.querySelector('form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            showLoading();
+        // document.querySelector('form').addEventListener('submit', function(e) {
+        //     e.preventDefault();
+        //     showLoading();
 
-            const formData = new FormData(this);
+        //     const formData = new FormData(this);
 
-            fetch('?Cavite-State-University=login', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'error') {
-                        hideLoading();
-                        showNotification(data.message, 'error');
-                    } else if (data.status === 'success') {
-                        showNotification(data.message, 'success');
-                        setTimeout(() => {
-                            window.location.href = data.redirect;
-                        }, 1500);
-                    }
-                })
-                .catch(error => {
-                    hideLoading();
-                    showNotification('An error occurred. Please try again.', 'error');
-                    console.error('Error:', error);
-                });
-        });
+        //     fetch('?Cavite-State-University=login', {
+        //             method: 'POST',
+        //             body: formData
+        //         })
+        //         .then(response => response.json())
+        //         .then(data => {
+        //             if (data.status === 'error') {
+        //                 hideLoading();
+        //                 showNotification(data.message, 'error');
+        //             } else if (data.status === 'success') {
+        //                 showNotification(data.message, 'success');
+        //                 setTimeout(() => {
+        //                     window.location.href = data.redirect;
+        //                 }, 1500);
+        //             }
+        //         })
+        //         .catch(error => {
+        //             hideLoading();
+        //             showNotification('An error occurred. Please try again.', 'error');
+        //             console.error('Error:', error);
+        //         });
+        // });
 
         function saveCredentials(email, password, remember) {
             if (remember) {

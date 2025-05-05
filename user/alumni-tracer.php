@@ -12,6 +12,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $logged_user_id = $_SESSION['user_id'];
+
 $check_sql = "SELECT id FROM personal_info WHERE user_id = ?";
 $check_stmt = $mysqli->prepare($check_sql);
 $check_stmt->bind_param("i", $logged_user_id);
@@ -26,6 +27,8 @@ if ($check_result->num_rows > 0) {
 $check_stmt->close();
 
 ob_end_flush();
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -38,6 +41,9 @@ ob_end_flush();
 <style>
     :root {
         --primary-color: #2d6936;
+
+        --primary-dark: #004d00;
+
         --secondary-color: #1e40af;
         --background-color: #f4f6f8;
         --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -165,7 +171,7 @@ ob_end_flush();
     }
 
     .step.completed {
-        background-color: #4ade80;
+        background-color: var(--primary-dark);
         color: white;
     }
 
@@ -464,14 +470,12 @@ ob_end_flush();
                 <div class="step" data-step="4">4</div>
                 <div class="step" data-step="5">5</div>
                 <div class="step" data-step="6">6</div>
-                <div class="step" data-step="7">7</div>
             </div>
-
             <!-- Step 1: Personal Information -->
             <div class="form-step" id="step1">
                 <h2>Personal Information</h2>
                 <div class="form-group">
-                    <label for="civilStatus">Civil Status</label>
+                    <label for="civilStatus">Civil Status <span style="color: red;">*</span></label>
                     <select name="civilStatus" id="civilStatus" required>
                         <option value="">Select Civil Status</option>
                         <option value="single">Single</option>
@@ -483,7 +487,7 @@ ob_end_flush();
                 </div>
 
                 <div class="form-group">
-                    <label for="sex">Sex</label>
+                    <label for="sex">Sex <span style="color: red;">*</span></label>
                     <select name="sex" id="sex" required>
                         <option value="">Select Sex</option>
                         <option value="male">Male</option>
@@ -492,12 +496,12 @@ ob_end_flush();
                 </div>
 
                 <div class="form-group">
-                    <label for="birthday">Birthday</label>
+                    <label for="birthday">Birthday <span style="color: red;">*</span></label>
                     <input type="date" name="birthday" id="birthday" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="course">Course</label>
+                    <label for="course">Course <span style="color: red;">*</span></label>
                     <select name="course" id="course" required>
                         <option value="">Select Course</option>
                         <option value="BS Information Technology">BS Information Technology</option>
@@ -522,7 +526,7 @@ ob_end_flush();
                 </div>
 
                 <div class="form-group">
-                    <label for="campus">Campus</label>
+                    <label for="campus">Campus <span style="color: red;">*</span></label>
                     <select name="campus" id="campus" required>
                         <option value="">Select Campus</option>
                         <option value="Main Campus">Main Campus</option>
@@ -536,7 +540,7 @@ ob_end_flush();
                 </div>
 
                 <div class="form-group">
-                    <label for="residence">Location Residence</label>
+                    <label for="residence">Location Residence <span style="color: red;">*</span></label>
                     <select name="residence" id="residence" required>
                         <option value="">Select Location in Cavite</option>
                         <option value="bacoor">Bacoor</option>
@@ -607,7 +611,7 @@ ob_end_flush();
                 </div>
 
                 <div class="form-group">
-                    <label for="highestEducation">What is your highest level of education completed?</label>
+                    <label for="highestEducation">What is your highest level of education completed? <span style="color: red;">*</span></label>
                     <select name="highestEducation" id="highestEducation" required>
                         <option value="">Select Highest Education</option>
                         <option value="bachelors">Bachelor's Degree</option>
@@ -725,7 +729,7 @@ ob_end_flush();
                 <h2>Employment Data</h2>
 
                 <div class="form-group">
-                    <label for="employmentStatus">Are you presently employed?</label>
+                    <label for="employmentStatus">Are you presently employed? <span style="color: red;">*</span></label>
                     <select name="employmentStatus" id="employmentStatus" required>
                         <option value="">Select Answer</option>
                         <option value="yes">Yes</option>
@@ -760,7 +764,7 @@ ob_end_flush();
                 </div>
 
                 <div class="form-group">
-                    <label for="presentEmploymentStatus">Present Employment Status</label>
+                    <label for="presentEmploymentStatus">Present Employment Status <span style="color: red;">*</span></label>
                     <select name="presentEmploymentStatus" id="presentEmploymentStatus" required>
                         <option value="">Select Status</option>
                         <option value="regular">Regular/Permanent</option>
@@ -781,7 +785,7 @@ ob_end_flush();
                 </div>
 
                 <div class="form-group">
-                    <label for="businessLine">Major line of business of the company</label>
+                    <label for="businessLine">Major line of business of the company <span style="color: red;">*</span></label>
                     <select name="businessLine" id="businessLine" required>
                         <option value="">Select Business Line</option>
                         <option value="agriculture">Agriculture, Hunting and Forestry</option>
@@ -803,7 +807,7 @@ ob_end_flush();
                 </div>
 
                 <div class="form-group">
-                    <label for="workPlace">Place of Work</label>
+                    <label for="workPlace">Place of Work <span style="color: red;">*</span></label>
                     <select name="workPlace" id="workPlace" required>
                         <option value="">Select Location</option>
                         <option value="local">Local</option>
@@ -824,7 +828,7 @@ ob_end_flush();
                 <h2>Job Experience and Reasons</h2>
 
                 <div class="form-group">
-                    <label for="firstJob">Is this your first job after college?</label>
+                    <label for="firstJob">Is this your first job after college? <span style="color: red;">*</span></label>
                     <select name="firstJob" id="firstJob" required>
                         <option value="">Select Answer</option>
                         <option value="yes">Yes</option>
@@ -867,7 +871,7 @@ ob_end_flush();
                 </div>
 
                 <div class="form-group">
-                    <label for="courseRelated">Is your first job related to the course you took up in college?</label>
+                    <label for="courseRelated">Is your first job related to the course you took up in college? <span style="color: red;">*</span></label>
                     <select name="courseRelated" id="courseRelated" required>
                         <option value="">Select Answer</option>
                         <option value="yes">Yes</option>
@@ -926,7 +930,7 @@ ob_end_flush();
                 </div>
 
                 <div class="form-group">
-                    <label for="firstJobDuration">How long did you stay in your first job?</label>
+                    <label for="firstJobDuration">How long did you stay in your first job? <span style="color: red;">*</span></label>
                     <select name="firstJobDuration" id="firstJobDuration" required>
                         <option value="">Select Duration</option>
                         <option value="less_than_6months">Less than 6 months</option>
@@ -937,7 +941,7 @@ ob_end_flush();
                 </div>
 
                 <div class="form-group">
-                    <label for="jobFinding">How did you find your first job?</label>
+                    <label for="jobFinding">How did you find your first job? <span style="color: red;">*</span></label>
                     <select name="jobFinding" id="jobFinding" required>
                         <option value="">Select Method</option>
                         <option value="job_fair">Job Fair</option>
@@ -949,7 +953,7 @@ ob_end_flush();
                 </div>
 
                 <div class="form-group">
-                    <label for="timeToLand">How long did it take you to land your first job?</label>
+                    <label for="timeToLand">How long did it take you to land your first job? <span style="color: red;">*</span></label>
                     <select name="timeToLand" id="timeToLand" required>
                         <option value="">Select Duration</option>
                         <option value="less_than_1month">Less than 1 month</option>
@@ -960,7 +964,7 @@ ob_end_flush();
                 </div>
 
                 <div class="form-group">
-                    <label for="jobLevel">Job Level Position</label>
+                    <label for="jobLevel">Job Level Position <span style="color: red;">*</span></label>
                     <select name="jobLevel" id="jobLevel" required>
                         <option value="">Select Position</option>
                         <option value="entry">Entry Level</option>
@@ -972,7 +976,7 @@ ob_end_flush();
                 </div>
 
                 <div class="form-group">
-                    <label for="currentJob">Current or Present Job</label>
+                    <label for="currentJob">Current or Present Job <span style="color: red;">*</span></label>
                     <select name="currentJob" id="currentJob" required>
                         <option value="">Select Job Type</option>
                         <option value="permanent">Permanent</option>
@@ -984,7 +988,7 @@ ob_end_flush();
                 </div>
 
                 <div class="form-group">
-                    <label for="initialEarning">What is your initial gross monthly earning in your first job after college?</label>
+                    <label for="initialEarning">What is your initial gross monthly earning in your first job after college? <span style="color: red;">*</span></label>
                     <select name="initialEarning" id="initialEarning" required>
                         <option value="">Select Range</option>
                         <option value="below_10k">Below ₱10,000</option>
@@ -996,7 +1000,7 @@ ob_end_flush();
                 </div>
 
                 <div class="form-group">
-                    <label for="curriculumRelevant">Was the curriculum you had in college relevant to your first job?</label>
+                    <label for="curriculumRelevant">Was the curriculum you had in college relevant to your first job? <span style="color: red;">*</span></label>
                     <select name="curriculumRelevant" id="curriculumRelevant" required>
                         <option value="">Select Answer</option>
                         <option value="yes">Yes</option>
@@ -1041,50 +1045,11 @@ ob_end_flush();
 
                 <div class="button-group">
                     <button type="button" class="btn prev-btn">Previous</button>
-                    <button type="button" class="btn next-btn">Next</button>
-                </div>
-            </div>
-
-            <!-- Step 7: Thank You -->
-            <div class="form-step" id="step7" style="display: none;">
-                <h2>Thank You!</h2>
-                <div class="thank-you-message">
-                    <p>Thank you for taking time out to fill out this questionnaire. Please return this GTS to your institution.</p>
-                    <p>Being one of the alumni of your institution, may we request you to list down the names of other college graduates (AY 2000-2001 to AY 2003-2004) from your institution including their email addresses and contact numbers. Their participation will also be needed to make this study more meaningful and useful.</p>
-                </div>
-
-                <div id="alumniContainer">
-                    <div class="person-entry">
-                        <div class="person-header">
-                            <h3>Alumnus 1</h3>
-                            <button type="button" class="remove-person-btn" onclick="removePerson(this)">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                        <div class="form-group">
-                            <label for="name1">Name</label>
-                            <input type="text" id="name1" name="graduate_name[]" placeholder="Enter full name">
-                        </div>
-                        <div class="form-group">
-                            <label for="address1">Email Address</label>
-                            <input type="email" id="address1" name="graduate_address[]" placeholder="Enter email address">
-                        </div>
-                        <div class="form-group">
-                            <label for="contact1">Contact Number</label>
-                            <input type="text" id="contact1" name="graduate_contact[]" placeholder="Enter contact number">
-                        </div>
-                    </div>
-                </div>
-
-                <button type="button" id="addPersonBtn" class="add-person-btn" onclick="addPerson()">
-                    <i class="fas fa-plus"></i> Add Another Person
-                </button>
-
-                <div class="button-group">
-                    <button type="button" class="btn prev-btn">Previous</button>
                     <button type="submit" class="btn submit-btn">Submit</button>
                 </div>
             </div>
+
+
         </form>
     </div>
 

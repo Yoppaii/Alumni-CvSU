@@ -14,7 +14,7 @@ if (isset($_SESSION['user_id'])) {
     $check_status->bind_param("i", $_SESSION['user_id']);
     $check_status->execute();
     $result = $check_status->get_result();
-    
+
     if ($result->num_rows > 0) {
         $user_data = $result->fetch_assoc();
         if ($user_data['user_status'] === 'Alumni') {
@@ -24,7 +24,7 @@ if (isset($_SESSION['user_id'])) {
     }
     $check_status->close();
 }
- 
+
 // Get the current URL parameters
 $current_url = '?section=re-apply-account';
 
@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $alumni_id_card_no = trim($_POST['alumni_id_card_no']);
     $first_name = trim($_POST['first_name']);
     $last_name = trim($_POST['last_name']);
-    
+
     if (empty($alumni_id_card_no) || empty($first_name) || empty($last_name)) {
         $error_message = 'All fields are required.';
     } else {
@@ -43,11 +43,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                   alumni_id_card_no = ? AND 
                                   first_name = ? AND 
                                   last_name = ?");
-        
+
         $alumni_stmt->bind_param("sss", $alumni_id_card_no, $first_name, $last_name);
         $alumni_stmt->execute();
         $alumni_result = $alumni_stmt->get_result();
-        
+
         if ($alumni_result->num_rows > 0) {
             // Alumni verification successful, but DON'T update the database yet
             // Just retrieve and display user details
@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $user_stmt->bind_param("i", $_SESSION['user_id']);
                 $user_stmt->execute();
                 $user_result = $user_stmt->get_result();
-                
+
                 if ($user_result->num_rows > 0) {
                     $alumni_details = $user_result->fetch_assoc();
                     // Store the verified alumni_id_card_no in session for later use
@@ -69,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 } else {
                     $error_message = 'User details not found.';
                 }
-                
+
                 $user_stmt->close();
             } else {
                 $success_message = 'Alumni verification successful! Please log in to view your details.';
@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $error_message = 'No matching alumni record found. Please check your information and try again.';
         }
-        
+
         $alumni_stmt->close();
     }
 }
@@ -85,10 +85,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Handle updates directly from the Update Profile button
 if (isset($_GET['update']) && $_GET['update'] == 'submit' && isset($_GET['user_id'])) {
     $user_id = $_GET['user_id'];
-    
+
     // Get the verified alumni ID from session if available
     $alumni_id_card_no = isset($_SESSION['verified_alumni_id_card_no']) ? $_SESSION['verified_alumni_id_card_no'] : null;
-    
+
     if ($alumni_id_card_no) {
         // Update BOTH user_status to Alumni AND alumni_id_card_no
         $update_status = $mysqli->prepare("UPDATE user SET user_status = 'Alumni', alumni_id_card_no = ? WHERE user_id = ?");
@@ -98,27 +98,41 @@ if (isset($_GET['update']) && $_GET['update'] == 'submit' && isset($_GET['user_i
         $update_status = $mysqli->prepare("UPDATE user SET user_status = 'Alumni' WHERE user_id = ?");
         $update_status->bind_param("i", $user_id);
     }
-    
+
     if ($update_status->execute()) {
         $success_message = 'Profile updated successfully! User status changed to Alumni.';
-        
+
         // Clear the session variable after successful update
         if (isset($_SESSION['verified_alumni_id_card_no'])) {
             unset($_SESSION['verified_alumni_id_card_no']);
         }
-        
+
         // Set flag to redirect using JavaScript
         $redirect_to_home = true;
     } else {
         $error_message = 'Failed to update profile. Please try again.';
     }
-    
+
     $update_status->close();
 }
+
+$user_id = $_SESSION['user_id'];
+
+$check_pre_fill = $mysqli->prepare("SELECT * FROM user WHERE user_id = ? LIMIT 1");
+if ($check_pre_fill === false) {
+    exit("Prepare failed: " . $mysqli->error);
+}
+$check_pre_fill->bind_param("i", $user_id);
+$check_pre_fill->execute();
+$pre_fill_result = $check_pre_fill->get_result();
+$pre_fill = $pre_fill_result->fetch_assoc();
+$check_pre_fill->close();
+
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -344,7 +358,7 @@ if (isset($_GET['update']) && $_GET['update'] == 'submit' && isset($_GET['user_i
             display: flex;
             justify-content: flex-end;
         }
-        
+
         /* Loading Overlay and Notification Styles */
         #loadingOverlay {
             position: fixed;
@@ -432,6 +446,7 @@ if (isset($_GET['update']) && $_GET['update'] == 'submit' && isset($_GET['user_i
                 transform: translateX(100%);
                 opacity: 0;
             }
+
             to {
                 transform: translateX(0);
                 opacity: 1;
@@ -443,6 +458,7 @@ if (isset($_GET['update']) && $_GET['update'] == 'submit' && isset($_GET['user_i
                 transform: translateX(0);
                 opacity: 1;
             }
+
             to {
                 transform: translateX(100%);
                 opacity: 0;
@@ -450,14 +466,27 @@ if (isset($_GET['update']) && $_GET['update'] == 'submit' && isset($_GET['user_i
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         @keyframes pulse {
-            0% { opacity: 0.6; }
-            50% { opacity: 1; }
-            100% { opacity: 0.6; }
+            0% {
+                opacity: 0.6;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0.6;
+            }
         }
 
         .loading-overlay-show {
@@ -469,16 +498,27 @@ if (isset($_GET['update']) && $_GET['update'] == 'submit' && isset($_GET['user_i
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+            }
         }
     </style>
 </head>
+
 <body>
     <?php if ($redirect_to_home): ?>
         <!-- JavaScript redirect to home page -->
@@ -486,138 +526,138 @@ if (isset($_GET['update']) && $_GET['update'] == 'submit' && isset($_GET['user_i
             window.location.href = 'Account?section=home';
         </script>
     <?php else: ?>
-    <div class="verification-form">
-        <div class="form-header">
-            <img src="asset/images/res1.png" alt="Cavite State University Logo">
-            <h1>
-                <?php if ($alumni_details): ?>
-                    Alumni Details
-                <?php else: ?>
-                    Please Input Your Alumni Information
+        <div class="verification-form">
+            <div class="form-header">
+                <img src="asset/images/res1.png" alt="Cavite State University Logo">
+                <h1>
+                    <?php if ($alumni_details): ?>
+                        Alumni Details
+                    <?php else: ?>
+                        Please Input Your Alumni Information
+                    <?php endif; ?>
+                </h1>
+            </div>
+
+            <div class="form-content">
+                <?php if ($error_message): ?>
+                    <div class="message error">
+                        <?php echo htmlspecialchars($error_message); ?>
+                    </div>
                 <?php endif; ?>
-            </h1>
-        </div>
 
-        <div class="form-content">
-            <?php if ($error_message): ?>
-                <div class="message error">
-                    <?php echo htmlspecialchars($error_message); ?>
-                </div>
-            <?php endif; ?>
+                <?php if (!$alumni_details): ?>
+                    <!-- Initial Verification Form -->
+                    <form method="POST" action="<?php echo htmlspecialchars($current_url); ?>" id="verificationForm">
+                        <div class="form-group">
+                            <label for="alumni_id_card_no">Alumni ID Card Number<span style="color: red;">*</span></label>
+                            <input type="text" id="alumni_id_card_no" name="alumni_id_card_no" required>
+                        </div>
 
-            <?php if (!$alumni_details): ?>
-                <!-- Initial Verification Form -->
-                <form method="POST" action="<?php echo htmlspecialchars($current_url); ?>" id="verificationForm">
-                    <div class="form-group">
-                        <label for="alumni_id_card_no">Alumni ID Card Number</label>
-                        <input type="text" id="alumni_id_card_no" name="alumni_id_card_no" required>
-                    </div>
+                        <div class="form-group">
+                            <label for="last_name">Last Name<span style="color: red;">*</span></label>
+                            <input type="text" id="last_name" name="last_name" value="<?php echo htmlspecialchars($pre_fill['last_name'] ?? ''); ?>" required readonly>
+                        </div>
 
-                    <div class="form-group">
-                        <label for="first_name">First Name</label>
-                        <input type="text" id="first_name" name="first_name" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="last_name">Last Name</label>
-                        <input type="text" id="last_name" name="last_name" required>
-                    </div>
-                    <button type="submit" class="submit-button">Verify Alumni Status</button>
-                </form>
-            <?php else: ?>
-                <!-- Display Alumni Details -->
-                <div class="details-container">
-                    <div class="details-row">
-                        <div class="details-label">ID</div>
-                        <div class="details-value"><?php echo htmlspecialchars($alumni_details['id']); ?></div>
-                    </div>
-                    <div class="details-row">
-                        <div class="details-label">User ID</div>
-                        <div class="details-value"><?php echo htmlspecialchars($alumni_details['user_id']); ?></div>
-                    </div>
-                    <div class="details-row">
-                        <div class="details-label">Alumni ID Card Number</div>
-                        <div class="details-value">
-                            <?php if (isset($_SESSION['verified_alumni_id_card_no'])): ?>
-                                <span style="color: var(--primary-color); font-weight: bold;">
-                                    <?php echo htmlspecialchars($_SESSION['verified_alumni_id_card_no']); ?> (Pending Update)
-                                </span>
-                            <?php else: ?>
-                                <?php echo htmlspecialchars($alumni_details['alumni_id_card_no']); ?>
-                            <?php endif; ?>
+                        <div class="form-group">
+                            <label for="first_name">First Name<span style="color: red;">*</span></label>
+                            <input type="text" id="first_name" name="first_name" value="<?php echo htmlspecialchars($pre_fill['first_name'] ?? ''); ?>" required readonly>
                         </div>
-                    </div>
-                    <div class="details-row">
-                        <div class="details-label">Full Name</div>
-                        <div class="details-value">
-                            <?php echo htmlspecialchars($alumni_details['first_name'] . ' ' . 
-                                    ($alumni_details['middle_name'] ? $alumni_details['middle_name'] . ' ' : '') . 
-                                    $alumni_details['last_name']); ?>
-                        </div>
-                    </div>
-                    <?php if (isset($alumni_details['position']) && $alumni_details['position']): ?>
+                        <button type="submit" class="submit-button">Verify Alumni Status</button>
+                    </form>
+                <?php else: ?>
+                    <!-- Display Alumni Details -->
+                    <div class="details-container">
                         <div class="details-row">
-                            <div class="details-label">Position</div>
-                            <div class="details-value"><?php echo htmlspecialchars($alumni_details['position']); ?></div>
+                            <div class="details-label">ID</div>
+                            <div class="details-value"><?php echo htmlspecialchars($alumni_details['id']); ?></div>
                         </div>
-                    <?php endif; ?>
-                    <?php if (isset($alumni_details['address']) && $alumni_details['address']): ?>
                         <div class="details-row">
-                            <div class="details-label">Primary Address</div>
-                            <div class="details-value"><?php echo htmlspecialchars($alumni_details['address']); ?></div>
+                            <div class="details-label">User ID</div>
+                            <div class="details-value"><?php echo htmlspecialchars($alumni_details['user_id']); ?></div>
                         </div>
-                    <?php endif; ?>
-                    <?php if (isset($alumni_details['second_address']) && $alumni_details['second_address']): ?>
                         <div class="details-row">
-                            <div class="details-label">Secondary Address</div>
-                            <div class="details-value"><?php echo htmlspecialchars($alumni_details['second_address']); ?></div>
-                        </div>
-                    <?php endif; ?>
-                    <?php if (isset($alumni_details['telephone']) && $alumni_details['telephone']): ?>
-                        <div class="details-row">
-                            <div class="details-label">Telephone</div>
-                            <div class="details-value"><?php echo htmlspecialchars($alumni_details['telephone']); ?></div>
-                        </div>
-                    <?php endif; ?>
-                    <?php if (isset($alumni_details['phone_number']) && $alumni_details['phone_number']): ?>
-                        <div class="details-row">
-                            <div class="details-label">Phone Number</div>
-                            <div class="details-value"><?php echo htmlspecialchars($alumni_details['phone_number']); ?></div>
-                        </div>
-                    <?php endif; ?>
-                    <?php if (isset($alumni_details['accompanying_persons']) && $alumni_details['accompanying_persons']): ?>
-                        <div class="details-row">
-                            <div class="details-label">Accompanying Persons</div>
-                            <div class="details-value"><?php echo htmlspecialchars($alumni_details['accompanying_persons']); ?></div>
-                        </div>
-                    <?php endif; ?>
-                    <div class="details-row">
-                        <div class="details-label">User Status</div>
-                        <div class="details-value">
-                            <div class="status-transition">
-                                <span class="status-from"><?php echo htmlspecialchars($alumni_details['user_status']); ?></span>
-                                <span class="status-arrow">→</span>
-                                <span class="status-to">Alumni</span>
+                            <div class="details-label">Alumni ID Card Number</div>
+                            <div class="details-value">
+                                <?php if (isset($_SESSION['verified_alumni_id_card_no'])): ?>
+                                    <span style="color: var(--primary-color); font-weight: bold;">
+                                        <?php echo htmlspecialchars($_SESSION['verified_alumni_id_card_no']); ?> (Pending Update)
+                                    </span>
+                                <?php else: ?>
+                                    <?php echo htmlspecialchars($alumni_details['alumni_id_card_no']); ?>
+                                <?php endif; ?>
                             </div>
                         </div>
+                        <div class="details-row">
+                            <div class="details-label">Full Name</div>
+                            <div class="details-value">
+                                <?php echo htmlspecialchars($alumni_details['first_name'] . ' ' .
+                                    ($alumni_details['middle_name'] ? $alumni_details['middle_name'] . ' ' : '') .
+                                    $alumni_details['last_name']); ?>
+                            </div>
+                        </div>
+                        <?php if (isset($alumni_details['position']) && $alumni_details['position']): ?>
+                            <div class="details-row">
+                                <div class="details-label">Position</div>
+                                <div class="details-value"><?php echo htmlspecialchars($alumni_details['position']); ?></div>
+                            </div>
+                        <?php endif; ?>
+                        <?php if (isset($alumni_details['address']) && $alumni_details['address']): ?>
+                            <div class="details-row">
+                                <div class="details-label">Primary Address</div>
+                                <div class="details-value"><?php echo htmlspecialchars($alumni_details['address']); ?></div>
+                            </div>
+                        <?php endif; ?>
+                        <?php if (isset($alumni_details['second_address']) && $alumni_details['second_address']): ?>
+                            <div class="details-row">
+                                <div class="details-label">Secondary Address</div>
+                                <div class="details-value"><?php echo htmlspecialchars($alumni_details['second_address']); ?></div>
+                            </div>
+                        <?php endif; ?>
+                        <?php if (isset($alumni_details['telephone']) && $alumni_details['telephone']): ?>
+                            <div class="details-row">
+                                <div class="details-label">Telephone</div>
+                                <div class="details-value"><?php echo htmlspecialchars($alumni_details['telephone']); ?></div>
+                            </div>
+                        <?php endif; ?>
+                        <?php if (isset($alumni_details['phone_number']) && $alumni_details['phone_number']): ?>
+                            <div class="details-row">
+                                <div class="details-label">Phone Number</div>
+                                <div class="details-value"><?php echo htmlspecialchars($alumni_details['phone_number']); ?></div>
+                            </div>
+                        <?php endif; ?>
+                        <?php if (isset($alumni_details['accompanying_persons']) && $alumni_details['accompanying_persons']): ?>
+                            <div class="details-row">
+                                <div class="details-label">Accompanying Persons</div>
+                                <div class="details-value"><?php echo htmlspecialchars($alumni_details['accompanying_persons']); ?></div>
+                            </div>
+                        <?php endif; ?>
+                        <div class="details-row">
+                            <div class="details-label">User Status</div>
+                            <div class="details-value">
+                                <div class="status-transition">
+                                    <span class="status-from"><?php echo htmlspecialchars($alumni_details['user_status']); ?></span>
+                                    <span class="status-arrow">→</span>
+                                    <span class="status-to">Alumni</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="details-row">
+                            <div class="details-label">Verified</div>
+                            <div class="details-value"><?php echo htmlspecialchars($alumni_details['verified']); ?></div>
+                        </div>
                     </div>
-                    <div class="details-row">
-                        <div class="details-label">Verified</div>
-                        <div class="details-value"><?php echo htmlspecialchars($alumni_details['verified']); ?></div>
-                    </div>
-                </div>
-                
-                <?php if (isset($_SESSION['verified_alumni_id_card_no'])): ?>
-                    <div class="message success" style="margin-top: 15px;">
-                        Alumni information verified. Click "Update Profile" to save changes and update your status to Alumni.
-                    </div>
+
+                    <?php if (isset($_SESSION['verified_alumni_id_card_no'])): ?>
+                        <div class="message success" style="margin-top: 15px;">
+                            Alumni information verified. Click "Update Profile" to save changes and update your status to Alumni.
+                        </div>
+                    <?php endif; ?>
+
+                    <!-- Update Profile Button -->
+                    <a href="<?php echo htmlspecialchars($current_url . '&update=submit&user_id=' . $alumni_details['user_id']); ?>" class="action-button update-button" id="updateProfileBtn">Update Profile</a>
                 <?php endif; ?>
-                
-                <!-- Update Profile Button -->
-                <a href="<?php echo htmlspecialchars($current_url . '&update=submit&user_id=' . $alumni_details['user_id']); ?>" class="action-button update-button" id="updateProfileBtn">Update Profile</a>
-            <?php endif; ?>
+            </div>
         </div>
-    </div>
     <?php endif; ?>
 
     <!-- Loading Overlay -->
@@ -656,10 +696,10 @@ if (isset($_GET['update']) && $_GET['update'] == 'submit' && isset($_GET['user_i
             const container = document.getElementById('notificationContainer');
             const notification = document.createElement('div');
             notification.className = `notification ${type}`;
-            
+
             const messageSpan = document.createElement('span');
             messageSpan.textContent = message;
-            
+
             const closeButton = document.createElement('button');
             closeButton.className = 'notification-close';
             closeButton.innerHTML = '&times;';
@@ -669,11 +709,11 @@ if (isset($_GET['update']) && $_GET['update'] == 'submit' && isset($_GET['user_i
                     container.removeChild(notification);
                 }, 300);
             });
-            
+
             notification.appendChild(messageSpan);
             notification.appendChild(closeButton);
             container.appendChild(notification);
-            
+
             // Auto-dismiss after 5 seconds
             setTimeout(() => {
                 if (container.contains(notification)) {
@@ -692,7 +732,7 @@ if (isset($_GET['update']) && $_GET['update'] == 'submit' && isset($_GET['user_i
         if (verificationForm) {
             verificationForm.addEventListener('submit', function(e) {
                 showLoading('Verifying...');
-                
+
                 // Let the form submit, but show the loading overlay
                 // The server will process the form and return
             });
@@ -704,10 +744,10 @@ if (isset($_GET['update']) && $_GET['update'] == 'submit' && isset($_GET['user_i
             updateProfileBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 showLoading('Updating...');
-                
+
                 // We need to navigate to the href after showing the loading overlay
                 const href = this.getAttribute('href');
-                
+
                 // Add a small delay to ensure the loading overlay is visible
                 setTimeout(() => {
                     // Send the update request
@@ -739,4 +779,5 @@ if (isset($_GET['update']) && $_GET['update'] == 'submit' && isset($_GET['user_i
         });
     </script>
 </body>
+
 </html>

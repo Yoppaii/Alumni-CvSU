@@ -16,6 +16,17 @@ $stmt->execute();
 $stmt->bind_result($email);
 $stmt->fetch();
 $stmt->close();
+ 
+$check_pre_fill = $mysqli->prepare("SELECT * FROM user WHERE user_id = ? LIMIT 1");
+if ($check_pre_fill === false) {
+    exit("Prepare failed: " . $mysqli->error);
+}
+$check_pre_fill->bind_param("i", $user_id);
+$check_pre_fill->execute();
+$pre_fill_result = $check_pre_fill->get_result();
+$pre_fill = $pre_fill_result->fetch_assoc();
+$check_pre_fill->close();
+
 
 $check_existing = $mysqli->prepare("SELECT * FROM alumni_id_cards WHERE user_id = ? LIMIT 1");
 if ($check_existing === false) {
@@ -27,6 +38,43 @@ $check_existing->execute();
 $result = $check_existing->get_result();
 $existing_application = $result->fetch_assoc();
 $check_existing->close();
+
+
+// Check if there's a decline reason for declined applications
+$decline_reason = '';
+$declined_at = '';
+$declined_by = '';
+
+if ($existing_application && strtolower($existing_application['status']) === 'declined') {
+    $get_decline_reason = $mysqli->prepare("SELECT r.reason, r.created_at, r.declined_by, u.username as declined_by_name 
+                                           FROM alumni_id_declined_reasons r
+                                           LEFT JOIN users u ON r.declined_by = u.id
+                                           WHERE r.application_id = ?
+                                           ORDER BY r.created_at DESC
+                                           LIMIT 1");
+    if ($get_decline_reason) {
+        $get_decline_reason->bind_param("i", $existing_application['id']);
+        $get_decline_reason->execute();
+        $decline_result = $get_decline_reason->get_result();
+        if ($decline_row = $decline_result->fetch_assoc()) {
+            $decline_reason = $decline_row['reason'];
+
+            // Format date
+            $date = new DateTime($decline_row['created_at']);
+            $declined_at = $date->format('F j, Y \a\t g:i A');
+
+            // Get declined by info if available
+            $declined_by = isset($decline_row['declined_by_name']) ? $decline_row['declined_by_name'] : 'Administrator';
+        }
+        $get_decline_reason->close();
+    }
+
+    // Add these decline details to the existing_application array so they're available to JavaScript
+    $existing_application['decline_reason'] = $decline_reason;
+    $existing_application['declined_at'] = $declined_at;
+    $existing_application['declined_by'] = $declined_by;
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -170,6 +218,12 @@ $check_existing->close();
 
     button[type="submit"]:hover {
         background-color: #235329;
+    }
+
+    button[type="submit"]:disabled {
+        background-color: #a8a8a8 !important;
+        cursor: not-allowed !important;
+        opacity: 0.7;
     }
 
     .alumni-details {
@@ -509,9 +563,9 @@ $check_existing->close();
 
     .notification-close:hover {
         color: #1e293b;
-    }f
+    }
 
-    .application-status {
+    f .application-status {
         display: inline-block;
         padding: 8px 16px;
         border-radius: 4px;
@@ -607,18 +661,19 @@ $check_existing->close();
         <div class="unique-form-row">
             <div class="unique-form-column">
                 <label for="unique-last-name">Last Name<span style="color: red;">*</span></label>
-                <input type="text" id="unique-last-name" name="last_name" required>
+                <input type="text" id="unique-last-name" name="last_name" value="<?php echo htmlspecialchars($pre_fill['last_name'] ?? ''); ?>" required readonly>
 
                 <label for="unique-first-name">First Name<span style="color: red;">*</span></label>
-                <input type="text" id="unique-first-name" name="first_name" required>
+                <input type="text" id="unique-first-name" name="first_name" value="<?php echo htmlspecialchars($pre_fill['first_name'] ?? ''); ?>" required readonly>
 
                 <label for="unique-middle-name">Middle Name</label>
-                <input type="text" id="unique-middle-name" name="middle_name">
+                <input type="text" id="unique-middle-name" name="middle_name"
+                    value="<?php echo htmlspecialchars($pre_fill['middle_name'] ?? ''); ?>"
+                    <?php echo (!empty($pre_fill['middle_name'])) ? 'readonly' : ''; ?>>
 
-                <label for="unique-email">Email</label>
-                <input type="email" id="unique-email" name="email" value="<?php echo htmlspecialchars(!empty($email) ? $email : 'N/A'); ?>" readonly>
+                <label for="unique-email">Email<span style="color: red;">*</label>
+                <input type="email" id="unique-email" name="email" value="<?php echo htmlspecialchars($email ?? 'N/A'); ?>" readonly>
             </div>
-
             <div class="unique-form-column">
                 <label for="unique-course-name">Course<span style="color: red;">*</span></label>
                 <input type="text" id="unique-course-name" name="course" required>
@@ -634,7 +689,6 @@ $check_existing->close();
                     <option value="5_years">5 Years (₱500.00)</option>
                     <option value="lifetime">Lifetime (₱1,500.00)</option>
                 </select>
-
                 <div class="price-display" style="margin-bottom: 16px;">
                     <label>Membership Fee:</label>
                     <span id="membership-price" style="font-weight: bold; color: #2d6936;">₱500.00</span>
@@ -643,8 +697,28 @@ $check_existing->close();
             </div>
         </div>
 
+        <!-- Payment Instructions Box -->
+        <div style="margin: 0 24px 24px; padding: 15px; background-color: #f0f7ff; border-left: 4px solid #2d6936; border-radius: 4px;">
+            <h4 style="margin-top: 0; color: #2d6936;">Payment Instructions:</h4>
+            <p style="margin-bottom: 8px;">After form submission and confirmation, please follow these steps to complete your application:</p>
+            <ol style="margin-left: 20px; padding-left: 0;">
+                <li>Visit the <strong>Bahay ng Alumni Office</strong> to make your payment</li>
+                <li>Bring a valid ID and a copy of your application confirmation</li>
+                <li>Once payment is processed, your application status will be updated to "Paid"</li>
+                <li>You can then update your account from Guest to Alumni User</li>
+                <li>As an Alumni User, you will receive discounts on room reservations</li>
+            </ol>
+        </div>
+        <div style="margin: 0 24px 16px;">
+            <label class="terms-checkbox-container" style="display: flex; align-items: flex-start; margin-bottom: 10px; cursor: pointer;">
+                <input type="checkbox" id="terms-checkbox" name="terms_accepted" style="margin-top: 3px; margin-right: 8px;" required>
+                <span style="font-size: 14px; line-height: 1.4;">
+                    I have read and agree to the <a href="#" onclick="showTermsModal(); return false;">Terms and Policies</a> of the Cavite State University Alumni Association.
+                </span>
+            </label>
+        </div>
+        <button type="submit" id="submit-button" disabled>Submit</button>
 
-        <button type="submit">Submit</button>
     </form>
 
     <div id="alumniDetails" class="alumni-details" style="display: <?php echo $existing_application ? 'block' : 'none'; ?>">
@@ -703,31 +777,49 @@ $check_existing->close();
                 </div>
             </div>
         </div>
+        <!-- Payment Instructions Box -->
+        <div style="margin: 0 24px 24px; padding: 15px; background-color: #f0f7ff; border-left: 4px solid #2d6936; border-radius: 4px;">
+            <h4 style="margin-top: 0; color: #2d6936;">Payment Instructions:</h4>
+            <p style="margin-bottom: 8px;">After form submission and confirmation, please follow these steps to complete your application:</p>
+            <ol style="margin-left: 20px; padding-left: 0;">
+                <li>Visit the <strong>Bahay ng Alumni Office</strong> to make your payment</li>
+                <li>Bring a valid ID and a copy of your application confirmation</li>
+                <li>Once payment is processed, your application status will be updated to "Paid"</li>
+                <li>You can then update your account from Guest to Alumni User</li>
+                <li>As an Alumni User, you will receive discounts on room reservations</li>
+            </ol>
+        </div>
 
+        <!-- Modified Payment Instructions Box Section (inside Alumni Details) -->
         <div class="status-message">
             <?php if ($existing_application): ?>
                 <?php
                 $status = strtolower($existing_application['status'] ?? 'pending');
                 $statusMessage = '';
-                switch ($status) {
-                    case 'pending':
-                        $statusMessage = 'Your Alumni ID application has been submitted successfully. Please wait for further instructions via email.';
-                        break;
-                    case 'declined':
-                        $statusMessage = 'Your Alumni ID application has been declined. Please contact the alumni office for more information.';
-                        break;
-                    case 'paid':
-                        $statusMessage = 'Your payment has been received. Your Alumni ID is being processed. You can now apply for an Alumni User account.';
-                        break;
-                    case 'confirmed':
-                        $statusMessage = 'Your Alumni ID application has been confirmed. You may now claim your ID at the alumni office.';
-                        break;
-                }
                 ?>
-                <p><?php echo $statusMessage; ?></p>
+
+                <?php if ($status === 'pending'): ?>
+                    <p>Your Alumni ID application has been submitted successfully. Please wait for further instructions via email.</p>
+
+                <?php elseif ($status === 'declined'): ?>
+                    <p>Your Alumni ID application has been declined. Please contact the alumni office for more information.</p>
+
+                <?php elseif ($status === 'paid'): ?>
+                    <p>Your payment has been received. Your Alumni ID is being processed. You can now apply for an Alumni User account.</p>
+
+                <?php elseif ($status === 'confirmed'): ?>
+                    <p>Your Alumni ID application has been confirmed. You may now claim your ID at the alumni office.</p>
+
+                <?php else: ?>
+                    <p>Your application status is unknown. Please contact the alumni office.</p>
+                <?php endif; ?>
+
                 <div class="application-status <?php echo $status; ?>">
                     Status: <?php echo ucfirst($status); ?>
                 </div>
+
+            <?php else: ?>
+                <p>No application found. Please submit an Alumni ID application.</p>
             <?php endif; ?>
         </div>
 
@@ -740,6 +832,9 @@ $check_existing->close();
             <?php endif; ?>
             <?php if ($existing_application && strtolower($existing_application['status']) === 'paid'): ?>
                 <button type="button" class="apply-alumni-button" onclick="window.location.href='?section=re-apply-account'">Apply for Alumni User Account</button>
+            <?php endif; ?>
+            <?php if ($existing_application && strtolower($existing_application['status']) === 'declined'): ?>
+                <button type="button" class="apply-alumni-button" onclick="reapplyForAlumniID()">Re-apply for Alumni ID</button>
             <?php endif; ?>
         </div>
 
@@ -755,6 +850,30 @@ $check_existing->close();
             </div>
         </div>
     </div>
+
+    <div id="termsModal" class="modal">
+        <div class="modal-content" style="max-width: 600px; max-height: 80vh; overflow-y: auto;">
+            <h3>Terms and Policies</h3>
+            <div style="margin-bottom: 20px; text-align: left;">
+                <p><strong>Alumni ID Card Terms and Policies</strong></p>
+                <p>By applying for a Cavite State University Alumni ID Card, you agree to the following terms and policies:</p>
+                <ol style="padding-left: 20px;">
+                    <li>The information provided in this application must be accurate and complete.</li>
+                    <li>The Alumni ID Card remains the property of Cavite State University Alumni Association, Inc.</li>
+                    <li>The membership fee is non-refundable once the application is processed.</li>
+                    <li>The Alumni ID Card is non-transferable and for personal use only.</li>
+                    <li>You must comply with all university policies when using your Alumni ID Card.</li>
+                    <li>Your personal information will be handled in accordance with applicable privacy laws.</li>
+                    <li>The university reserves the right to revoke the Alumni ID Card for violation of terms.</li>
+                    <li>Benefits associated with the Alumni ID Card are subject to change without prior notice.</li>
+                </ol>
+            </div>
+            <div class="modal-buttons">
+                <button type="button" class="back-button" onclick="hideTermsModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
@@ -929,7 +1048,7 @@ $check_existing->close();
             document.getElementById('alumniDetails').style.display = 'block';
             document.getElementById('display-last-name').textContent = formData.last_name;
             document.getElementById('display-first-name').textContent = formData.first_name;
-            document.getElementById('display-middle-name').textContent = formData.middle_name || 'N/A';
+            document.getElementById('display-middle-name').textContent = formData.middle_name || '';
             document.getElementById('display-email').textContent = formData.email;
             document.getElementById('display-course').textContent = formData.course;
             document.getElementById('display-year-graduated').textContent = formData.year_graduated;
@@ -938,12 +1057,26 @@ $check_existing->close();
                 `${formData.membership_type === 'lifetime' ? 'Lifetime' : '5 Years'} (${parseFloat(formData.price).toFixed(2)})`;
 
             let statusMessage = '';
+            let statusHtml = '';
+
             switch (formData.status.toLowerCase()) {
                 case 'pending':
                     statusMessage = 'Please wait, your application is pending. We will review your application. Once your application is reviewed, your status will change to confirmed.';
                     break;
                 case 'declined':
                     statusMessage = 'Your Alumni ID application has been declined. Please contact the alumni office for more information.';
+
+                    // Add decline reason HTML if available
+                    if (formData.decline_reason) {
+                        statusHtml = `
+                <div style="margin-top: 20px; padding: 15px; background-color: #fee2e2; border-radius: 6px; text-align: left;">
+                    <h4 style="margin-top: 0; color: #991b1b;">Reason for Decline:</h4>
+                    <p style="margin-bottom: 5px;">${formData.decline_reason}</p>
+                    <p style="font-size: 12px; color: #64748b; margin-top: 10px; margin-bottom: 0;">
+                        Declined on ${formData.declined_at} by ${formData.declined_by}
+                    </p>
+                </div>`;
+                    }
                     break;
                 case 'paid':
                     statusMessage = 'Thank you for purchasing an Alumni ID! You can now apply to change your account from Guest to Alumni User Account.';
@@ -963,11 +1096,12 @@ $check_existing->close();
             }
 
             statusMessageDiv.innerHTML = `
-                <p>${statusMessage}</p>
-                <div class="application-status ${formData.status.toLowerCase()}">
-                    Status: ${formData.status.charAt(0).toUpperCase() + formData.status.slice(1)}
-                </div>
-            `;
+        <p>${statusMessage}</p>
+        ${statusHtml}
+        <div class="application-status ${formData.status.toLowerCase()}">
+            Status: ${formData.status.charAt(0).toUpperCase() + formData.status.slice(1)}
+        </div>
+    `;
 
             const cancelButton = document.querySelector('.cancel-button');
             if (cancelButton) {
@@ -1166,7 +1300,7 @@ $check_existing->close();
                 const instructions = [
                     'Please follow these steps to complete your Alumni ID application:',
                     '1. Print this application summary',
-                    '2. Visit the Alumni Office to make your payment',
+                    '2. Visit the Bahay ng Alumni Office to make your payment',
                     '3. Once payment is processed, your status will change from "Confirmed" to "Paid"',
                     '4. You can then update your account from Guest to Alumni User',
                     '5. As an Alumni User, you will receive discounts on room reservations'
@@ -1260,6 +1394,59 @@ $check_existing->close();
                 displayAlumniDetails(applicationData);
             });
         <?php endif; ?>
+    </script>
+
+    <!-- Terms and Policies -->
+    <script>
+        function showTermsModal() {
+            document.getElementById('termsModal').style.display = 'flex';
+        }
+
+        function hideTermsModal() {
+            document.getElementById('termsModal').style.display = 'none';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const termsCheckbox = document.getElementById('terms-checkbox');
+            const submitButton = document.getElementById('submit-button');
+
+            if (termsCheckbox && submitButton) {
+                termsCheckbox.addEventListener('change', function() {
+                    submitButton.disabled = !this.checked;
+                });
+            }
+        });
+    </script>
+
+    <!-- Reapplying -->
+    <script>
+        function reapplyForAlumniID() {
+            showLoading('Processing your re-application...');
+
+            fetch('/Alumni-CvSU/user/reapply_alumni_id.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    hideLoading();
+                    if (data.success) {
+                        showNotification('Your application has been reset. You can now re-apply.', 'success');
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000);
+                    } else {
+                        showNotification(data.message || 'Error re-applying for Alumni ID', 'error');
+                    }
+                })
+                .catch(error => {
+                    hideLoading();
+                    showNotification('An error occurred. Please try again.', 'error');
+                    console.error('Error:', error);
+                });
+        }
     </script>
 </body>
 

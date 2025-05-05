@@ -292,14 +292,14 @@ $history_result = $history_stmt->get_result();
                 <div id="reschedule-step1" class="book-step-content">
                     <div class="book-date-time-container">
                         <div>
-                            <label for="reschedule-arrival-datetime">New Arrival Date and Time</label>
+                            <label for="reschedule-arrival-datetime">New Check-in Date and Time</label>
                             <input type="text" class="book-date-time-input" id="reschedule-arrival-datetime"
-                                placeholder="Select new arrival date and time">
+                                placeholder="Select new check-in date and time">
                         </div>
                         <div>
-                            <label for="reschedule-departure-datetime">New Departure Date and Time</label>
+                            <label for="reschedule-departure-datetime">New Check-out Date and Time</label>
                             <input type="text" class="book-date-time-input" id="reschedule-departure-datetime"
-                                placeholder="Select new departure date and time">
+                                placeholder="Select new check-out date and time">
                         </div>
                     </div>
                 </div>
@@ -313,19 +313,19 @@ $history_result = $history_stmt->get_result();
                             <span class="book-summary-value" id="reschedule-summary-room">-</span>
                         </div>
                         <div class="book-summary-item">
-                            <span class="book-summary-label">Original Arrival:</span>
+                            <span class="book-summary-label">Original Check-in:</span>
                             <span class="book-summary-value" id="reschedule-summary-old-arrival">-</span>
                         </div>
                         <div class="book-summary-item">
-                            <span class="book-summary-label">Original Departure:</span>
+                            <span class="book-summary-label">Original Check-out:</span>
                             <span class="book-summary-value" id="reschedule-summary-old-departure">-</span>
                         </div>
                         <div class="book-summary-item">
-                            <span class="book-summary-label">New Arrival:</span>
+                            <span class="book-summary-label">New Check-in:</span>
                             <span class="book-summary-value" id="reschedule-summary-new-arrival">-</span>
                         </div>
                         <div class="book-summary-item">
-                            <span class="book-summary-label">New Departure:</span>
+                            <span class="book-summary-label">New Check-out:</span>
                             <span class="book-summary-value" id="reschedule-summary-new-departure">-</span>
                         </div>
                         <div class="book-summary-item">

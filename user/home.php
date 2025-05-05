@@ -184,9 +184,12 @@ if ($userId) {
     }
 
     .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 15px;
+        padding: 1.5rem;
+        background: white;
+        border-radius: 0.75rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        margin: auto;
+        width: 100%;
     }
 
     .home-welcome-section {

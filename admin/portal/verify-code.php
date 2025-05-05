@@ -7,17 +7,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (isset($_COOKIE['otp']) && $otp === $_COOKIE['otp']) {
             $email = $_COOKIE['email'];
             $password = $_COOKIE['password'];
+            $first_name = isset($_COOKIE['firstName']) ? $_COOKIE['firstName'] : '';
+
             // Start a transaction to ensure data consistency
             $mysqli->begin_transaction();
             try {
                 // Insert into users table
-                $stmt = $mysqli->prepare("INSERT INTO `users`(`email`, `password`) VALUES (?, ?)");
-                $stmt->bind_param("ss", $email, $password);
+                $stmt = $mysqli->prepare("INSERT INTO `users`(`username`, `email`, `password`) VALUES (?, ?, ?)");
+                $stmt->bind_param("sss", $first_name, $email, $password);
                 if ($stmt->execute()) {
                     $userId = $mysqli->insert_id; // Get the newly inserted user ID
 
                     // Check if user profile data exists in cookies with default values if not set
-                    $first_name = isset($_COOKIE['firstName']) ? $_COOKIE['firstName'] : '';
                     $last_name = isset($_COOKIE['lastName']) ? $_COOKIE['lastName'] : '';
                     $middle_name = isset($_COOKIE['middleName']) ? $_COOKIE['middleName'] : '';
                     $position = isset($_COOKIE['position']) ? $_COOKIE['position'] : '';

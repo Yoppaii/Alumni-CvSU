@@ -550,8 +550,8 @@ $mysqli->close();
             <div id="book-step2" class="book-step-content" style="display: none;">
                 <div class="book-date-time-container">
                     <div>
-                        <label>Arrival Date and Time</label>
-                        <input type="text" class="book-date-time-input" id="book-arrival-datetime" placeholder="Select arrival date and time">
+                        <label>Check-in Date and Time</label>
+                        <input type="text" class="book-date-time-input" id="book-arrival-datetime" placeholder="Select check-in date and time">
                     </div>
                 </div>
             </div>
@@ -559,8 +559,8 @@ $mysqli->close();
             <div id="book-step3" class="book-step-content" style="display: none;">
                 <div class="book-date-time-container">
                     <div>
-                        <label>Departure Date and Time</label>
-                        <input type="text" class="book-date-time-input" id="book-departure-datetime" placeholder="Select departure date and time">
+                        <label>Check-out Date and Time</label>
+                        <input type="text" class="book-date-time-input" id="book-departure-datetime" placeholder="Select check-out date and time">
                     </div>
                 </div>
             </div>
@@ -597,7 +597,7 @@ $mysqli->close();
                     </div>
 
                     <div class="book-summary-item" style="margin-bottom: 10px;">
-                        <span class="book-summary-label" style="font-weight: 600;">Price per Night:</span>
+                        <span class="book-summary-label" style="font-weight: 600;">Price per Day:</span>
                         <span class="book-summary-value" id="book-summary-price">-</span>
                     </div>
                     <div class="book-summary-item" style="margin-bottom: 10px;">
@@ -630,6 +630,17 @@ $mysqli->close();
                                 The guest house is not responsible for any lost, stolen, or damaged personal belongings during your stay.
                             </li>
                         </ol>
+
+                        <!-- Add this code inside the terms-policies div, right after the ordered list -->
+                        <div class="terms-acceptance" style="margin-top: 15px;">
+                            <label class="flex items-center">
+                                <input type="checkbox" id="terms-checkbox" style="margin-right: 8px;">
+                                <span>I agree to the terms and policies outlined above</span>
+                            </label>
+                            <p id="terms-error" style="color: #dc2626; font-size: 0.85em; margin-top: 5px; display: none;">
+                                You must agree to the terms and policies to complete your booking
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -727,6 +738,51 @@ $mysqli->close();
                 totalPrice: null
             };
 
+            // Add event listener for the terms checkbox
+            const termsCheckbox = document.getElementById('terms-checkbox');
+            if (termsCheckbox) {
+                termsCheckbox.addEventListener('change', checkTermsAcceptance);
+            }
+
+            // Add some basic styling for disabled button
+            const style = document.createElement('style');
+            style.textContent = `
+        .book-nav-button.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    `;
+            document.head.appendChild(style);
+
+            // Add this to your navigation button click handler
+            document.getElementById('book-next-button').addEventListener('click', function(e) {
+                // If we're on the final step and the terms are not checked, prevent navigation
+                if (currentStep === totalSteps && !document.getElementById('terms-checkbox').checked) {
+                    e.preventDefault();
+                    // Highlight the error message
+                    const termsError = document.getElementById('terms-error');
+                    termsError.style.display = 'block';
+                    // Add a flash effect to draw attention
+                    termsError.style.animation = 'none';
+                    setTimeout(() => {
+                        termsError.style.animation = 'flash 0.5s';
+                    }, 10);
+                    return false;
+                }
+
+                // Your existing navigation logic continues here...
+            });
+
+            // Add this CSS for the flash animation
+            const flashAnimation = document.createElement('style');
+            flashAnimation.textContent = `
+@keyframes flash {
+    0% { background-color: transparent; }
+    50% { background-color: #fee2e2; }
+    100% { background-color: transparent; }
+}
+`;
+            document.head.appendChild(flashAnimation);
             // async function fetchBookings(roomId) {
             //     try {
             //         const response = await fetch('user/get-room-bookings.php', {
@@ -1885,8 +1941,40 @@ $mysqli->close();
                 });
 
                 document.getElementById('book-prev-button').style.display = currentStep === 1 ? 'none' : 'block';
-                document.getElementById('book-next-button').textContent = currentStep === totalSteps ? 'Complete Booking' : 'Next';
+
+                // Change button text based on current step
+                const nextButton = document.getElementById('book-next-button');
+                nextButton.textContent = currentStep === totalSteps ? 'Complete Booking' : 'Next';
+
+                // Add special handling for the final step
+                if (currentStep === totalSteps) {
+                    // Initially disable the button when reaching the final step
+                    checkTermsAcceptance();
+                } else {
+                    // For non-final steps, ensure the button is enabled
+                    nextButton.disabled = false;
+                }
             }
+
+            function checkTermsAcceptance() {
+                const termsCheckbox = document.getElementById('terms-checkbox');
+                const nextButton = document.getElementById('book-next-button');
+                const termsError = document.getElementById('terms-error');
+
+                // Update button state based on checkbox
+                nextButton.disabled = !termsCheckbox.checked;
+
+                // Show/hide error message
+                termsError.style.display = !termsCheckbox.checked ? 'block' : 'none';
+
+                // Optionally add visual indication that button is disabled
+                if (nextButton.disabled) {
+                    nextButton.classList.add('disabled');
+                } else {
+                    nextButton.classList.remove('disabled');
+                }
+            }
+
 
             function submitBooking() {
                 const selectedRoom = document.querySelector('.book-room-card.selected');
@@ -1989,6 +2077,7 @@ $mysqli->close();
             }
         });
     </script>
+
 </body>
 
 

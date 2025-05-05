@@ -37,6 +37,56 @@ function formatMembershipType($type)
     $type = str_replace('_', ' ', $type);
     return ucwords($type);
 }
+
+function getDeclineReason($application_id, $mysqli)
+{
+    $query = "SELECT reason, created_at FROM alumni_id_declined_reasons 
+              WHERE application_id = ? 
+              ORDER BY created_at DESC LIMIT 1";
+
+    $stmt = $mysqli->prepare($query);
+    $stmt->bind_param('i', $application_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($row = $result->fetch_assoc()) {
+        return $row['reason'];
+    }
+
+    return null;
+}
+
+// Example usage in the declined tab
+if ($current_tab === 'declined') {
+    // Add a function to view reason for each row
+?>
+    <script>
+        function viewDeclineReason(applicationId) {
+            // Use fetch to get the reason
+            fetch('/Alumni-CvSU/admin/get_decline_reason.php?id=' + applicationId)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show in modal
+                        const modal = document.getElementById('almViewReasonModal');
+                        const reasonText = document.getElementById('viewReasonText');
+
+                        if (modal && reasonText) {
+                            reasonText.textContent = data.reason || 'No reason provided';
+                            modal.classList.add('active');
+                        }
+                    } else {
+                        showToast('Failed to retrieve decline reason', false);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching decline reason:', error);
+                    showToast('An error occurred while retrieving the reason', false);
+                });
+        }
+    </script>
+<?php
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -1490,6 +1540,78 @@ function formatMembershipType($type)
         gap: 0.5rem;
         margin-top: 1rem;
     }
+
+    /* Add these styles to your existing CSS */
+
+    /* View Reason Button */
+    .alm-view-reason-btn {
+        background: none;
+        border: none;
+        color: #4a69bd;
+        cursor: pointer;
+        font-size: 14px;
+        margin-left: 8px;
+        padding: 2px 4px;
+        transition: all 0.2s ease;
+    }
+
+    .alm-view-reason-btn:hover {
+        color: #1e3799;
+        transform: scale(1.1);
+    }
+
+    /* Modal textarea focus style */
+    #declineReasonText:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 3px rgba(52, 152, 219, 0.5);
+        outline: none;
+    }
+
+    /* Error state for textarea */
+    #declineReasonText.error {
+        border-color: #e74c3c;
+        box-shadow: 0 0 3px rgba(231, 76, 60, 0.5);
+    }
+
+    /* Modal info icon style */
+    .AL-modal-icon.info {
+        background-color: #3498db;
+    }
+
+    /* Reason display style */
+    #viewReasonText {
+        font-family: inherit;
+        line-height: 1.5;
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+
+    /* Animation for view button */
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.1);
+        }
+
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    .alm-status-declined .alm-view-reason-btn {
+        animation: pulse 2s infinite;
+    }
+
+    /* Add responsive styles */
+    @media screen and (max-width: 768px) {
+        #viewReasonText {
+            max-height: 150px;
+            overflow-y: auto;
+        }
+    }
 </style>
 
 <body>
@@ -1580,6 +1702,14 @@ function formatMembershipType($type)
                                     <span class="alm-status-badge <?php echo $statusClass; ?>">
                                         <?php echo $statusIcon . ucfirst($application['status']); ?>
                                     </span>
+
+                                    <?php if ($application['status'] === 'declined'): ?>
+                                        <button class="alm-view-reason-btn"
+                                            onclick="viewDeclineReason('<?php echo $application['id']; ?>')"
+                                            title="View Decline Reason">
+                                            <i class="fas fa-info-circle"></i>
+                                        </button>
+                                    <?php endif; ?>
                                 </td>
                                 <td class="alm-hide-mobile">
                                     <div class="alm-action-buttons">
@@ -1664,17 +1794,66 @@ function formatMembershipType($type)
             </div>
         </div>
 
+        <!-- Decline Reason Modal -->
+        <div id="almDeclineReasonModal" class="AL-modal-overlay">
+            <div class="AL-modal">
+                <div class="AL-modal-header">
+                    <div class="AL-modal-icon warning">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <h2 class="AL-modal-title">Provide Decline Reason</h2>
+                </div>
+                <div class="AL-modal-content">
+                    <p>Please provide a reason for declining this application:</p>
+                    <textarea id="declineReasonText" rows="4"
+                        style="width: 100%; margin-top: 10px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
+                        placeholder="Enter reason for declining this application..."></textarea>
+                </div>
+                <div class="AL-modal-actions">
+                    <button id="almDeclineReasonCancelBtn" class="AL-modal-btn AL-modal-btn-secondary">
+                        Cancel
+                    </button>
+                    <button id="almDeclineReasonSubmitBtn" class="AL-modal-btn AL-modal-btn-danger">
+                        Submit
+                    </button>
+                </div>
+            </div>
+        </div>
 
+        <!-- View Reason Modal (Add this to your page) -->
+        <div id="almViewReasonModal" class="AL-modal-overlay">
+            <div class="AL-modal">
+                <div class="AL-modal-header">
+                    <div class="AL-modal-icon danger">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <h2 class="AL-modal-title">Decline Reason</h2>
+                </div>
+                <div class="AL-modal-content">
+                    <p>This application was declined for the following reason:</p>
+                    <div id="viewReasonText" style="margin-top: 10px; padding: 10px; background: #f8f8f8; border-radius: 4px; border-left: 4px solid #e74c3c;">
+                        <!-- Reason will be inserted here -->
+                    </div>
+                </div>
+                <div class="AL-modal-actions">
+                    <button id="almViewReasonCloseBtn" class="AL-modal-btn AL-modal-btn-primary">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
 
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 // Modal elements and state management
                 const statusConfirmModal = document.getElementById('almStatusConfirmModal');
                 const deleteModal = document.getElementById('almDeleteConfirmModal');
+                const declineReasonModal = document.getElementById('almDeclineReasonModal');
+
                 let applicationId, newStatus, originalValue, select;
 
                 // Validate required elements exist
-                if (!statusConfirmModal || !deleteModal) {
+                if (!statusConfirmModal || !deleteModal || !declineReasonModal) {
                     console.error('Required modal elements not found');
                     return;
                 }
@@ -1798,23 +1977,107 @@ function formatMembershipType($type)
                         this.dataset.originalValue = originalValue;
                         select = this;
 
-                        // Show status confirmation modal
-                        statusConfirmModal.classList.add('active');
+                        // Check if this is a decline status change
+                        if (newStatus === 'declined') {
+                            // Show decline reason modal directly
+                            const declineReasonTextarea = document.getElementById('declineReasonText');
+                            if (declineReasonTextarea) {
+                                declineReasonTextarea.value = ''; // Clear any previous reason
+                            }
+                            declineReasonModal.classList.add('active');
+                        } else {
+                            // Show regular status confirmation modal for other statuses
+                            statusConfirmModal.classList.add('active');
+                        }
                     });
                 });
 
-                // Status change confirmation
+                // Buttons for decline reason modal
+                const declineReasonSubmitBtn = document.getElementById('almDeclineReasonSubmitBtn');
+                const declineReasonCancelBtn = document.getElementById('almDeclineReasonCancelBtn');
+                const declineReasonTextarea = document.getElementById('declineReasonText');
+
+                // Add event listeners for decline reason modal
+                if (declineReasonSubmitBtn) {
+                    declineReasonSubmitBtn.onclick = async function() {
+                        try {
+                            const reason = declineReasonTextarea?.value?.trim() || '';
+
+                            // Validate the reason is not empty
+                            if (!reason) {
+                                alert('Please provide a reason for declining this application.');
+                                return;
+                            }
+
+                            // Hide modal
+                            declineReasonModal.classList.remove('active');
+                            showLoading('Updating application status...');
+
+                            const formData = new FormData();
+                            formData.append('application_id', applicationId);
+                            formData.append('status', 'declined');
+                            formData.append('decline_reason', reason);
+
+                            const response = await fetch('/Alumni-CvSU/admin/update_id_status.php', {
+                                method: 'POST',
+                                body: formData
+                            });
+
+                            const data = await response.json();
+                            hideLoading();
+
+                            if (data.success) {
+                                // Update UI
+                                const rowStatus = document.querySelector(`tr[data-user-id="${applicationId}"]`);
+                                if (rowStatus) {
+                                    // Animate row out
+                                    rowStatus.style.animation = 'slideOut 0.3s ease-out forwards';
+                                    setTimeout(() => {
+                                        rowStatus.remove();
+                                    }, 300);
+                                }
+
+                                // Show success toast
+                                showToast('Application declined successfully', true);
+
+                                // Reload page after delay
+                                setTimeout(() => {
+                                    location.reload();
+                                }, 500);
+                            } else {
+                                throw new Error(data.message || 'Failed to update status');
+                            }
+                        } catch (error) {
+                            console.error('Update error:', error);
+                            hideLoading();
+
+                            // Show error toast
+                            showToast('Failed to update status: ' + error.message, false);
+
+                            // Reset the select value
+                            if (select && originalValue !== null) {
+                                select.value = originalValue;
+                            }
+                        }
+                    };
+                }
+
+                if (declineReasonCancelBtn) {
+                    declineReasonCancelBtn.onclick = function() {
+                        declineReasonModal.classList.remove('active');
+                        if (select) {
+                            select.value = originalValue;
+                        }
+                    };
+                }
+
+                // Status change confirmation (for non-decline statuses)
                 const statusConfirmBtn = document.getElementById('almStatusConfirmBtn');
                 const statusCancelBtn = document.getElementById('almStatusCancelBtn');
                 const statusCloseBtn = statusConfirmModal.querySelector('.AL-modal-close');
 
                 if (statusConfirmBtn) {
                     statusConfirmBtn.onclick = async function() {
-                        // Assuming you have a reference to the select element and original value somewhere
-                        // You need to pass or capture these values before this handler runs.
-                        const select = document.querySelector('select-selector'); // Replace with actual selector or logic
-                        const originalValue = select ? select.value : null;
-
                         try {
                             // Hide modal by removing 'active' class
                             statusConfirmModal.classList.remove('active');
@@ -1836,7 +2099,6 @@ function formatMembershipType($type)
                                 // Update UI first before removing the row
                                 const rowStatus = document.querySelector(`tr[data-user-id="${applicationId}"]`);
                                 if (rowStatus) {
-
                                     // Animate row out and remove after animation
                                     rowStatus.style.animation = 'slideOut 0.3s ease-out forwards';
                                     setTimeout(() => {
@@ -1854,7 +2116,7 @@ function formatMembershipType($type)
                                 // Show success toast
                                 showToast('Application status updated successfully', true);
 
-                                // Reload page after 2 seconds to allow viewing the notification
+                                // Reload page after delay
                                 setTimeout(() => {
                                     location.reload();
                                 }, 500);
@@ -1895,45 +2157,45 @@ function formatMembershipType($type)
                     };
                 }
 
+                // Delete confirmation
+                const deleteConfirmBtn = document.getElementById('almDeleteConfirmBtn');
+                const deleteCancelBtn = document.getElementById('almDeleteCancelBtn');
+
                 // Add permanent delete confirmation modal HTML
                 const permanentDeleteModal = document.createElement('div');
                 permanentDeleteModal.id = 'almPermanentDeleteModal';
                 permanentDeleteModal.className = 'AL-modal-overlay';
                 permanentDeleteModal.innerHTML = `
-                    <div class="AL-modal">
-                        <div class="AL-modal-header">
-                            <div class="AL-modal-icon danger">
-                                <i class="fas fa-exclamation-triangle"></i>
-                            </div>
-                            <h2 class="AL-modal-title">Permanent Delete</h2>
-                      
-                        </div>
-                        <div class="AL-modal-content">
-                            <p style="color: red; font-weight: bold;">
-                                Are you absolutely sure you want to permanently delete this application? 
-                                This action CANNOT be undone.
-                            </p>
-                            <p style="margin-top: 10px;">
-                                Please type "DELETE" to confirm:
-                            </p>
-                            <input type="text" id="deleteConfirmInput" 
-                                style="width: 100%; margin-top: 10px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-                            <div class="AL-modal-buttons" style="margin-top: 15px; display: flex; justify-content: flex-end; gap: 10px;">
-                                <button id="almPermanentDeleteCancelBtn" class="AL-modal-btn AL-modal-btn-secondary">
-                                    Cancel
-                                </button>
-                                <button id="almPermanentDeleteConfirmBtn" class="AL-modal-btn AL-modal-btn-danger" disabled>
-                                    Permanently Delete
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
+        <div class="AL-modal">
+            <div class="AL-modal-header">
+                <div class="AL-modal-icon danger">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h2 class="AL-modal-title">Permanent Delete</h2>
+            </div>
+            <div class="AL-modal-content">
+                <p style="color: red; font-weight: bold;">
+                    Are you absolutely sure you want to permanently delete this application? 
+                    This action CANNOT be undone.
+                </p>
+                <p style="margin-top: 10px;">
+                    Please type "DELETE" to confirm:
+                </p>
+                <input type="text" id="deleteConfirmInput" 
+                    style="width: 100%; margin-top: 10px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                <div class="AL-modal-buttons" style="margin-top: 15px; display: flex; justify-content: flex-end; gap: 10px;">
+                    <button id="almPermanentDeleteCancelBtn" class="AL-modal-btn AL-modal-btn-secondary">
+                        Cancel
+                    </button>
+                    <button id="almPermanentDeleteConfirmBtn" class="AL-modal-btn AL-modal-btn-danger" disabled>
+                        Permanently Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
                 document.body.appendChild(permanentDeleteModal);
 
-                // Delete confirmation
-                const deleteConfirmBtn = document.getElementById('almDeleteConfirmBtn');
-                const deleteCancelBtn = document.getElementById('almDeleteCancelBtn');
                 const permanentDeleteConfirmBtn = document.getElementById('almPermanentDeleteConfirmBtn');
                 const permanentDeleteCancelBtn = document.getElementById('almPermanentDeleteCancelBtn');
                 const deleteConfirmInput = document.getElementById('deleteConfirmInput');
@@ -2034,6 +2296,9 @@ function formatMembershipType($type)
                             if (modal.id === 'almStatusConfirmModal' && select) {
                                 select.value = originalValue;
                             }
+                            if (modal.id === 'almDeclineReasonModal' && select) {
+                                select.value = originalValue;
+                            }
                             if (modal.id === 'almPermanentDeleteModal' && deleteConfirmInput) {
                                 deleteConfirmInput.value = '';
                                 if (permanentDeleteConfirmBtn) {
@@ -2050,7 +2315,7 @@ function formatMembershipType($type)
                         document.querySelectorAll('.AL-modal-overlay').forEach(modal => {
                             if (modal.classList.contains('active')) {
                                 modal.classList.remove('active');
-                                if (modal.id === 'almStatusConfirmModal' && select) {
+                                if ((modal.id === 'almStatusConfirmModal' || modal.id === 'almDeclineReasonModal') && select) {
                                     select.value = originalValue;
                                 }
                                 if (modal.id === 'almPermanentDeleteModal' && deleteConfirmInput) {
@@ -2063,6 +2328,29 @@ function formatMembershipType($type)
                         });
                     }
                 });
+            });
+        </script>
+
+        <!-- View Reason Modal Script -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const viewReasonModal = document.getElementById('almViewReasonModal');
+                const viewReasonCloseBtn = document.getElementById('almViewReasonCloseBtn');
+
+                if (viewReasonCloseBtn) {
+                    viewReasonCloseBtn.onclick = function() {
+                        viewReasonModal.classList.remove('active');
+                    };
+                }
+
+                // Close modal when clicking outside
+                if (viewReasonModal) {
+                    viewReasonModal.addEventListener('click', (e) => {
+                        if (e.target === viewReasonModal) {
+                            viewReasonModal.classList.remove('active');
+                        }
+                    });
+                }
             });
         </script>
 </body>

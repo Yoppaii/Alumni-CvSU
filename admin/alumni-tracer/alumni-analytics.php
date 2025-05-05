@@ -120,6 +120,8 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 1.5rem;
+            box-shadow: var(--shadow);
+
             margin-bottom: 1.5rem;
         }
 
@@ -127,7 +129,6 @@
         .analytics-card {
             background: var(--bg-primary);
             border-radius: 0.75rem;
-            box-shadow: var(--shadow);
             overflow: hidden;
         }
 

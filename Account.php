@@ -720,7 +720,7 @@ $_SESSION['has_booking'] = $hasBooking;
                         </span>
                     </div>
                     <?php if ($userStatus == 'Alumni' && isset($user['alumni_id_card_no'])): ?>
-                        <div class="alumni-id">
+                        <div class="ealumni-id">
                             ID: <?php echo $user['alumni_id_card_no']; ?>
                         </div>
                     <?php endif; ?>
@@ -744,12 +744,12 @@ $_SESSION['has_booking'] = $hasBooking;
                 <?php if (!$hasBooking): ?>
                     <li class="nav-item"><a href="?section=Room-Reservation" class="nav-link booking-link"><i class="fas fa-calendar-check"></i> Booking</a></li>
                 <?php endif; ?>
-                <li class="nav-item"><a href="?section=booking_history" class="nav-link"><i class="fas fa-calendar-check"></i> Booking History</a></li>
+                <li class="nav-item"><a href="?section=booking_history" class="nav-link"><i class="fas fa-calendar-alt"></i> Booking History</a></li>
 
                 <?php if (!$hasSubmittedTracer && $verified == 1): ?>
                     <li class="nav-item"><a href="?section=Alumni-Tracer-Form" class="nav-link"><i class="fas fa-user"></i> Alumni Tracer Form</a></li>
                 <?php endif; ?>
-                <li class="nav-item"><a href="?section=Alumni-Tracer-Referal" class="nav-link"><i class="fas fa-user"></i> Alumni Tracer Referal</a></li>
+                <li class="nav-item"><a href="?section=Alumni-Tracer-Referal" class="nav-link"><i class="fas fa-user-friends"></i> Alumni Tracer Referal</a></li>
 
 
                 <li class="nav-item settings-dropdown">

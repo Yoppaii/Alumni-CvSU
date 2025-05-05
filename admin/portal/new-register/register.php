@@ -21,6 +21,8 @@
             --login-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
             --login-shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
             --login-transition: all 0.3s ease;
+            --login-error: #ef4444;
+
         }
 
         * {
@@ -333,12 +335,12 @@
             flex-grow: 1;
             font-size: 14px;
             color: var(--login-text-dark);
-            border-left: 4px solid var(--login-primary);
+            border-left: 4px solid var(--login-error);
 
         }
 
         .view-booking-toast-error .view-booking-toast-icon i {
-            color: var(--login-primary);
+            color: var(--login-error);
         }
 
 
@@ -818,13 +820,13 @@
                 <p>Please enter your alumni details for verification</p>
 
                 <div class="input-group">
-                    <label for="alumni_id_card_no">Alumni ID Card Number</label>
+                    <label for="alumni_id_card_no">Alumni ID Card Number<span style="color: red;">*</span></label>
                     <i class="fa-solid fa-id-card input-icon-left"></i>
                     <input type="text" id="alumni_id_card_no" name="alumni_id_card_no" placeholder="Enter your Alumni ID" required>
                 </div>
 
                 <div class="input-group">
-                    <label for="verify_first_name">First Name</label>
+                    <label for="verify_first_name">First Name<span style="color: red;">*</span></label>
                     <i class="fa-solid fa-user input-icon-left"></i>
                     <input type="text" id="verify_first_name" name="verify_first_name" placeholder="Enter your first name" required>
                 </div>
@@ -836,7 +838,7 @@
                 </div>
 
                 <div class="input-group">
-                    <label for="verify_last_name">Last Name</label>
+                    <label for="verify_last_name">Last Name<span style="color: red;">*</span></label>
                     <i class="fa-solid fa-user input-icon-left"></i>
                     <input type="text" id="verify_last_name" name="verify_last_name" placeholder="Enter your last name" required>
                 </div>
@@ -854,7 +856,7 @@
 
                 <!-- Common fields for all users -->
                 <div class="input-group">
-                    <label for="register-firstname">First Name</label>
+                    <label for="register-firstname">First Name<span style="color: red;">*</span></label>
                     <i class="fa-solid fa-user input-icon-left"></i>
                     <input type="text" id="register-firstname" name="first_name" placeholder="Enter your first name" required>
                 </div>
@@ -866,31 +868,31 @@
                 </div>
 
                 <div class="input-group">
-                    <label for="register-lastname">Last Name</label>
+                    <label for="register-lastname">Last Name<span style="color: red;">*</span></label>
                     <i class="fa-solid fa-user input-icon-left"></i>
                     <input type="text" id="register-lastname" name="last_name" placeholder="Enter your last name" required>
                 </div>
 
                 <div class="input-group">
-                    <label for="register-address">Complete Address</label>
+                    <label for="register-address">Complete Address<span style="color: red;">*</span></label>
                     <i class="fa-solid fa-map-marker-alt input-icon-left"></i>
                     <input type="text" id="register-address" name="address" placeholder="Enter your complete address" required>
                 </div>
 
                 <div class="input-group">
-                    <label for="register-telephone">Telephone Number</label>
+                    <label for="register-telephone">Telephone Number</span></label>
                     <i class="fa-solid fa-phone-alt input-icon-left"></i>
                     <input type="tel" id="register-telephone" name="telephone" placeholder="Enter your telephone number">
                 </div>
 
                 <div class="input-group">
-                    <label for="register-phone">Mobile Phone Number</label>
+                    <label for="register-phone">Mobile Phone Number<span style="color: red;">*</span></label>
                     <i class="fa-solid fa-mobile-alt input-icon-left"></i>
                     <input type="tel" id="register-phone" name="phone_number" placeholder="Enter your mobile phone number" required>
                 </div>
 
                 <div class="input-group">
-                    <label for="register-position">Job Position/Role</label>
+                    <label for="register-position">Job Position/Role<span style="color: red;">*</span></label>
                     <i class="fa-solid fa-briefcase input-icon-left"></i>
                     <input type="text" id="register-position" name="position" placeholder="Enter your position" required>
                 </div>
@@ -907,20 +909,20 @@
                 <p>Enter your email and create a password</p>
 
                 <div class="input-group">
-                    <label for="register-email">Email Address</label>
+                    <label for="register-email">Email Address<span style="color: red;">*</span></label>
                     <i class="fa-solid fa-envelope input-icon-left"></i>
                     <input type="email" id="register-email" name="email" placeholder="your.email@example.com" required>
                 </div>
 
                 <div class="input-group">
-                    <label for="register-password">Password</label>
+                    <label for="register-password">Password<span style="color: red;">*</span></label>
                     <i class="fa-solid fa-lock input-icon-left"></i>
                     <input type="password" id="register-password" name="password" placeholder="Create a password" required>
                     <i class="fa-solid fa-eye password-toggle" id="passwordToggle"></i>
                 </div>
 
                 <div class="input-group">
-                    <label for="register-confirmPassword">Confirm Password</label>
+                    <label for="register-confirmPassword">Confirm Password<span style="color: red;">*</span></label>
                     <i class="fa-solid fa-lock input-icon-left"></i>
                     <input type="password" id="register-confirmPassword" name="confirm_password" placeholder="Confirm your password" required>
                     <i class="fa-solid fa-eye password-toggle" id="confirmPasswordToggle"></i>

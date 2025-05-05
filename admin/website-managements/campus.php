@@ -511,7 +511,12 @@ $result = $mysqli->query($query);
                     <label class="campus-label" for="campus_image">Campus Image</label>
                     <input class="campus-input" type="file" id="campus_image" name="campus_image" accept="image/*" />
                 </div>
-                <button class="campus-submit" type="submit">Add Campus</button>
+
+                <div class="campus-button-group">
+                    <button type="submit" class="campus-submit">Add Campus</button>
+                    <button type="button" class="campus-submit" id="campus-reset-btn" style="background-color: var(--secondary-color); margin-left: 0.5rem;">Cancel</button>
+                </div>
+
             </form>
         </section>
 
@@ -524,11 +529,11 @@ $result = $mysqli->query($query);
                         <div class="campus-card-header">
                             <h3><?= htmlspecialchars($row['name']) ?></h3>
                             <div class="campus-actions">
-                                <button class="campus-btn campus-btn-edit" onclick="openEditModal(<?= $row['id'] ?>)" title="Edit">&#9998;</button>
+                                <button class="campus-btn campus-btn-edit" onclick="openEditModal(<?= $row['id'] ?>)" title="Edit"> <i class="fas fa-edit"></i></button>
                                 <form method="POST" style="display:inline;" onsubmit="return confirm('Delete this campus?');">
                                     <input type="hidden" name="action" value="delete" />
                                     <input type="hidden" name="campus_id" value="<?= $row['id'] ?>" />
-                                    <button class="campus-btn campus-btn-delete" type="submit" title="Delete">&#10006;</button>
+                                    <button class="campus-btn campus-btn-delete" type="submit" title="Delete"> <i class="fas fa-trash"></i></button>
                                 </form>
                             </div>
                         </div>
@@ -606,6 +611,16 @@ $result = $mysqli->query($query);
                 }, 3000);
             }, 100);
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const resetBtn = document.getElementById('campus-reset-btn');
+
+            resetBtn.addEventListener('click', function() {
+                document.getElementById('campus_name').value = '';
+                document.getElementById('campus_url').value = '';
+                document.getElementById('campus_image').value = '';
+            });
+        })
     </script>
 
 </body>

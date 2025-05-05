@@ -1,93 +1,139 @@
 <?php
 require_once 'main_db.php';
 
-// Initialize message variables
+// Initialize variables
 $message = '';
 $messageType = '';
+$editMode = false;
+$editId = null;
+$editData = [
+    'alumni_id_card_no' => '',
+    'last_name' => '',
+    'first_name' => '',
+    'middle_name' => '',
+    'membership_type' => ''
+];
+
+// Check if in edit mode
+if (isset($_GET['edit'])) {
+    $editId = (int)$_GET['edit'];
+    $edit_sql = "SELECT * FROM alumni WHERE alumni_id = ?";
+    $edit_stmt = $mysqli->prepare($edit_sql);
+    $edit_stmt->bind_param("i", $editId);
+    $edit_stmt->execute();
+    $edit_result = $edit_stmt->get_result();
+
+    if ($edit_result->num_rows > 0) {
+        $editMode = true;
+        $editData = $edit_result->fetch_assoc();
+    }
+    $edit_stmt->close();
+}
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Get form data and sanitize inputs
-    $alumni_id_card_no = $mysqli->real_escape_string($_POST['alumni_id_card_no']);
-    $last_name = $mysqli->real_escape_string($_POST['last_name']);
-    $first_name = $mysqli->real_escape_string($_POST['first_name']);
-    $middle_name = empty($_POST['middle_name']) ? NULL : $mysqli->real_escape_string($_POST['middle_name']);
-    $membership_type = $mysqli->real_escape_string($_POST['membership_type']);
-    $verify = 'unused'; // Default value for verify field
-
-    // Check if the alumni ID card number already exists
-    $check_sql = "SELECT alumni_id_card_no FROM alumni WHERE alumni_id_card_no = ?";
-    $check_stmt = $mysqli->prepare($check_sql);
-    $check_stmt->bind_param("s", $alumni_id_card_no);
-    $check_stmt->execute();
-    $check_result = $check_stmt->get_result();
-
-    if ($check_result->num_rows > 0) {
-        $message = "Error: Alumni ID Card Number already exists!";
-        $messageType = "error";
-    } else {
-        // Prepare INSERT statement
-        $insert_sql = "INSERT INTO alumni (alumni_id_card_no, last_name, first_name, middle_name, membership_type, verify) VALUES (?, ?, ?, ?, ?, ?)";
-
-        $stmt = $mysqli->prepare($insert_sql);
-
-        // Use different bind_param based on whether middle_name is NULL
-        if ($middle_name === NULL) {
-            $stmt->bind_param(
-                "ssssss",
-                $alumni_id_card_no,
-                $last_name,
-                $first_name,
-                $middle_name,
-                $membership_type,
-                $verify
-            );
-        } else {
-            $stmt->bind_param(
-                "ssssss",
-                $alumni_id_card_no,
-                $last_name,
-                $first_name,
-                $middle_name,
-                $membership_type,
-                $verify
-            );
-        }
-
-        // Execute the statement
+    // Delete handling
+    if (isset($_POST['delete']) && isset($_POST['alumni_id'])) {
+        $alumni_id = (int)$_POST['alumni_id'];
+        $delete_sql = "DELETE FROM alumni WHERE alumni_id = ?";
+        $stmt = $mysqli->prepare($delete_sql);
+        $stmt->bind_param("i", $alumni_id);
         if ($stmt->execute()) {
-            $message = "Alumni ID Card added successfully!";
+            $message = "Record deleted successfully!";
             $messageType = "success";
-
-            // Clear form data on successful submission
-            $_POST = array();
         } else {
-            $message = "Error: " . $stmt->error;
+            $message = "Error deleting record: " . $stmt->error;
             $messageType = "error";
         }
-
         $stmt->close();
     }
-    $check_stmt->close();
+    // Add/Edit handling
+    else {
+        $alumni_id_card_no = $mysqli->real_escape_string($_POST['alumni_id_card_no']);
+        $last_name = $mysqli->real_escape_string($_POST['last_name']);
+        $first_name = $mysqli->real_escape_string($_POST['first_name']);
+        $middle_name = empty($_POST['middle_name']) ? NULL : $mysqli->real_escape_string($_POST['middle_name']);
+        $membership_type = $mysqli->real_escape_string($_POST['membership_type']);
+
+        // Edit mode
+        if (isset($_POST['edit']) && isset($_POST['alumni_id'])) {
+            $editId = (int)$_POST['alumni_id'];
+            $update_sql = "UPDATE alumni SET 
+                alumni_id_card_no=?, 
+                last_name=?, 
+                first_name=?, 
+                middle_name=?, 
+                membership_type=? 
+                WHERE alumni_id=?";
+            $stmt = $mysqli->prepare($update_sql);
+            $stmt->bind_param("sssssi", $alumni_id_card_no, $last_name, $first_name, $middle_name, $membership_type, $editId);
+
+            if ($stmt->execute()) {
+                $message = "Record updated successfully!";
+                $messageType = "success";
+                $editMode = false;
+            } else {
+                $message = "Error updating record: " . $stmt->error;
+                $messageType = "error";
+            }
+            $stmt->close();
+        }
+        // Add mode
+        else {
+            $check_sql = "SELECT alumni_id_card_no FROM alumni WHERE alumni_id_card_no = ?";
+            $check_stmt = $mysqli->prepare($check_sql);
+            $check_stmt->bind_param("s", $alumni_id_card_no);
+            $check_stmt->execute();
+            $check_result = $check_stmt->get_result();
+
+            if ($check_result->num_rows > 0) {
+                $message = "Error: Alumni ID already exists!";
+                $messageType = "error";
+                $check_stmt->close();
+            } else {
+                $check_stmt->close();
+                $insert_sql = "INSERT INTO alumni (alumni_id_card_no, last_name, first_name, middle_name, membership_type, verify) 
+                              VALUES (?, ?, ?, ?, ?, 'unused')";
+                $stmt = $mysqli->prepare($insert_sql);
+                $stmt->bind_param("sssss", $alumni_id_card_no, $last_name, $first_name, $middle_name, $membership_type);
+
+                if ($stmt->execute()) {
+                    $message = "Record added successfully!";
+                    $messageType = "success";
+                } else {
+                    $message = "Error adding record: " . $stmt->error;
+                    $messageType = "error";
+                }
+                $stmt->close();
+            }
+        }
+    }
 }
 
-// Fetch the latest 3 alumni entries
-$recent_alumni_sql = "SELECT alumni_id, alumni_id_card_no, last_name, first_name, middle_name, membership_type, verify 
-                     FROM alumni 
-                     ORDER BY alumni_id DESC 
-                     LIMIT 3";
-$recent_alumni_result = $mysqli->query($recent_alumni_sql);
+// Search functionality - only apply if section is alumni-id
+$search = (isset($_GET['search']) && isset($_GET['section']) && $_GET['section'] === 'alumni-id')
+    ? $mysqli->real_escape_string($_GET['search']) : '';
+$searchCondition = $search ?
+    "WHERE last_name LIKE '%$search%' OR first_name LIKE '%$search%' OR alumni_id_card_no LIKE '%$search%'" : "";
 
+// Fetch all records with search
+$sql = "SELECT * FROM alumni $searchCondition ORDER BY alumni_id DESC";
+$result = $mysqli->query($sql);
+
+// Get next ID
 $last_id_sql = "SELECT MAX(CAST(alumni_id_card_no AS UNSIGNED)) AS max_id FROM alumni";
 $last_id_result = $mysqli->query($last_id_sql);
-
-$next_alumni_id_card_no = 1; // Default start
-
+$next_alumni_id_card_no = 1;
 if ($last_id_result) {
     $row = $last_id_result->fetch_assoc();
     if ($row && $row['max_id'] !== null) {
         $next_alumni_id_card_no = (int)$row['max_id'] + 1;
     }
+}
+
+// Auto-fill form with next ID if not in edit mode
+if (!$editMode) {
+    $editData['alumni_id_card_no'] = $next_alumni_id_card_no;
 }
 ?>
 
@@ -123,30 +169,10 @@ if ($last_id_result) {
         --radius-md: 0.5rem;
         --radius-lg: 0.75rem;
         --transition: all 0.3s ease;
-
-        /* Alumni ID Form Variables */
-        --alumni-bg-primary: #ffffff;
-        --alumni-text-primary: #1e293b;
-        --alumni-text-secondary: #64748b;
-        --alumni-border-color: #e2e8f0;
-        --alumni-input-bg: #ffffff;
-        --alumni-card-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        --alumni-success-bg: #dcfce7;
-        --alumni-success-text: #15803d;
-        --alumni-success-border: #86efac;
-        --alumni-error-bg: #fee2e2;
-        --alumni-error-text: #dc2626;
-        --alumni-error-border: #fca5a5;
-        --alumni-hover-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        --alumni-button-bg: #10b981;
-        --alumni-button-hover: #059669;
-        --alumni-input-focus: rgba(16, 185, 129, 0.1);
-        --alumni-placeholder: #94a3b8;
     }
 
     /* Dark Theme Variables */
     [data-theme="dark"] {
-        /* Dashboard Dark Theme */
         --primary-color: #10b981;
         --primary-hover: #059669;
         --primary-light: rgba(16, 185, 129, 0.2);
@@ -155,25 +181,6 @@ if ($last_id_result) {
         --text-secondary: #94a3b8;
         --bg-primary: #1e293b;
         --bg-secondary: #0f172a;
-
-        /* Alumni ID Form Dark Theme */
-        --alumni-bg-primary: #1e293b;
-        --alumni-text-primary: #e2e8f0;
-        --alumni-text-secondary: #94a3b8;
-        --alumni-border-color: #334155;
-        --alumni-input-bg: #0f172a;
-        --alumni-card-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-        --alumni-success-bg: rgba(16, 185, 129, 0.2);
-        --alumni-success-text: #10b981;
-        --alumni-success-border: #059669;
-        --alumni-error-bg: rgba(220, 38, 38, 0.2);
-        --alumni-error-text: #ef4444;
-        --alumni-error-border: #dc2626;
-        --alumni-hover-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-        --alumni-button-bg: #10b981;
-        --alumni-button-hover: #059669;
-        --alumni-input-focus: rgba(16, 185, 129, 0.2);
-        --alumni-placeholder: #64748b;
     }
 
     /* Reset and Base Styles */
@@ -199,44 +206,28 @@ if ($last_id_result) {
         transition: background-color 0.3s ease, color 0.3s ease;
     }
 
-    /* Theme Toggle Button */
-    .theme-toggle {
-        background: none;
-        border: none;
-        padding: 0.5rem;
-        color: var(--text-secondary);
-        cursor: pointer;
-        border-radius: var(--radius-md);
-        transition: var(--transition);
-    }
-
-    .theme-toggle:hover {
-        color: var(--primary-color);
-        background-color: var(--primary-light);
-    }
-
     /* Alumni Container Styles */
     .alumni-container {
-        display: grid;
-        grid-template-columns: 1fr 350px;
-        gap: 2rem;
+        display: flex;
+        gap: 1rem;
         width: 100%;
-        margin: 0 auto;
+        margin: auto;
     }
 
     /* Form Container */
-    .alumni-id-form-container {
-        background: var(--alumni-bg-primary);
-        border-radius: 0.75rem;
+    .alumni-form-section {
+        flex: 1;
+        min-width: 0;
+        background-color: var(--bg-primary);
+        border-radius: var(--radius-lg);
         padding: 2rem;
-        box-shadow: var(--alumni-card-shadow);
-        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: var(--shadow-md);
     }
 
     .alumni-id-form-title {
         font-size: 1.5rem;
         font-weight: 600;
-        color: var(--alumni-text-primary);
+        color: var(--text-primary);
         margin-bottom: 1.5rem;
         transition: color 0.3s ease;
     }
@@ -244,150 +235,240 @@ if ($last_id_result) {
     /* Message Styles */
     .alumni-id-message {
         padding: 1rem;
-        border-radius: 0.5rem;
+        border-radius: var(--radius-md);
         margin-bottom: 1.5rem;
         font-size: 0.875rem;
         transition: all 0.3s ease;
     }
 
     .alumni-id-message.success {
-        background-color: var(--alumni-success-bg);
-        color: var(--alumni-success-text);
-        border: 1px solid var(--alumni-success-border);
+        background-color: var(--alumni-success-bg, #dcfce7);
+        color: var(--alumni-success-text, #15803d);
+        border: 1px solid var(--alumni-success-border, #86efac);
     }
 
     .alumni-id-message.error {
-        background-color: var(--alumni-error-bg);
-        color: var(--alumni-error-text);
-        border: 1px solid var(--alumni-error-border);
+        background-color: var(--alumni-error-bg, #fee2e2);
+        color: var(--alumni-error-text, #dc2626);
+        border: 1px solid var(--alumni-error-border, #fca5a5);
     }
 
     /* Form Styles */
     .alumni-id-form {
         display: grid;
-        gap: 1.5rem;
+        gap: 1.25rem;
     }
 
-    .alumni-id-form-group {
+    .alumni-form-group {
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
     }
 
-    .alumni-id-form-label {
-        font-size: 0.875rem;
-        font-weight: 500;
-        color: var(--alumni-text-primary);
-        transition: color 0.3s ease;
+    .alumni-form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: var(--text-primary);
     }
 
-    .alumni-id-form-input {
+    .alumni-form-input {
+        width: 100%;
         padding: 0.75rem 1rem;
-        border: 1px solid var(--alumni-border-color);
-        border-radius: 0.5rem;
+        border: 1px solid #d1d5db;
+        border-radius: var(--radius-md);
         font-size: 0.875rem;
-        color: var(--alumni-text-primary);
-        background-color: var(--alumni-input-bg);
+        color: var(--text-primary);
+        background-color: var(--bg-secondary);
         transition: all 0.3s ease;
     }
 
-    .alumni-id-form-input:focus {
+    .alumni-form-input:focus {
         outline: none;
-        border-color: var(--alumni-button-bg);
-        box-shadow: 0 0 0 3px var(--alumni-input-focus);
+        border-color: var(--primary-color);
+        background-color: #f0fdf4;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
     }
 
-    .alumni-id-form-input::placeholder {
-        color: var(--alumni-placeholder);
+    .alumni-form-input::placeholder {
+        color: var(--alumni-placeholder, #94a3b8);
     }
 
     /* Submit Button */
-    .alumni-id-submit-btn {
-        background-color: var(--alumni-button-bg);
+    .alumni-submit-btn {
+        background-color: var(--primary-color);
         color: #ffffff;
         padding: 0.75rem 1.5rem;
         border: none;
-        border-radius: 0.5rem;
+        border-radius: var(--radius-md);
         font-weight: 500;
         cursor: pointer;
         transition: all 0.2s ease;
         margin-top: 0.5rem;
     }
 
-    .alumni-id-submit-btn:hover {
-        background-color: var(--alumni-button-hover);
+    .alumni-submit-btn:hover {
+        background-color: var(--primary-hover);
     }
 
-    .alumni-id-submit-btn:focus {
+    .alumni-submit-btn:focus {
         outline: none;
-        box-shadow: 0 0 0 3px var(--alumni-input-focus);
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
     }
 
-    /* History Section */
-    .alumni-history-container {
-        background: var(--alumni-bg-primary);
-        border-radius: 0.75rem;
+    /* Records Section */
+    .alumni-records-section {
+        background: var(--bg-primary);
+        border-radius: var(--radius-lg);
         padding: 1.5rem;
-        box-shadow: var(--alumni-card-shadow);
-        transition: all 0.3s ease;
+        box-shadow: var(--shadow-md);
+        max-height: 80vh;
+        overflow-y: auto;
+        width: 600px;
+        min-width: 600px;
     }
 
-    .alumni-history-title {
+    .alumni-records-title {
         font-size: 1.25rem;
         font-weight: 600;
-        color: var(--alumni-text-primary);
+        color: var(--text-primary);
         margin-bottom: 1.5rem;
         transition: color 0.3s ease;
     }
 
-    .alumni-history-card {
+    /* Search Styles */
+    .search-container {
+        margin-bottom: 1.5rem;
+    }
+
+    .search-form {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .search-form input {
+        flex: 1;
+        padding: 0.75rem 1rem;
+        border: 1px solid #d1d5db;
+        border-radius: var(--radius-md);
+        font-size: 0.875rem;
+        color: var(--text-primary);
+        background-color: var(--bg-secondary);
+    }
+
+    .search-form input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+
+    .search-form button {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 0.75rem 1rem;
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .search-form button:hover {
+        background-color: var(--primary-hover);
+    }
+
+    .alumni-card {
+        background: var(--bg-secondary);
+        border-radius: var(--radius-md);
         padding: 1rem;
-        border: 1px solid var(--alumni-border-color);
-        border-radius: 0.5rem;
+        border: 1px solid #e5e7eb;
         margin-bottom: 1rem;
         transition: all 0.2s ease;
-        background: var(--alumni-bg-primary);
     }
 
-    .alumni-history-card:hover {
+    .alumni-card:hover {
         transform: translateY(-2px);
-        box-shadow: var(--alumni-hover-shadow);
+        box-shadow: var(--shadow-sm);
     }
 
-    .alumni-history-card:last-child {
+    .alumni-card:last-child {
         margin-bottom: 0;
     }
 
-    .alumni-history-card h3 {
-        font-size: 1rem;
+    .alumni-card-header {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 0.75rem;
+    }
+
+    .alumni-card-header h3 {
+        margin: 0;
+        font-size: 1.1rem;
+        color: var(--text-primary);
         font-weight: 600;
-        color: var(--alumni-text-primary);
-        margin-bottom: 0.5rem;
-        transition: color 0.3s ease;
     }
 
-    .alumni-history-card p {
+    .alumni-card p {
         font-size: 0.875rem;
-        color: var(--alumni-text-secondary);
+        color: var(--text-secondary);
         margin: 0.25rem 0;
-        transition: color 0.3s ease;
     }
 
-    .alumni-history-card p strong {
-        color: var(--alumni-text-primary);
+    .alumni-card p strong {
+        color: var(--text-primary);
         font-weight: 500;
     }
 
-    .alumni-history-empty {
+    .alumni-empty {
         text-align: center;
         padding: 2rem;
-        color: var(--alumni-text-secondary);
+        color: var(--text-secondary);
         font-size: 0.875rem;
-        transition: color 0.3s ease;
+    }
+
+    /* Action Buttons */
+    .alumni-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 0.75rem;
+    }
+
+    .alumni-btn {
+        padding: 0.5rem 1rem;
+        border-radius: var(--radius-sm);
+        font-size: 0.75rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: var(--transition);
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .alumni-btn-edit {
+        background-color: var(--primary-light);
+        color: var(--primary-color);
+    }
+
+    .alumni-btn-edit:hover {
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+    .alumni-btn-delete {
+        background-color: #fee2e2;
+        color: var(--danger-color);
+    }
+
+    .alumni-btn-delete:hover {
+        background-color: var(--danger-color);
+        color: white;
     }
 
     /* Select Element Specific Styles */
-    select.alumni-id-form-input {
+    select.alumni-form-input {
         appearance: none;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
         background-repeat: no-repeat;
@@ -396,7 +477,7 @@ if ($last_id_result) {
         padding-right: 2.5rem;
     }
 
-    [data-theme="dark"] select.alumni-id-form-input {
+    [data-theme="dark"] select.alumni-form-input {
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
     }
 
@@ -408,21 +489,15 @@ if ($last_id_result) {
         }
     }
 
-    @media (max-width: 768px) {
+    @media (max-width: 900px) {
         .alumni-container {
-            grid-template-columns: 1fr;
-            padding: 1rem;
+            flex-direction: column;
         }
 
-        .alumni-id-form-container,
-        .alumni-history-container {
-            padding: 1.5rem;
-        }
-
-        .alumni-id-form-title,
-        .alumni-history-title {
-            font-size: 1.25rem;
-            margin-bottom: 1.25rem;
+        .alumni-records-section {
+            max-height: none;
+            width: 100%;
+            min-width: 0;
         }
     }
 
@@ -431,37 +506,14 @@ if ($last_id_result) {
             padding: 0.75rem;
         }
 
-        .alumni-id-form-container,
-        .alumni-history-container {
+        .alumni-form-section,
+        .alumni-records-section {
             padding: 1rem;
         }
 
-        .alumni-id-form-input,
-        .alumni-id-submit-btn {
+        .alumni-form-input,
+        .alumni-submit-btn {
             padding: 0.625rem 1rem;
-        }
-    }
-
-    /* Print Styles */
-    @media print {
-        .alumni-container {
-            display: block;
-        }
-
-        .alumni-id-form-container,
-        .alumni-history-container {
-            box-shadow: none;
-            padding: 0;
-            margin-bottom: 2rem;
-        }
-
-        .alumni-id-form {
-            display: none;
-        }
-
-        .alumni-history-card {
-            break-inside: avoid;
-            border: 1px solid #000;
         }
     }
 </style>
@@ -469,76 +521,99 @@ if ($last_id_result) {
 <body>
 
     <div class="alumni-container">
-        <div class="alumni-id-form-container">
-            <h2 class="alumni-id-form-title">Add Alumni ID Card</h2>
-
+        <!-- Add/Edit Form -->
+        <section class="alumni-form-section">
+            <h2 class="alumni-id-form-title"><?= $editMode ? 'Edit' : 'Add' ?> Alumni Record</h2>
             <?php if ($message): ?>
-                <div class="alumni-id-message <?php echo $messageType; ?>">
-                    <?php echo $message; ?>
-                </div>
+                <div class="alumni-id-message <?= $messageType ?>"><?= $message ?></div>
             <?php endif; ?>
 
-            <form method="POST" action="" class="alumni-id-form">
-                <div class="alumni-id-form-group">
-                    <label class="alumni-id-form-label" for="alumni_id_card_no">Alumni ID Card Number</label>
-                    <input type="text" id="alumni_id_card_no" name="alumni_id_card_no" class="alumni-id-form-input" required value="<?php echo htmlspecialchars($next_alumni_id_card_no); ?>">
+            <form method="POST" action="?section=alumni-id" class="alumni-id-form">
+                <?php if ($editMode): ?>
+                    <input type="hidden" name="alumni_id" value="<?= $editId ?>">
+                <?php endif; ?>
+                <div class="alumni-form-group">
+                    <label class="alumni-form-label" for="alumni_id_card_no">Alumni ID Card Number</label>
+                    <input type="text" id="alumni_id_card_no" name="alumni_id_card_no" class="alumni-form-input" required
+                        value="<?= htmlspecialchars($editData['alumni_id_card_no']) ?>">
                 </div>
 
-                <div class="alumni-id-form-group">
-                    <label class="alumni-id-form-label" for="last_name">Last Name</label>
-                    <input type="text" id="last_name" name="last_name" class="alumni-id-form-input" required>
+                <div class="alumni-form-group">
+                    <label class="alumni-form-label" for="last_name">Last Name</label>
+                    <input type="text" id="last_name" name="last_name" class="alumni-form-input" required
+                        value="<?= htmlspecialchars($editData['last_name']) ?>">
                 </div>
 
-                <div class="alumni-id-form-group">
-                    <label class="alumni-id-form-label" for="first_name">First Name</label>
-                    <input type="text" id="first_name" name="first_name" class="alumni-id-form-input" required>
+                <div class="alumni-form-group">
+                    <label class="alumni-form-label" for="first_name">First Name</label>
+                    <input type="text" id="first_name" name="first_name" class="alumni-form-input" required
+                        value="<?= htmlspecialchars($editData['first_name']) ?>">
                 </div>
 
-                <div class="alumni-id-form-group">
-                    <label class="alumni-id-form-label" for="middle_name">Middle Name</label>
-                    <input type="text" id="middle_name" name="middle_name" class="alumni-id-form-input">
+                <div class="alumni-form-group">
+                    <label class="alumni-form-label" for="middle_name">Middle Name</label>
+                    <input type="text" id="middle_name" name="middle_name" class="alumni-form-input"
+                        value="<?= htmlspecialchars($editData['middle_name'] ?? '') ?>">
                 </div>
 
-                <div class="alumni-id-form-group">
-                    <label class="alumni-id-form-label" for="membership_type">Membership Type</label>
-                    <select id="membership_type" name="membership_type" class="alumni-id-form-input" required>
+                <div class="alumni-form-group">
+                    <label class="alumni-form-label" for="membership_type">Membership Type</label>
+                    <select id="membership_type" name="membership_type" class="alumni-form-input" required>
                         <option value="">Select Membership Type</option>
-                        <option value="Premium">Premium</option>
-                        <option value="Lifetime">Lifetime</option>
+                        <option value="Premium" <?= ($editData['membership_type'] === 'Premium') ? 'selected' : '' ?>>Premium</option>
+                        <option value="Lifetime" <?= ($editData['membership_type'] === 'Lifetime') ? 'selected' : '' ?>>Lifetime</option>
                     </select>
                 </div>
 
-                <button type="submit" class="alumni-id-submit-btn">Add Alumni ID Card</button>
+                <button type="submit" class="alumni-submit-btn" name="<?= $editMode ? 'edit' : 'submit' ?>">
+                    <?= $editMode ? 'Update' : 'Add' ?> Record
+                </button>
             </form>
-        </div>
+        </section>
 
-        <div class="alumni-history-container">
-            <h2 class="alumni-history-title">Recently Added Alumni</h2>
+        <!-- Records Section -->
+        <section class="alumni-records-section">
+            <div class="search-container">
+                <form method="GET" class="search-form">
+                    <input type="hidden" name="section" value="alumni-id">
+                    <input type="text" name="search" placeholder="Search alumni..."
+                        value="<?= htmlspecialchars($search) ?>">
+                    <button type="submit">Search</button>
+                </form>
+            </div>
 
-            <?php if ($recent_alumni_result && $recent_alumni_result->num_rows > 0): ?>
-                <?php while ($row = $recent_alumni_result->fetch_assoc()): ?>
-                    <div class="alumni-history-card">
-                        <h3><?php echo htmlspecialchars($row['first_name']) . ' ' . htmlspecialchars($row['last_name']); ?></h3>
-                        <p><strong>ID:</strong> <?php echo htmlspecialchars($row['alumni_id_card_no']); ?></p>
-                        <p><strong>Type:</strong> <?php echo htmlspecialchars($row['membership_type']); ?></p>
-                        <?php if ($row['middle_name']): ?>
-                            <p><strong>Middle Name:</strong> <?php echo htmlspecialchars($row['middle_name']); ?></p>
-                        <?php endif; ?>
+            <h2 class="alumni-records-title">Alumni Records</h2>
+
+            <?php if ($result && $result->num_rows > 0): ?>
+                <?php while ($row = $result->fetch_assoc()): ?>
+                    <div class="alumni-card">
+                        <div class="alumni-card-header">
+                            <h3><?= htmlspecialchars($row['last_name']) ?>, <?= htmlspecialchars($row['first_name']) ?></h3>
+                        </div>
+                        <p><strong>ID:</strong> <?= htmlspecialchars($row['alumni_id_card_no']) ?></p>
+                        <p><strong>Membership:</strong> <?= htmlspecialchars($row['membership_type']) ?></p>
+
+                        <div class="alumni-actions">
+                            <a href="?section=alumni-id&edit=<?= $row['alumni_id'] ?>" class="alumni-btn alumni-btn-edit">Edit</a>
+                            <form method="POST" style="display:inline;">
+                                <input type="hidden" name="alumni_id" value="<?= $row['alumni_id'] ?>">
+                                <button type="submit" name="delete" class="alumni-btn alumni-btn-delete"
+                                    onclick="return confirm('Are you sure you want to delete this record?');">Delete</button>
+                            </form>
+                        </div>
                     </div>
                 <?php endwhile; ?>
             <?php else: ?>
-                <div class="alumni-history-empty">
-                    <p>No alumni records found</p>
-                </div>
+                <div class="alumni-empty">No records found</div>
             <?php endif; ?>
-        </div>
+        </section>
     </div>
 
     <script>
         document.querySelector('.alumni-id-form').addEventListener('submit', function(e) {
-            const cardNo = document.getElementById('alumni_id_card_no').value;
-            const lastName = document.getElementById('last_name').value;
-            const firstName = document.getElementById('first_name').value;
+            const cardNo = document.getElementById('alumni_id_card_no').value.trim();
+            const lastName = document.getElementById('last_name').value.trim();
+            const firstName = document.getElementById('first_name').value.trim();
 
             if (!cardNo || !lastName || !firstName) {
                 e.preventDefault();

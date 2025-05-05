@@ -581,8 +581,8 @@ $mysqli->close();
             <div id="book-step2" class="book-step-content" style="display: none;">
                 <div class="book-date-time-container">
                     <div>
-                        <label>Arrival Date and Time</label>
-                        <input type="text" class="book-date-time-input" id="book-arrival-datetime" placeholder="Select arrival date and time">
+                        <label>Check-in Date and Time</label>
+                        <input type="text" class="book-date-time-input" id="book-arrival-datetime" placeholder="Select check-in date and time">
                     </div>
                 </div>
             </div>
@@ -590,8 +590,8 @@ $mysqli->close();
             <div id="book-step3" class="book-step-content" style="display: none;">
                 <div class="book-date-time-container">
                     <div>
-                        <label>Departure Date and Time</label>
-                        <input type="text" class="book-date-time-input" id="book-departure-datetime" placeholder="Select departure date and time">
+                        <label>Check-out Date and Time</label>
+                        <input type="text" class="book-date-time-input" id="book-departure-datetime" placeholder="Select check-out date and time">
                     </div>
                 </div>
             </div>

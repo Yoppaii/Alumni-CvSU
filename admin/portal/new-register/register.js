@@ -338,12 +338,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         middleNameField.setAttribute('title', readOnlyTooltip);
                         lastNameField.setAttribute('title', readOnlyTooltip);
 
-                        showToast('Alumni status verified successfully! Your name details have been locked.', false);
+                        showToast('Alumni status verified successfully! Your name details have been locked.');
 
                         // Proceed to personal info step
                         showStep(2);
                     } else {
-                        showToast(data.message || 'Alumni verification failed. Please check your details.');
+                        showToast(data.message || 'Alumni verification failed. Please check your details.', false);
                     }
                 })
                 .catch(error => {
@@ -587,9 +587,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (data.status === 'error') {
                     // Display error message but DO NOT redirect
                     showToast(data.message, false);
-                } else if (data.status === false) {
+                } else if (data.status === "success") {
                     // Only store data and redirect if successful
-                    showToast(data.message, false);
+                    showToast(data.message, true);
+                    console.log('Registration successful:', data.message);
 
                     // Save form data to sessionStorage
                     try {

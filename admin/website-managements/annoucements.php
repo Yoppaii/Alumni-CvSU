@@ -161,7 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['delete_id'])) {
             background-color: #8b5cf6;
             color: white;
         }
-
+ 
         .AN-submit {
             background-color: var(--primary-color);
             color: white;

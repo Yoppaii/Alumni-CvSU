@@ -88,11 +88,6 @@ function sendTracerSubmissionEmail($email, $fullName)
     }
 }
 
-if (isset($_SESSION['user_id'])) {
-    echo json_encode(['status' => 'error', 'message' => 'User not logged in']);
-    exit();
-}
-
 $logged_user_id = $_SESSION['user_id'];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -261,33 +256,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             foreach ($_POST['competencies'] as $competency) {
                 $stmt->bind_param("iis", $logged_user_id, $form_id, $competency);
                 $stmt->execute();
-            }
-            $stmt->close();
-        }
-
-        // Step 7: Other Alumni Information
-        if (isset($_POST['graduate_name'])) {
-            $stmt = $mysqli->prepare("INSERT INTO other_alumni (
-                user_id, personal_info_id, name, email, contact_number
-            ) VALUES (?, ?, ?, ?, ?)");
-
-            for ($i = 0; $i < count($_POST['graduate_name']); $i++) {
-                if (!empty($_POST['graduate_name'][$i])) {
-                    $stmt->bind_param(
-                        "iisss",
-                        $logged_user_id,
-                        $form_id,
-                        $_POST['graduate_name'][$i],
-                        $_POST['graduate_address'][$i], // This is now the email address
-                        $_POST['graduate_contact'][$i]
-                    );
-                    $stmt->execute();
-
-                    // Send email notification to each alumnus
-                    if (!empty($_POST['graduate_address'][$i])) {
-                        sendTracerSubmissionEmail($_POST['graduate_address'][$i], $_POST['graduate_name'][$i]);
-                    }
-                }
             }
             $stmt->close();
         }

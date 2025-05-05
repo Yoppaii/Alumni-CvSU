@@ -450,8 +450,8 @@ ob_end_flush();
             <div class="form-step">
                 <h2>Thank You!</h2>
                 <div class="thank-you-message">
-                    <p>Thank you for taking time out to fill out this questionnaire. Please return this GTS to your institution.</p>
-                    <p>Being one of the alumni of your institution, may we request you to list down the names of other college graduates (AY 2000-2001 to AY 2003-2004) from your institution including their email addresses and contact numbers. Their participation will also be needed to make this study more meaningful and useful.</p>
+                    <p>Help us reach more alumni! If you know other graduates from your institution, please refer them below so we can also invite them to participate in this important study.</p>
+                    <p>Kindly include their full name, email address, and contact number. Your referrals will greatly help in making this study more meaningful and comprehensive.</p>
                 </div>
 
                 <div id="alumniContainer" class="alumniContainer">

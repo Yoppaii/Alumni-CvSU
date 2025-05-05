@@ -2,14 +2,13 @@
 include 'main_db.php';
 $today = date('Y-m-d');
 
-$baseQuery = "SELECT a.*, u.email as user_email 
-             FROM alumni_id_cards a 
-             LEFT JOIN users u ON a.user_id = u.id
-             WHERE a.status = 'cancelled'
-             ORDER BY a.created_at DESC LIMIT 20";
+$baseQuery = "SELECT c.*, u.email as user_email 
+             FROM cancelled_alumni_applications c 
+             LEFT JOIN users u ON c.user_id = u.id
+             ORDER BY c.cancelled_at DESC LIMIT 20";
 $applicationsResult = $mysqli->query($baseQuery);
 
-$countQuery = "SELECT COUNT(*) as count FROM alumni_id_cards WHERE status = 'paid'";
+$countQuery = "SELECT COUNT(*) as count FROM cancelled_alumni_applications";
 $totalCount = $mysqli->query($countQuery)->fetch_assoc()['count'];
 ?>
 <!DOCTYPE html>
@@ -18,7 +17,7 @@ $totalCount = $mysqli->query($countQuery)->fetch_assoc()['count'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alumni ID Cards</title>
+    <title>Cancelled Alumni ID Applications</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <style>
@@ -83,7 +82,7 @@ $totalCount = $mysqli->query($countQuery)->fetch_assoc()['count'];
     }
 
     .alm-header-content h2 i {
-        color: var(--primary-color);
+        color: var(--danger-color);
     }
 
     .alm-booking-count {
@@ -95,7 +94,7 @@ $totalCount = $mysqli->query($countQuery)->fetch_assoc()['count'];
         padding: 0 0.375rem;
         font-size: 0.75rem;
         font-weight: 500;
-        background-color: var(--primary-color);
+        background-color: var(--danger-color);
         color: var(--white);
         border-radius: 9999px;
         margin-left: 0.5rem;
@@ -136,7 +135,7 @@ $totalCount = $mysqli->query($countQuery)->fetch_assoc()['count'];
 
     .alm-bookings-table th i {
         margin-right: 0.5rem;
-        color: var(--primary-color);
+        color: var(--danger-color);
     }
 
     .alm-bookings-table td {
@@ -171,9 +170,9 @@ $totalCount = $mysqli->query($countQuery)->fetch_assoc()['count'];
         white-space: nowrap;
     }
 
-    .alm-status-paid {
-        background-color: #dcfce7;
-        color: #15803d;
+    .alm-status-cancelled {
+        background-color: #fee2e2;
+        color: #b91c1c;
     }
 
     .alm-delete-btn {
@@ -193,6 +192,27 @@ $totalCount = $mysqli->query($countQuery)->fetch_assoc()['count'];
 
     .alm-delete-btn:hover {
         background-color: #dc2626;
+        transform: translateY(-1px);
+    }
+
+    .alm-view-btn {
+        background-color: #3b82f6;
+        color: white;
+        border: none;
+        border-radius: 0.375rem;
+        padding: 0.5rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .alm-view-btn:hover {
+        background-color: #2563eb;
         transform: translateY(-1px);
     }
 
@@ -277,22 +297,12 @@ $totalCount = $mysqli->query($countQuery)->fetch_assoc()['count'];
 
         .AL-modal-actions {
             flex-direction: column;
-            /* Adjust for AL-modal-actions */
         }
 
         .AL-modal-btn {
             width: 100%;
             justify-content: center;
         }
-    }
-
-    .alm-status-select {
-        padding: 0.25rem 0.5rem;
-        border-radius: 9999px;
-        border: 1px solid var(--border-color);
-        font-size: 0.85rem;
-        background: var(--bg-light);
-        color: var(--text-dark);
     }
 
     /* Modal Styles */
@@ -323,10 +333,12 @@ $totalCount = $mysqli->query($countQuery)->fetch_assoc()['count'];
         border-radius: var(--radius-lg);
         padding: 1.5rem;
         width: 90%;
-        max-width: 400px;
+        max-width: 600px;
         transform: translateY(-20px);
         transition: all 0.3s ease;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        max-height: 80vh;
+        overflow-y: auto;
     }
 
     .AL-modal-overlay.active .AL-modal {
@@ -360,8 +372,8 @@ $totalCount = $mysqli->query($countQuery)->fetch_assoc()['count'];
         color: white;
     }
 
-    .AL-modal-icon.success {
-        background-color: var(--success-color);
+    .AL-modal-icon.info {
+        background-color: #3b82f6;
         color: white;
     }
 
@@ -420,9 +432,26 @@ $totalCount = $mysqli->query($countQuery)->fetch_assoc()['count'];
     .AL-modal-btn-success:hover {
         background-color: var(--success-hover);
     }
-</style>
-<!-- Add some CSS for animations if needed -->
-<style>
+
+    .reason-container {
+        padding: 1rem;
+        background-color: #f8fafc;
+        border-radius: 0.5rem;
+        border-left: 4px solid var(--danger-color);
+        margin-top: 0.5rem;
+    }
+
+    .reason-label {
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+    }
+
+    .reason-text {
+        color: var(--text-secondary);
+        white-space: pre-wrap;
+    }
+
     /* Notification styles */
     #notificationContainer {
         position: fixed;
@@ -500,36 +529,22 @@ $totalCount = $mysqli->query($countQuery)->fetch_assoc()['count'];
         color: #1e293b;
     }
 
-    @keyframes slideOut {
-        0% {
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        100% {
-            opacity: 0;
-            transform: translateX(100%);
-        }
+    .modal-info-row {
+        display: flex;
+        margin-bottom: 0.75rem;
+        border-bottom: 1px solid #e5e7eb;
+        padding-bottom: 0.75rem;
     }
 
-    @keyframes statusChangeHighlight {
-        0% {
-            background-color: transparent;
-        }
-
-        50% {
-            background-color: rgba(255, 255, 0, 0.2);
-        }
-
-        100% {
-            background-color: transparent;
-        }
+    .modal-info-label {
+        font-weight: 600;
+        width: 170px;
+        color: var(--text-primary);
     }
 
-    /* Disable delete button when input is empty */
-    #almDeleteConfirmBtn:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
+    .modal-info-value {
+        flex: 1;
+        color: var(--text-secondary);
     }
 </style>
 
@@ -543,7 +558,7 @@ $totalCount = $mysqli->query($countQuery)->fetch_assoc()['count'];
 
     <div class="alm-bookings-container">
         <div class="alm-header-content">
-            <h2><i class="fas fa-credit-card"></i> Paid Alumni ID Applications <span class="alm-booking-count"><?php echo $totalCount; ?></span></h2>
+            <h2><i class="fas fa-ban"></i> Cancelled Alumni ID Applications <span class="alm-booking-count"><?php echo $totalCount; ?></span></h2>
         </div>
         <div class="alm-table-responsive">
             <table class="alm-bookings-table">
@@ -554,15 +569,14 @@ $totalCount = $mysqli->query($countQuery)->fetch_assoc()['count'];
                         <th class="alm-hide-mobile"><i class="fas fa-calendar"></i> Year Graduated</th>
                         <th class="alm-hide-mobile"><i class="fas fa-school"></i> High School</th>
                         <th class="alm-hide-mobile"><i class="fas fa-tag"></i> Type</th>
-                        <th><i class="fas fa-dollar-sign"></i> Amount</th>
-                        <th><i class="fas fa-info-circle"></i> Status</th>
-                        <th class="alm-hide-mobile"><i class="fas fa-cog"></i> Action</th>
+                        <th><i class="fas fa-calendar-times"></i> Cancelled Date</th>
+                        <th><i class="fas fa-cog"></i> Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if ($applicationsResult && $applicationsResult->num_rows > 0): ?>
                         <?php while ($application = $applicationsResult->fetch_assoc()): ?>
-                            <tr data-user-id="<?php echo htmlspecialchars($application['id']); ?>">
+                            <tr data-application-id="<?php echo htmlspecialchars($application['id']); ?>">
                                 <td>
                                     <?php
                                     $fullName = implode(' ', array_filter([
@@ -573,22 +587,17 @@ $totalCount = $mysqli->query($countQuery)->fetch_assoc()['count'];
                                     echo htmlspecialchars($fullName);
                                     ?>
                                     <br>
-                                    <small><i class="fas fa-envelope"></i> <?php echo htmlspecialchars($application['user_email']); ?></small>
+                                    <small><i class="fas fa-envelope"></i> <?php echo htmlspecialchars($application['user_email'] ?? $application['email']); ?></small>
                                 </td>
                                 <td><?php echo htmlspecialchars($application['course']); ?></td>
                                 <td class="alm-hide-mobile"><?php echo htmlspecialchars($application['year_graduated']); ?></td>
                                 <td class="alm-hide-mobile"><?php echo htmlspecialchars($application['highschool_graduated']); ?></td>
                                 <td class="alm-hide-mobile"><?php echo htmlspecialchars($application['membership_type']); ?></td>
-                                <td>₱<?php echo number_format($application['price'], 2); ?></td>
+                                <td><?php echo date('M d, Y', strtotime($application['cancelled_at'])); ?></td>
                                 <td>
-                                    <select class="alm-status-select" data-id="<?php echo $application['id']; ?>">
-                                        <option value="pending" <?php if ($application['status'] == 'pending') echo 'selected'; ?>>Pending</option>
-                                        <option value="paid" <?php if ($application['status'] == 'paid') echo 'selected'; ?>>Paid</option>
-                                        <option value="confirmed" <?php if ($application['status'] == 'confirmed') echo 'selected'; ?>>Confirmed</option>
-                                        <option value="declined" <?php if ($application['status'] == 'declined') echo 'selected'; ?>>Declined</option>
-                                    </select>
-                                </td>
-                                <td class="alm-hide-mobile">
+                                    <button class="alm-view-btn" onclick="viewApplication('<?php echo $application['id']; ?>', '<?php echo addslashes(htmlspecialchars($fullName)); ?>', '<?php echo addslashes(htmlspecialchars($application['cancellation_reason'])); ?>')">
+                                        <i class="fas fa-eye"></i> View
+                                    </button>
                                     <button class="alm-delete-btn" onclick="deleteApplication('<?php echo $application['id']; ?>', event)">
                                         <i class="fas fa-trash-alt"></i> Delete
                                     </button>
@@ -597,9 +606,9 @@ $totalCount = $mysqli->query($countQuery)->fetch_assoc()['count'];
                         <?php endwhile; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="8" class="alm-text-center">
-                                <i class="fas fa-inbox fa-2x"></i><br>
-                                No paid ID card applications found
+                            <td colspan="7" style="text-align: center; padding: 2rem;">
+                                <i class="fas fa-inbox fa-2x" style="color: #64748b;"></i><br>
+                                <p style="margin-top: 1rem; color: #64748b;">No cancelled ID card applications found</p>
                             </td>
                         </tr>
                     <?php endif; ?>
@@ -608,21 +617,18 @@ $totalCount = $mysqli->query($countQuery)->fetch_assoc()['count'];
         </div>
     </div>
 
-
-
-    <!-- Updated Delete Confirmation Modal -->
-    <div class="AL-modal-overlay" id="almDeleteConfirmModal" role="dialog" aria-modal="true" aria-labelledby="AL-delete-modal-title" aria-describedby="AL-delete-modal-desc">
+    <!-- Delete Confirmation Modal -->
+    <div class="AL-modal-overlay" id="almDeleteConfirmModal">
         <div class="AL-modal">
             <div class="AL-modal-header">
                 <div class="AL-modal-icon danger">
                     <i class="fas fa-exclamation-triangle"></i>
                 </div>
-                <h3 class="AL-modal-title" id="AL-delete-modal-title">Delete Alumni</h3>
-                <button class="AL-modal-close">&times;</button>
+                <h3 class="AL-modal-title">Delete Cancelled Application</h3>
             </div>
-            <div class="AL-modal-content" id="AL-delete-modal-desc">
+            <div class="AL-modal-content">
                 <p style="color: red; font-weight: bold;">
-                    Are you absolutely sure you want to delete this alumni record?
+                    Are you absolutely sure you want to delete this cancelled application record?
                     This action CANNOT be undone.
                 </p>
                 <p style="margin-top: 10px;">
@@ -632,18 +638,39 @@ $totalCount = $mysqli->query($countQuery)->fetch_assoc()['count'];
                     style="width: 100%; margin-top: 10px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
             </div>
             <div class="AL-modal-actions">
-                <button id="almDeleteCancelBtn" class="AL-modal-btn AL-modal-btn-secondary" data-action="cancel">Cancel</button>
-                <button id="almDeleteConfirmBtn" class="AL-modal-btn AL-modal-btn-danger" data-action="confirm">Delete Permanently</button>
+                <button id="almDeleteCancelBtn" class="AL-modal-btn AL-modal-btn-secondary">Cancel</button>
+                <button id="almDeleteConfirmBtn" class="AL-modal-btn AL-modal-btn-danger" disabled>Delete Permanently</button>
             </div>
         </div>
     </div>
-    <!-- JavaScript for handling the delete confirmation -->
+
+    <!-- View Application Modal -->
+    <div class="AL-modal-overlay" id="viewApplicationModal">
+        <div class="AL-modal">
+            <div class="AL-modal-header">
+                <div class="AL-modal-icon info">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <h3 class="AL-modal-title">Application Details</h3>
+            </div>
+            <div class="AL-modal-content" id="applicationDetails">
+                <!-- Application details will be inserted here by JavaScript -->
+            </div>
+            <div class="AL-modal-actions">
+                <button id="closeViewModalBtn" class="AL-modal-btn AL-modal-btn-secondary">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="notificationContainer"></div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const deleteModal = document.getElementById('almDeleteConfirmModal');
+            const viewModal = document.getElementById('viewApplicationModal');
             const confirmDeleteBtn = document.getElementById('almDeleteConfirmBtn');
             const cancelDeleteBtn = document.getElementById('almDeleteCancelBtn');
-            const modalCloseBtn = document.querySelector('.AL-modal-close');
+            const closeViewModalBtn = document.getElementById('closeViewModalBtn');
             const deleteConfirmInput = document.getElementById('deleteConfirmInput');
             let applicationIdToDelete = null;
 
@@ -673,6 +700,14 @@ $totalCount = $mysqli->query($countQuery)->fetch_assoc()['count'];
                 deleteModal.classList.remove('active');
             }
 
+            function showViewModal() {
+                viewModal.classList.add('active');
+            }
+
+            function hideViewModal() {
+                viewModal.classList.remove('active');
+            }
+
             // Enable or disable the delete button based on confirmation input
             if (deleteConfirmInput) {
                 deleteConfirmInput.addEventListener('input', function() {
@@ -685,6 +720,31 @@ $totalCount = $mysqli->query($countQuery)->fetch_assoc()['count'];
                 event.preventDefault();
                 applicationIdToDelete = applicationId;
                 showDeleteModal();
+            };
+
+            // View application details
+            window.viewApplication = function(applicationId, applicantName, cancellationReason) {
+                const detailsContainer = document.getElementById('applicationDetails');
+
+                // Fetch application details from server
+                showLoading('Loading application details...');
+
+                // Using the data we already have for demonstration
+                // In a real implementation, you might want to fetch more details via AJAX
+                setTimeout(() => {
+                    hideLoading();
+
+                    detailsContainer.innerHTML = `
+                        <h4 style="margin-bottom: 1rem;">${applicantName}</h4>
+                        
+                        <div class="reason-container">
+                            <div class="reason-label">Cancellation Reason:</div>
+                            <div class="reason-text">${cancellationReason || 'No reason provided'}</div>
+                        </div>
+                    `;
+
+                    showViewModal();
+                }, 500);
             };
 
             // Update the confirm delete button to check for "DELETE" text
@@ -703,7 +763,7 @@ $totalCount = $mysqli->query($countQuery)->fetch_assoc()['count'];
                 showLoading('Deleting application...');
 
                 // AJAX request to delete record
-                fetch('/Alumni-CvSU/admin/delete-id-application.php', {
+                fetch('/Alumni-CvSU/admin/delete-cancelled-application.php', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded'
@@ -721,7 +781,7 @@ $totalCount = $mysqli->query($countQuery)->fetch_assoc()['count'];
                         hideDeleteModal();
 
                         if (data.success) {
-                            const rowToDelete = document.querySelector(`tr[data-user-id="${applicationIdToDelete}"]`);
+                            const rowToDelete = document.querySelector(`tr[data-application-id="${applicationIdToDelete}"]`);
                             if (rowToDelete) {
                                 rowToDelete.style.animation = 'slideOut 0.3s ease-out forwards';
                                 setTimeout(() => {
@@ -748,25 +808,26 @@ $totalCount = $mysqli->query($countQuery)->fetch_assoc()['count'];
                 applicationIdToDelete = null;
             });
 
-            if (modalCloseBtn) {
-                modalCloseBtn.addEventListener('click', function() {
-                    hideDeleteModal();
-                    applicationIdToDelete = null;
-                });
-            }
+            closeViewModalBtn.addEventListener('click', function() {
+                hideViewModal();
+            });
 
-            // Close modal on outside click
+            // Close modals on outside click
             window.addEventListener('click', function(event) {
                 if (event.target == deleteModal) {
                     hideDeleteModal();
                     applicationIdToDelete = null;
                 }
+                if (event.target == viewModal) {
+                    hideViewModal();
+                }
             });
 
-            // Close modal on pressing escape key
+            // Close modals on pressing escape key
             document.addEventListener('keydown', function(event) {
                 if (event.key === 'Escape') {
                     hideDeleteModal();
+                    hideViewModal();
                     applicationIdToDelete = null;
                 }
             });
@@ -778,10 +839,6 @@ $totalCount = $mysqli->query($countQuery)->fetch_assoc()['count'];
                     // Create notification container if it doesn't exist
                     const newContainer = document.createElement('div');
                     newContainer.id = 'notificationContainer';
-                    newContainer.style.position = 'fixed';
-                    newContainer.style.top = '20px';
-                    newContainer.style.right = '20px';
-                    newContainer.style.zIndex = '9999';
                     document.body.appendChild(newContainer);
                 }
 
@@ -808,226 +865,6 @@ $totalCount = $mysqli->query($countQuery)->fetch_assoc()['count'];
                     }
                 }, 5000);
             };
-        });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const deleteModal = document.getElementById('almDeleteConfirmModal');
-            const confirmDeleteBtn = document.getElementById('almDeleteConfirmBtn');
-            const cancelDeleteBtn = document.getElementById('almDeleteCancelBtn');
-            const modalCloseBtn = document.querySelector('.AL-modal-close');
-            const deleteConfirmInput = document.getElementById('deleteConfirmInput');
-            let applicationIdToDelete = null;
-
-            function showLoading(message = 'Processing your request...') {
-                const overlay = document.getElementById('loadingOverlay');
-                const loadingText = overlay.querySelector('.loading-text');
-                if (loadingText) {
-                    loadingText.textContent = message;
-                }
-                overlay.style.display = 'flex';
-            }
-
-            function hideLoading() {
-                const overlay = document.getElementById('loadingOverlay');
-                overlay.style.display = 'none';
-            }
-
-
-
-            function showALModal(options) {
-                return new Promise((resolve) => {
-                    const modal = document.getElementById('AL-modal-overlay');
-                    const confirmBtn = modal.querySelector('[data-action="confirm"]');
-                    const cancelBtn = modal.querySelector('[data-action="cancel"]');
-
-                    // Update modal title and content if provided
-                    if (options.title) {
-                        modal.querySelector('.AL-modal-title').textContent = options.title;
-                    }
-                    if (options.message) {
-                        modal.querySelector('.AL-modal-content').textContent = options.message;
-                    }
-
-                    modal.classList.add('active');
-
-                    const cleanup = () => {
-                        modal.classList.remove('active');
-                        confirmBtn.onclick = null;
-                        cancelBtn.onclick = null;
-                        modal.onclick = null;
-                    };
-
-                    confirmBtn.onclick = () => {
-                        cleanup();
-                        resolve(true);
-                    };
-
-                    cancelBtn.onclick = () => {
-                        cleanup();
-                        resolve(false);
-                    };
-
-                    modal.onclick = (e) => {
-                        if (e.target === modal) {
-                            cleanup();
-                            resolve(false);
-                        }
-                    };
-                });
-            }
-
-            cancelDeleteBtn.addEventListener('click', function() {
-                hideDeleteModal();
-                applicationIdToDelete = null;
-            });
-
-            if (modalCloseBtn) {
-                modalCloseBtn.addEventListener('click', function() {
-                    hideDeleteModal();
-                    applicationIdToDelete = null;
-                });
-            }
-
-
-            // Close modal on pressing escape key
-            document.addEventListener('keydown', function(event) {
-                if (event.key === 'Escape') {
-                    hideDeleteModal();
-                    applicationIdToDelete = null;
-                }
-            });
-
-            // Handle status select changes with improved animation
-            const statusSelects = document.querySelectorAll('.alm-status-select');
-            statusSelects.forEach(select => {
-                select.addEventListener('change', function() {
-                    const id = this.dataset.id;
-                    const status = this.value;
-                    const previousValue = this.getAttribute('data-previous-value') || 'pending';
-
-                    if (!id) {
-                        showNotification('Application ID not found', 'error');
-                        return;
-                    }
-
-                    // Get the parent row for animation
-                    const parentRow = this.closest('tr');
-                    if (parentRow) {
-                        parentRow.style.animation = 'statusChangeHighlight 1s ease';
-                    }
-
-                    showLoading(`Updating status to ${status}...`);
-
-                    // AJAX request to update status
-                    fetch('/Alumni-CvSU/admin/alumni/update_status.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded'
-                            },
-                            body: 'id=' + encodeURIComponent(id) + '&status=' + encodeURIComponent(status)
-                        })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Network response was not ok');
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            hideLoading();
-
-                            if (data.success) {
-                                const user = document.querySelector(`tr[data-user-id="${id}"]`);
-
-                                if (user) {
-                                    user.style.animation = 'slideOut 0.3s ease-out forwards';
-                                    setTimeout(() => {
-                                        user.remove();
-                                    }, 300);
-                                }
-
-                                showNotification(`Status successfully updated to ${status}`, 'success');
-                            } else {
-                                showNotification('Failed to update status: ' + (data.message || 'Unknown error'), 'error');
-                                // Reset the select to its previous value
-                                this.value = previousValue;
-                            }
-                        })
-                        .catch(error => {
-                            hideLoading();
-                            showNotification('An error occurred: ' + error.message, 'error');
-                            // Reset the select to its previous value
-                            this.value = previousValue;
-                        });
-
-                    // Store the current value as previous value for potential rollback
-                    this.setAttribute('data-previous-value', status);
-                });
-
-                // Store initial value
-                select.setAttribute('data-previous-value', select.value);
-            });
-
-            // Initialize archiveAlumni function from the original code
-            window.archiveAlumni = async function(id) {
-                const confirmed = await showALModal({
-                    type: 'warning',
-                    title: 'Archive Alumni',
-                    message: 'Are you sure you want to archive this alumni record? The record will be removed from the active list.'
-                });
-
-                if (confirmed) {
-                    // Send AJAX request to archive the alumni record
-                    const formData = new FormData();
-                    formData.append('alumni_id', id);
-
-                    fetch('/Alumni-CvSU/admin/alumni/archive-alumni.php', {
-                            method: 'POST',
-                            body: formData
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                // Remove the row from the table on success
-                                const row = document.querySelector(`button[onclick="archiveAlumni('${id}')"]`).closest('tr');
-                                if (row) {
-                                    row.style.animation = 'slideOut 0.3s ease-out forwards';
-                                    setTimeout(() => {
-                                        row.remove();
-                                    }, 300);
-                                }
-
-                                // Show a success notification
-                                showNotification('Alumni record archived successfully', 'success');
-                            } else {
-                                showNotification('Error: ' + data.message, 'error');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            showNotification('An error occurred while archiving the record', 'error');
-                        });
-                }
-            };
-
-            // Initialize search functionality if needed
-            function initializeSearch() {
-                const searchInput = document.getElementById('alumni-search');
-                if (!searchInput) return;
-
-                searchInput.addEventListener('input', function(e) {
-                    const searchTerm = e.target.value.toLowerCase();
-                    const rows = document.querySelectorAll('.AL-table tbody tr');
-
-                    rows.forEach(row => {
-                        const text = row.textContent.toLowerCase();
-                        row.style.display = text.includes(searchTerm) ? '' : 'none';
-                    });
-                });
-            }
-
-            // Initialize search
-            initializeSearch();
         });
     </script>
 </body>

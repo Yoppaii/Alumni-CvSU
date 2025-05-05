@@ -161,8 +161,10 @@ $jobs = $mysqli->query("SELECT * FROM jobs ORDER BY posted_date DESC LIMIT 10");
         }
 
         .CR-btn:hover {
-            background-color: #004d00;
+            background-color: var(--primary-hover);
         }
+
+
 
 
         .form-btn-cancel {
@@ -177,11 +179,6 @@ $jobs = $mysqli->query("SELECT * FROM jobs ORDER BY posted_date DESC LIMIT 10");
             transition: background 0.15s, color 0.15s, border-color 0.15s;
         }
 
-        .form-btn-cancel:hover {
-            background: #d1fae5;
-            color: #065f46;
-            border-color: #10b981;
-        }
 
 
 
@@ -406,9 +403,7 @@ $jobs = $mysqli->query("SELECT * FROM jobs ORDER BY posted_date DESC LIMIT 10");
                     <input class="CR-input" type="text" id="location" name="location" value="<?= $edit_job ? htmlspecialchars($edit_job['location']) : '' ?>" placeholder="Location">
                 </div>
                 <button type="submit" class="CR-btn"><?= $edit_job ? "Update Job" : "Post Job" ?></button>
-                <?php if ($edit_job): ?>
-                    <button type="button" class="form-btn-cancel" onclick="window.location.href='?section=CvSU-Careers'">Cancel</button>
-                <?php endif; ?>
+                <button type="button" class="form-btn-cancel" onclick="window.location.href='?section=CvSU-Careers'">Cancel</button>
 
             </form>
         </section>

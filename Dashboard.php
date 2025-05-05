@@ -6,7 +6,7 @@ if (!isset($_SESSION['admin_id'])) {
     header("Location: admin/portal/login-admin");
     exit();
 }
- 
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -879,21 +879,22 @@ if (!isset($_SESSION['admin_id'])) {
                     </a>
                     <div class="dropdown">
                         <a href="?section=view-alumni-id-cards" class="nav-item <?php echo (isset($_GET['section']) && $_GET['section'] == 'user-live-chat') ? 'active' : ''; ?>">
-                            <i class="fas fa-id-badge"></i>Pending Alumni ID Cards Applications
+                            <i class="fas fa-id-badge"></i> Pending Alumni ID Cards Applications
                         </a>
                         <a href="?section=paid-alumni-id" class="dropdown-item">
-                            <i class="fas fa-plus-circle"></i>Paid Alumni ID
+                            <i class="fas fa-credit-card"></i> Paid Alumni ID
                         </a>
                         <a href="?section=cancelled-alumni-id" class="dropdown-item">
-                            <i class="fas fa-plus-circle"></i>Cancelled Alumni ID
+                            <i class="fas fa-times-circle"></i> Cancelled Alumni ID
                         </a>
                         <a href="?section=alumni-id" class="dropdown-item">
-                            <i class="fas fa-plus-circle"></i>Add Alumni ID
+                            <i class="fas fa-id-card-alt"></i> Add Alumni ID
                         </a>
                         <a href="?section=manage-alumni-id-cards" class="dropdown-item">
-                            <i class="fas fa-cogs"></i>Alumni ID Management
+                            <i class="fas fa-tools"></i> Alumni ID Management
                         </a>
                     </div>
+
                 </div>
 
                 <div class="nav-section">
@@ -903,28 +904,29 @@ if (!isset($_SESSION['admin_id'])) {
                         <i class="fas fa-users-cog"></i>All Users
                     </a>
                     <a href="#" class="nav-item has-dropdown">
-                        <i class="fas fa-globe"></i>Website Contents
+                        <i class="fas fa-globe"></i> Website Contents
                     </a>
                     <div class="dropdown">
                         <a href="?section=Latest-Announcements" class="dropdown-item">
-                            <i class="fas fa-bullhorn"></i>Announcement
+                            <i class="fas fa-bullhorn"></i> Announcement
                         </a>
                         <a href="?section=Latest-News-and-Features" class="dropdown-item">
-                            <i class="fas fa-newspaper"></i>News / Features
+                            <i class="fas fa-newspaper"></i> News / Features
                         </a>
                         <a href="?section=CvSU-Events" class="dropdown-item">
-                            <i class="fas fa-calendar-day"></i>Events
+                            <i class="fas fa-calendar-alt"></i> Events
                         </a>
                         <a href="?section=CvSU-Careers" class="dropdown-item">
-                            <i class="fas fa-calendar-day"></i>Careers
+                            <i class="fas fa-briefcase"></i> Careers
                         </a>
                         <a href="?section=CvSU-Campuses" class="dropdown-item">
-                            <i class="fas fa-calendar-day"></i>Campus
+                            <i class="fas fa-university"></i> Campus
                         </a>
                         <a href="?section=Latest-Abouts" class="dropdown-item">
-                            <i class="fas fa-calendar-day"></i>About
+                            <i class="fas fa-info-circle"></i> About
                         </a>
                     </div>
+
                     <a href="#" class="nav-item has-dropdown">
                         <i class="fas fa-calendar-alt"></i>Room Settings
                     </a>

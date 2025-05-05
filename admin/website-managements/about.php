@@ -319,27 +319,27 @@ $stmt->close();
             resize: vertical;
         }
 
+
         .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.6rem 1.2rem;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
             border-radius: var(--radius-md);
-            font-size: 0.95rem;
-            font-weight: 500;
             cursor: pointer;
+            font-weight: 500;
             transition: var(--transition);
             text-decoration: none;
-            border: none;
         }
 
         .btn-primary {
-            background-color: var(--success-color);
-            color: var(--white);
+            background-color: var(--primary-light);
+            color: var(--primary-color);
         }
 
         .btn-primary:hover {
-            background-color: var(--success-hover);
+            background-color: var(--primary-color);
+            color: white;
         }
 
         .btn-secondary {
@@ -352,12 +352,13 @@ $stmt->close();
         }
 
         .btn-danger {
-            background-color: var(--danger-color);
-            color: var(--white);
+            background-color: #fee2e2;
+            color: var(--danger-color);
         }
 
         .btn-danger:hover {
-            background-color: var(--danger-hover);
+            background-color: var(--danger-color);
+            color: white;
         }
 
         .btn-sm {
@@ -614,15 +615,11 @@ $stmt->close();
 
                                             <div class="card-footer">
                                                 <button type="submit" class="btn btn-primary">
-                                                    <i class="fas fa-save btn-icon"></i>
                                                     <?= $editRecord ? 'Update Record' : 'Save Record' ?>
                                                 </button>
-                                                <?php if ($editRecord): ?>
-                                                    <a href="?section=Latest-Abouts&tab=institutional" class="btn btn-secondary">
-                                                        <i class="fas fa-times btn-icon"></i>
-                                                        Cancel
-                                                    </a>
-                                                <?php endif; ?>
+                                                <a href="?section=Latest-Abouts&tab=institutional" class="btn btn-secondary">
+                                                    Cancel
+                                                </a>
                                             </div>
                                         </form>
                                     </div>
@@ -659,12 +656,12 @@ $stmt->close();
                                                                 <td>
                                                                     <div class="table-actions">
                                                                         <a href="?section=Latest-Abouts&tab=institutional&edit=<?= $record['id'] ?>" class="btn btn-primary btn-sm">
-                                                                            <i class="fas fa-edit"></i> Edit
+                                                                            <i class="fas fa-edit"></i>
                                                                         </a>
                                                                         <form method="post" action="" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this record?');">
                                                                             <input type="hidden" name="delete_id" value="<?= $record['id'] ?>" />
                                                                             <button type="submit" class="btn btn-danger btn-sm">
-                                                                                <i class="fas fa-trash"></i> Delete
+                                                                                <i class="fas fa-trash"></i>
                                                                             </button>
                                                                         </form>
                                                                     </div>
@@ -721,16 +718,11 @@ $stmt->close();
 
                                             <div class="card-footer">
                                                 <button type="submit" class="btn btn-primary">
-                                                    <i class="fas fa-save btn-icon"></i>
                                                     <?= $editCore ? 'Update Core Value' : 'Save Core Value' ?>
                                                 </button>
-                                                <?php if ($editCore): ?>
-                                                    <a href="?section=Latest-Abouts&tab=core_values" class="btn btn-secondary">
-                                                        <i class="fas fa-times btn-icon">
-                                                        </i>
-                                                        Cancel
-                                                    </a>
-                                                <?php endif; ?>
+                                                <a href="?section=Latest-Abouts&tab=core_values" class="btn btn-secondary">
+                                                    Cancel
+                                                </a>
                                             </div>
                                         </form>
                                     </div>
@@ -765,12 +757,12 @@ $stmt->close();
                                                                 <td>
                                                                     <div class="table-actions">
                                                                         <a href="?section=Latest-Abouts&tab=core_values&edit_core=<?= $value['id'] ?>" class="btn btn-primary btn-sm">
-                                                                            <i class="fas fa-edit"></i> Edit
+                                                                            <i class="fas fa-edit"></i>
                                                                         </a>
                                                                         <form method="post" action="" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this core value?');">
                                                                             <input type="hidden" name="delete_core_id" value="<?= $value['id'] ?>" />
                                                                             <button type="submit" class="btn btn-danger btn-sm">
-                                                                                <i class="fas fa-trash"></i> Delete
+                                                                                <i class="fas fa-trash"></i>
                                                                             </button>
                                                                         </form>
                                                                     </div>
