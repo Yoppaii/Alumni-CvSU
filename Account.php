@@ -749,7 +749,7 @@ $_SESSION['has_booking'] = $hasBooking;
                 <?php if (!$hasSubmittedTracer && $verified == 1): ?>
                     <li class="nav-item"><a href="?section=Alumni-Tracer-Form" class="nav-link"><i class="fas fa-user"></i> Alumni Tracer Form</a></li>
                 <?php endif; ?>
-                <li class="nav-item"><a href="?section=Alumni-Tracer-Referal" class="nav-link"><i class="fas fa-user-friends"></i> Alumni Tracer Referal</a></li>
+                <li class="nav-item"><a href="?section=Alumni-Tracer-Referal" class="nav-link"><i class="fas fa-user-friends"></i> Alumni Tracer Referral</a></li>
 
 
                 <li class="nav-item settings-dropdown">

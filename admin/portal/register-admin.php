@@ -1,114 +1,157 @@
 <?php
-session_start();
-require('main_db.php');
+// Include database connection
+require_once '../../main_db.php';
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
-    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-    $role = $_POST['role'];
-    $created_at = date('Y-m-d H:i:s');
-    
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $error = "Invalid email format";
-    } else {
-        $check_query = "SELECT * FROM it_support WHERE email = '$email'";
-        $result = mysqli_query($con, $check_query);
-        
-        if (mysqli_num_rows($result) > 0) {
-            $error = "Email already exists";
+// Initialize variables
+$message = "";
+$success = false;
+
+// Process form submission
+if (isset($_POST['register'])) {
+    try {
+        // Get current date and time
+        $currentDateTime = date('Y-m-d H:i:s');
+
+        // Hash the password - using fixed 'admin' password
+        $password_hash = password_hash('admin', PASSWORD_DEFAULT);
+
+        // Prepare SQL statement
+        $stmt = $mysqli->prepare("INSERT INTO `admin_users`
+                              (`admin_id`, `username`, `first_name`, `last_name`, `email`, 
+                               `password_hash`, `role`, `is_active`, `last_login`, 
+                               `created_at`, `updated_at`) 
+                              VALUES 
+                              (NULL, ?, ?, ?, ?, 
+                               ?, ?, ?, NULL, 
+                               ?, ?)");
+
+        // Set is_active to 1 (true)
+        $is_active = 1;
+
+        // Bind parameters
+        $stmt->bind_param(
+            "sssssssss",
+            $_POST['username'],
+            $_POST['first_name'],
+            $_POST['last_name'],
+            $_POST['email'],
+            $password_hash,
+            $_POST['role'],
+            $is_active,
+            $currentDateTime,
+            $currentDateTime
+        );
+
+        // Execute the statement
+        $stmt->execute();
+
+        // Check if the insertion was successful
+        if ($stmt->affected_rows > 0) {
+            $message = "Admin user created successfully!";
+            $success = true;
         } else {
-            $insert_query = "INSERT INTO it_support (email, password, role, created_at) 
-                           VALUES ('$email', '$password', '$role', '$created_at')";
-            
-            if (mysqli_query($con, $insert_query)) {
-                $_SESSION['success'] = "Registration successful! Please login.";
-                header("Location: login.php");
-                exit();
-            } else {
-                $error = "Registration failed: " . mysqli_error($con);
-            }
+            $message = "Error: Admin user could not be created.";
         }
+
+        // Close statement
+        $stmt->close();
+    } catch (Exception $e) {
+        $message = "Error: " . $e->getMessage();
     }
 }
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-</head>
-<body class="bg-gray-50">
-    <div class="min-h-screen flex items-center justify-center">
-        <div class="bg-white p-8 rounded-lg shadow-md w-96">
-            <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Register</h2>
-            
-            <?php if (isset($error)): ?>
-                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-                    <span class="block sm:inline"><?php echo $error; ?></span>
-                </div>
-            <?php endif; ?>
-            
-            <form method="POST" action="" onsubmit="return validateForm()">
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
-                    <input type="email" name="email" required
-                        class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
-                </div>
-                
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
-                    <input type="password" name="password" id="password" required
-                        class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
-                </div>
-                
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Confirm Password</label>
-                    <input type="password" name="confirm_password" id="confirm_password" required
-                        class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
-                </div>
-                
-                <div class="mb-6">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Role</label>
-                    <select name="role" required
-                        class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
-                        <option value="">Select Role</option>
-                        <option value="it_support">IT Support</option>
-                        <option value="admin">Admin</option>
-                    </select>
-                </div>
-                
-                <button type="submit"
-                    class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-200">
-                    Register
-                </button>
-
-                <div class="mt-4 text-center">
-                    <a href="login.php" class="text-blue-500 hover:text-blue-600">Already have an account? Login</a>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <script>
-        function validateForm() {
-            var password = document.getElementById("password").value;
-            var confirm_password = document.getElementById("confirm_password").value;
-            
-            if (password != confirm_password) {
-                alert("Passwords do not match!");
-                return false;
-            }
-            
-            if (password.length < 8) {
-                alert("Password must be at least 8 characters long!");
-                return false;
-            }
-            
-            return true;
+    <title>Register Admin User</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
         }
-    </script>
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Register Admin User</h2>
+
+    <?php if (!empty($message)): ?>
+        <div class="<?php echo $success ? 'success' : 'error'; ?>">
+            <?php echo $message; ?>
+        </div>
+    <?php endif; ?>
+
+    <form method="post" action="">
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" value="admin" required>
+        </div>
+
+        <div class="form-group">
+            <label for="first_name">First Name:</label>
+            <input type="text" id="first_name" name="first_name" required>
+        </div>
+
+        <div class="form-group">
+            <label for="last_name">Last Name:</label>
+            <input type="text" id="last_name" name="last_name" required>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" value="bahayngalumni.reservations@gmail.com" required>
+        </div>
+
+        <div class="form-group">
+            <label for="role">Role:</label>
+            <select id="role" name="role" required>
+                <option value="admin">Admin</option>
+                <option value="super_admin">Super Admin</option>
+            </select>
+        </div>
+
+        <button type="submit" name="register">Register Admin</button>
+    </form>
 </body>
+
 </html>

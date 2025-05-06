@@ -1,10 +1,12 @@
 <?php
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-function sendBookingStatusEmail($email, $fullName, $bookingRef, $status, $roomNumber, $checkIn, $checkOut, $price, $price_per_day, $arrivalTime, $departureTime) {
+function sendBookingStatusEmail($email, $fullName, $bookingRef, $status, $roomNumber, $checkIn, $checkOut, $price, $price_per_day, $arrivalTime, $departureTime)
+{
     $mail = new PHPMailer(true);
 
     $checkInDate = date('F d, Y', strtotime($checkIn));
@@ -15,13 +17,13 @@ function sendBookingStatusEmail($email, $fullName, $bookingRef, $status, $roomNu
         'cancelled' => '#dc2626',
         'completed' => '#1d4ed8',
     ];
-    
+
     $statusMessages = [
         'confirmed' => 'Your booking has been confirmed! Please download the invoice PDF from your booking history and present it to the alumni office. We look forward to hosting you.',
         'cancelled' => 'Your booking has been cancelled. We hope to serve you another time.',
         'completed' => 'Your stay with us has been completed. Thank you for choosing our services!',
     ];
-    
+
     $statusColor = $statusColors[$status] ?? '#1a73e8';
     $statusMessage = $statusMessages[$status] ?? 'Your booking status has been updated.';
 
@@ -85,12 +87,12 @@ function sendBookingStatusEmail($email, $fullName, $bookingRef, $status, $roomNu
         $mail->isSMTP();
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
-        $mail->Username = 'roomreservation.csumc@gmail.com';
-        $mail->Password = 'bpqazltzfyacofjd';
+        $mail->Username = 'bahayngalumni.reservations@gmail.com';
+        $mail->Password = 'fbcf mkmy awck koqi';
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
 
-        $mail->setFrom('roomreservation.csumc@gmail.com', 'CvSU Room Reservation');
+        $mail->setFrom('bahayngalumni.reservations@gmail.com', 'Bahay Ng Alumni');
         $mail->addAddress($email);
 
         $mail->isHTML(true);
@@ -104,4 +106,3 @@ function sendBookingStatusEmail($email, $fullName, $bookingRef, $status, $roomNu
         return false;
     }
 }
-?>

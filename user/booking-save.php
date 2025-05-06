@@ -2,6 +2,8 @@
 define('BASE_PATH', dirname(__DIR__));
 require_once BASE_PATH . '/main_db.php';
 require_once 'email-notif.php';
+require_once 'new-booking-notification.php';
+
 
 header('Content-Type: application/json');
 session_start();
@@ -84,6 +86,9 @@ try {
         throw new Exception($bookingStmt->error);
     }
 
+    // Get the new booking ID
+    $newBookingId = $mysqli->insert_id;
+
     // Send confirmation email
     $emailSent = sendBookingStatusEmail(
         $userData['email'],
@@ -101,6 +106,7 @@ try {
         $data['departure_time']
     );
 
+    $adminNotificationSent = triggerNewBookingNotification($newBookingId);
 
     // Clean up
     $userStmt->close();
@@ -110,7 +116,9 @@ try {
     echo json_encode([
         'success' => true,
         'reference_number' => $data['reference_number'],
-        'email_sent' => $emailSent
+        'email_sent' => $emailSent,
+        'admin_notification_sent' => $adminNotificationSent
+
     ]);
 } catch (Exception $e) {
     if (isset($userStmt)) $userStmt->close();

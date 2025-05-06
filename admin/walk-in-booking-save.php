@@ -2,6 +2,7 @@
 define('BASE_PATH', dirname(__DIR__));
 require_once BASE_PATH . '/main_db.php';
 require_once 'walk-in-email-notif.php';
+require_once 'new-booking-notification.php'; // Include the new notification file
 
 header('Content-Type: application/json');
 
@@ -13,7 +14,7 @@ try {
 
     $isWalkin = 'yes';
 
-    $userId = 73; // Hardcoded user ID for keithjoshuabungalso123@gmail.com
+    $userId = 118; // Hardcoded user ID for admin gmail
 
     $userStmt = $mysqli->prepare("
         SELECT u.email, 
@@ -84,7 +85,10 @@ try {
         throw new Exception($bookingStmt->error);
     }
 
-    // Send confirmation email
+    // Get the new booking ID
+    $newBookingId = $mysqli->insert_id;
+
+    // Send confirmation email to user
     $emailSent = sendBookingStatusEmail(
         $userData['email'],
         $userData['full_name'],
@@ -101,6 +105,9 @@ try {
         $data['departure_time']
     );
 
+    // Send notification email to admin about the new booking
+    $adminNotificationSent = triggerNewBookingNotification($newBookingId);
+
     // Clean up
     $userStmt->close();
     $bookingStmt->close();
@@ -109,7 +116,8 @@ try {
     echo json_encode([
         'success' => true,
         'reference_number' => $data['reference_number'],
-        'email_sent' => $emailSent
+        'email_sent' => $emailSent,
+        'admin_notification_sent' => $adminNotificationSent
     ]);
 } catch (Exception $e) {
     if (isset($userStmt)) $userStmt->close();

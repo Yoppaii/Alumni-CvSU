@@ -91,12 +91,12 @@ function sendBookingStatusEmail(
         $mail->isSMTP();
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
-        $mail->Username = 'roomreservation.csumc@gmail.com';
-        $mail->Password = 'bpqazltzfyacofjd';
+        $mail->Username = 'bahayngalumni.reservations@gmail.com';
+        $mail->Password = 'fbcf mkmy awck koqi';
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
 
-        $mail->setFrom('roomreservation.csumc@gmail.com', 'CvSU Room Reservation');
+        $mail->setFrom('bahayngalumni.reservations@gmail.com', 'Bahay Ng Alumni');
         $mail->addAddress($email);
 
         $mail->isHTML(true);
