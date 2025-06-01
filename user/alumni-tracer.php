@@ -43,7 +43,8 @@ ob_end_flush();
         --primary-color: #2d6936;
 
         --primary-dark: #004d00;
-
+        --success-color: #2d6936;
+        --danger-color: #dc2626;
         --secondary-color: #1e40af;
         --background-color: #f4f6f8;
         --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -384,15 +385,15 @@ ob_end_flush();
     }
 
     .notification.success {
-        background: #2d6936;
-        color: white;
-        border-left: 4px solid #1a4721;
+        background: white;
+        color: black;
+        border-left-color: var(--success-color);
     }
 
     .notification.error {
-        background: #dc2626;
-        color: white;
-        border-left: 4px solid #991b1b;
+        background: white;
+        color: black;
+        border-left-color: var(--danger-color);
     }
 
     .notification-close {

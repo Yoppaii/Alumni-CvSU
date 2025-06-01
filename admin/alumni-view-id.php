@@ -7,7 +7,6 @@ $current_tab = isset($_GET['tab']) ? $_GET['tab'] : 'all';
 $tabs = [
     'pending' => 'Pending',
     'confirmed' => 'Confirmed',
-    'declined' => 'Declined'
 ];
 
 $baseQuery = "SELECT a.*, u.email as user_email 

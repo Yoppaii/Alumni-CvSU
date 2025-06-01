@@ -65,11 +65,11 @@ function sendTracerSubmissionEmail($email, $fullName)
         $mail->isSMTP();
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
-        $mail->Username = 'roomreservation.csumc@gmail.com'; // Use your email account
-        $mail->Password = 'bpqazltzfyacofjd'; // Use your email password or app password
+        $mail->Username = 'bahayngalumni.reservations@gmail.com'; // Use your email account
+        $mail->Password = 'fbcf mkmy awck koqi'; // Use your email password or app password
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
-        $mail->setFrom('roomreservation.csumc@gmail.com', 'Alumni Tracer System');
+        $mail->setFrom('bahayngalumni.reservations@gmail.com', 'Bahay Ng Alumni');
         $mail->addAddress($email);
         $mail->isHTML(true);
         $mail->Subject = 'Invitation to Join Alumni Tracer System';
