@@ -309,7 +309,7 @@
 
     .button-group {
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-end;
         align-items: center;
         gap: 16px;
         margin-top: 40px;
@@ -623,10 +623,7 @@
                 </div>
 
                 <div class="button-group">
-                    <button type="button" class="btn prev-btn">
-                        <i class="fas fa-arrow-left"></i>
-                        Previous
-                    </button>
+
                     <button type="submit" class="btn submit-btn">
                         <i class="fas fa-paper-plane"></i>
                         Submit Referrals
